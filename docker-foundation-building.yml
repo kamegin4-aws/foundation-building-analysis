@@ -1,0 +1,50 @@
+version: '3.8'
+services:
+  nextjs:
+    build:
+      context: ${PWD}/frontend/next-app
+      dockerfile: Dockerfile
+    image: nextjs
+    container_name: nextjs
+    #  depends_on:
+    #    postgres:
+    #      condition: service_healthy
+    restart: always
+    tty: true
+    #privileged: true
+    #environment:
+    #  - 
+    expose:
+      - 3000
+    ports:
+      - '3000:3000'
+    extra_hosts:
+      - "local_dev:10.0.2.15"
+    #volumes:
+    #  - 
+    #command: 
+  django-rest:
+    build:
+      context: ${PWD}/backend/django-rest
+      dockerfile: Dockerfile
+    image: django-rest
+    container_name: django-rest
+    #  depends_on:
+    #    postgres:
+    #      condition: service_healthy
+    restart: always
+    tty: true
+    #privileged: true
+    #environment:
+    #  - 
+    expose:
+      - 8080
+    ports:
+      - '8080:8080'
+    extra_hosts:
+      - "local_dev:10.0.2.15"
+    volumes:
+      - ${PWD}/backend/django-rest/tutorial/:/usr/src/app/tutorial
+    working_dir: /usr/src/app/tutorial
+    command: [python, manage.py, runserver, 0.0.0.0:8080]
+  

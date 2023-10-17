@@ -1,0 +1,43 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+#Front
+
+# dependencies
+frontend/next-app/node_modules
+frontend/next-app/.pnp
+frontend/next-app/.pnp.js
+
+# testing
+frontend/next-app/coverage
+
+# next.js
+frontend/next-app/.next/
+frontend/next-app/out/
+
+# production
+frontend/next-app/build
+
+# misc
+frontend/next-app/.DS_Store
+frontend/next-app/*.pem
+
+# debug
+frontend/next-app/npm-debug.log*
+frontend/next-app/yarn-debug.log*
+frontend/next-app/yarn-error.log*
+
+# local env files
+frontend/next-app/.env*.local
+frontend/next-app/.env*
+
+# vercel
+frontend/next-app/.vercel
+
+# typescript
+frontend/next-app/*.tsbuildinfo
+frontend/next-app/next-env.d.ts
+
+#Back
+
+backend/django-rest/envDjango
+backend/django-rest/tutorial
