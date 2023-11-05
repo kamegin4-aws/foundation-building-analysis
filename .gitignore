@@ -1,43 +1,75 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+docker.env
+
 ###### Frontend ######
 
 # dependencies
-frontend/next-app/node_modules
-frontend/next-app/.pnp
-frontend/next-app/.pnp.js
+node_modules
+.pnp
+.pnp.js
 
 # testing
-frontend/next-app/coverage
+coverage
 
 # next.js
-frontend/next-app/.next/
-frontend/next-app/out/
+.next/
+out/
 
 # production
-frontend/next-app/build
+build
 
 # misc
-frontend/next-app/.DS_Store
-frontend/next-app/*.pem
+.DS_Store
+*.pem
 
 # debug
-frontend/next-app/npm-debug.log*
-frontend/next-app/yarn-debug.log*
-frontend/next-app/yarn-error.log*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # local env files
-frontend/next-app/.env*.local
-frontend/next-app/.env*
+.env*.local
+.env*
 
 # vercel
-frontend/next-app/.vercel
+.vercel
 
 # typescript
-frontend/next-app/*.tsbuildinfo
-frontend/next-app/next-env.d.ts
+*.tsbuildinfo
+next-env.d.ts
 
 ###### Backend ######
 
 backend/django-rest/envDjango
-backend/django-rest/tutorial/db.sqlite3
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal

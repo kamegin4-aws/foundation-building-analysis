@@ -68,8 +68,6 @@ pip 22.0.2 from /usr/lib/python3/dist-packages/pip (python 3.10)
 * [Node](https://nodejs.org/en)
 * [Python](https://www.python.org/)
 
-# Usage
-
 ### NextJs
 
 1. パッケージのインストール
@@ -96,6 +94,8 @@ python manage.py migrate
 python manage.py createsuperuser --email admin@example.com --username admin
 ※その後パスワードを設定
 ```
+
+# Usage
 
 ### 起動
 

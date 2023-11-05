@@ -37,6 +37,7 @@ services:
     #privileged: true
     #environment:
     #  - 
+    env_file: ${PWD}/docker.env
     expose:
       - 8080
     ports:
@@ -44,7 +45,7 @@ services:
     extra_hosts:
       - "local_dev:10.0.2.15"
     volumes:
-      - ${PWD}/backend/django-rest/tutorial/db.split3:/usr/src/app/tutorial/db.split3
-    #working_dir: /usr/src/app/tutorial
-    #command: [python, manage.py, runserver, 0.0.0.0:8080]
+      - ${PWD}/backend/django-rest/tutorial:/usr/src/app/tutorial
+    working_dir: /usr/src/app/tutorial
+    command: [python, manage.py, runserver, 0.0.0.0:8080]
   
