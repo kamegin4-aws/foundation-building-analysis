@@ -1,6 +1,6 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-#Front
+###### Frontend ######
 
 # dependencies
 frontend/next-app/node_modules
@@ -37,7 +37,7 @@ frontend/next-app/.vercel
 frontend/next-app/*.tsbuildinfo
 frontend/next-app/next-env.d.ts
 
-#Back
+###### Backend ######
 
 backend/django-rest/envDjango
-backend/django-rest/tutorial
+backend/django-rest/tutorial/db.sqlite3
