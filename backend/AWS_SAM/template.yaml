@@ -1,0 +1,294 @@
+Resources:
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: false
+      AliasAttributes:
+        - email
+        - preferred_username
+      UserPoolName: !Sub ${AWS::StackName}-UserPool
+      AutoVerifiedAttributes:
+        - email
+  IdentityPool:
+    Type: AWS::Cognito::IdentityPool
+    Properties:
+      AllowUnauthenticatedIdentities: false
+  Login:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: Login
+      CodeUri: src/Login
+      Handler: handler.handler
+      Runtime: python3.10
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Environment:
+        Variables:
+          USERPOOL_USER_POOL_ID: '!Ref UserPool'
+          USERPOOL_USER_POOL_ARN: '!GetAtt UserPool.Arn'
+          USERPOOLCLIENT_USER_POOL_CLIENT_ID: !Ref UserPoolClient
+      Events:
+        CognitoPOSTcognitologin:
+          Type: Api
+          Properties:
+            Path: /cognito/login
+            Method: POST
+            RestApiId: !Ref Cognito
+  LoginLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${Login}
+  Logout:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: Logout
+      CodeUri: src/Logout
+      Handler: handler.handler
+      Runtime: python3.10
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Events:
+        CognitoPOSTcognitologout:
+          Type: Api
+          Properties:
+            Path: /cognito/logout
+            Method: POST
+            RestApiId: !Ref Cognito
+      Environment:
+        Variables:
+          USERPOOLCLIENT_USER_POOL_CLIENT_ID: !Ref UserPoolClient
+  LogoutLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${Logout}
+  Configuration:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: Configuration
+      CodeUri: src/Configuration
+      Handler: handler.handler
+      Runtime: python3.10
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Events:
+        CognitoPOSTcognitoconfiguration:
+          Type: Api
+          Properties:
+            Path: /cognito/configuration
+            Method: POST
+            RestApiId: !Ref Cognito
+      Environment:
+        Variables:
+          USERPOOLCLIENT_USER_POOL_CLIENT_ID: !Ref UserPoolClient
+  ConfigurationLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${Configuration}
+  Authorization:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: Authorization
+      CodeUri: src/Authorization
+      Handler: handler.handler
+      Runtime: python3.10
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Environment:
+        Variables:
+          ID_POOL_ID: !Ref IdentityPool
+      Role: arn:aws:iam::519502641206:role/cognito_userpool_role
+      Events:
+        CognitoPOSTcognitoauthorization:
+          Type: Api
+          Properties:
+            Path: /cognito/authorization
+            Method: POST
+            RestApiId: !Ref Cognito
+  AuthorizationLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${Authorization}
+  Cognito:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub
+        - ${ResourceName} From Stack ${AWS::StackName}
+        - ResourceName: Cognito
+      StageName: Prod
+      DefinitionBody:
+        openapi: '3.0'
+        info: {}
+        paths:
+          /cognito/login:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Login.Arn}/invocations
+              responses: {}
+          /cognito/logout:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Logout.Arn}/invocations
+              responses: {}
+          /cognito/session:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Session.Arn}/invocations
+              responses: {}
+          /cognito/configuration:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Configuration.Arn}/invocations
+              responses: {}
+          /cognito/authorization:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Authorization.Arn}/invocations
+              responses: {}
+          /cognito/signup:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SignUp.Arn}/invocations
+              responses: {}
+          /cognito/confirm-signup:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConfirmSignUp.Arn}/invocations
+              responses: {}
+      EndpointConfiguration: REGIONAL
+      TracingEnabled: true
+      Cors:
+        AllowOrigin: '''*'''
+        AllowHeaders: '''*'''
+        AllowMethods: '''*'''
+        MaxAge: 5
+  Session:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: Session
+      CodeUri: src/Session
+      Handler: handler.handler
+      Runtime: python3.10
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Events:
+        CognitoPOSTcognitosession:
+          Type: Api
+          Properties:
+            Path: /cognito/session
+            Method: POST
+            RestApiId: !Ref Cognito
+      Environment:
+        Variables:
+          USERPOOLCLIENT_USER_POOL_CLIENT_ID: !Ref UserPoolClient
+  SessionLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${Session}
+  SignUp:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: SignUp
+      CodeUri: src/SignUp
+      Handler: handler.handler
+      Runtime: python3.10
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Events:
+        CognitoPOSTcognitosignup:
+          Type: Api
+          Properties:
+            Path: /cognito/signup
+            Method: POST
+            RestApiId: !Ref Cognito
+      Environment:
+        Variables:
+          USERPOOLCLIENT_USER_POOL_CLIENT_ID: !Ref UserPoolClient
+          USER_POOL_ID: !Ref userPoolId
+          CLIENT_ID: !Ref clientId
+          CLIENT_SECRET: !Ref clientSecret
+  SignUpLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${SignUp}
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+      GenerateSecret: true
+  ConfirmSignUp:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: ConfirmSignUp
+      CodeUri: src/ConfirmSignUp
+      Handler: handler.handler
+      Runtime: python3.10
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Events:
+        CognitoPOSTcognitoconfirmsignup:
+          Type: Api
+          Properties:
+            Path: /cognito/confirm-signup
+            Method: POST
+            RestApiId: !Ref Cognito
+      Environment:
+        Variables:
+          USERPOOLCLIENT_USER_POOL_CLIENT_ID: !Ref UserPoolClient
+          USER_POOL_ID: !Ref userPoolId
+          CLIENT_ID: !Ref clientId
+          CLIENT_SECRET: !Ref clientSecret
+  ConfirmSignUpLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${ConfirmSignUp}
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  userPoolId:
+    Type: String
+  clientId:
+    Type: String
+  clientSecret:
+    Type: String

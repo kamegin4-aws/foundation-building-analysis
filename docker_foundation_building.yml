@@ -1,0 +1,48 @@
+version: "3.8"
+services:
+  presentation:
+    build:
+      context: ./frontend/NextJs
+      dockerfile: Dockerfile
+    image: next_js
+    container_name: next_js
+    #  depends_on:
+    #    postgres:
+    #      condition: service_healthy
+    restart: always
+    tty: true
+    #privileged: true
+    #environment:
+    #  -
+    expose:
+      - 3000
+    ports:
+      - "3000:3000"
+    extra_hosts:
+      - "local_dev:${HOST_IP}"
+    #volumes:
+    #  -
+    #command:
+  application:
+    build:
+      context: ./backend/Django_RestFrameWork
+      dockerfile: Dockerfile
+    image: django_rf
+    container_name: django_rf
+    #  depends_on:
+    #    postgres:
+    #      condition: service_healthy
+    restart: always
+    tty: true
+    #privileged: true
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+    expose:
+      - 8080
+    ports:
+      - "8080:8080"
+    extra_hosts:
+      - "local_dev:${HOST_IP}"
+    volumes:
+      - ./backend/Django_RestFrameWork/db.sqlite3:/usr/src/app/tutorial/db.sqlite3
+    #command: [python, manage.py, runserver, 0.0.0.0:8080]

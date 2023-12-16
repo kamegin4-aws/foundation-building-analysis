@@ -1,7 +1,5 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-docker.env
-
 ###### Frontend ######
 
 # dependencies
@@ -30,7 +28,7 @@ yarn-error.log*
 
 # local env files
 .env*.local
-.env*
+.env
 
 # vercel
 .vercel
@@ -41,7 +39,7 @@ next-env.d.ts
 
 ###### Backend ######
 
-backend/django-rest/envDjango
+backend/envDjango
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -73,3 +71,8 @@ MANIFEST
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+
+# AWS SAM
+.aws-composer
+.aws-sam
+samconfig.toml
