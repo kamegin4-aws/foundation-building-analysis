@@ -14,35 +14,50 @@ def handler(event, context):
     # Log the event argument for debugging and for use in local development.
     print(json.dumps(event))
 
-    # body = event["body"]
-    body = json.loads(event["body"])
+    try:
+        if ("body" in event):
+            # body = event["body"]
+            body = json.loads(event["body"])
 
-    cognito_idp_client = boto3.client(
-        "cognito-idp", region_name="ap-northeast-1")
+        cognito_idp_client = boto3.client(
+            "cognito-idp", region_name="ap-northeast-1")
 
-    user_pool_id = os.environ["USER_POOL_ID"]
+        user_pool_id = os.environ["USER_POOL_ID"]
 
-    client_id = os.environ["CLIENT_ID"]
+        client_id = os.environ["CLIENT_ID"]
 
-    client_secret = os.environ["CLIENT_SECRET"]
+        client_secret = os.environ["CLIENT_SECRET"]
 
-    cognitoIdentityProviderWrapper = CognitoIdentityProviderWrapper(
-        cognito_idp_client=cognito_idp_client,
-        user_pool_id=user_pool_id,
-        client_id=client_id,
-        client_secret=client_secret)
+        cognitoIdentityProviderWrapper = CognitoIdentityProviderWrapper(
+            cognito_idp_client=cognito_idp_client,
+            user_pool_id=user_pool_id,
+            client_id=client_id,
+            client_secret=client_secret)
 
-    user_name = body["user_name"]
-    password = body["password"]
-    user_email = body["user_email"]
+        user_name = body["user_name"]
+        password = body["password"]
+        user_email = body["user_email"]
 
-    confirmed = cognitoIdentityProviderWrapper.sign_up_user(
-        user_name=user_name, password=password, user_email=user_email)
+        confirmed = cognitoIdentityProviderWrapper.sign_up_user(
+            user_name=user_name, password=password, user_email=user_email)
 
-    return {
-        'statusCode': 200,
-        'body': json.dumps(confirmed)
-    }
+        return {
+            'statusCode': 200,
+            'body': json.dumps(confirmed)
+        }
+
+    except MyError as err:
+        logger.error(err)
+        return {
+            'statusCode': 501,
+            'body': json.dumps(err.value)
+        }
+    except Exception as err:
+        logger.error(err)
+        return {
+            'statusCode': 500,
+            'body': json.dumps("Internal server error")
+        }
 
 
 class CognitoIdentityProviderWrapper:
@@ -90,6 +105,7 @@ class CognitoIdentityProviderWrapper:
             if self.client_secret is not None:
                 kwargs["SecretHash"] = self.secret_hash(user_name=user_name)
             response = self.cognito_idp_client.sign_up(**kwargs)
+            print(response)
             confirmed = response["UserConfirmed"]
         except ClientError as err:
             if err.response["Error"]["Code"] == "UsernameExistsException":
@@ -102,7 +118,7 @@ class CognitoIdentityProviderWrapper:
                     user_name,
                     response["UserStatus"])
 
-                errorMassage = 'User {} exists and is {}.'.format(
+                error_massage = 'User {} exists and is {}.'.format(
                     user_name, response["UserStatus"])
                 confirmed = response["UserStatus"] == "CONFIRMED"
             else:
@@ -113,14 +129,9 @@ class CognitoIdentityProviderWrapper:
                     err.response["Error"]["Message"],
                 )
 
-                errorMassage = "Couldn't sign up {}. Here's why: {}: {}".format(
+                error_massage = "Couldn't sign up {}. Here's why: {}: {}".format(
                     user_name, err.response["Error"]["Code"], err.response["Error"]["Message"])
-                raise
-
-            return {
-                'statusCode': 500,
-                'body': json.dumps(errorMassage)
-            }
+            raise MyError(error_massage) from err
 
         return confirmed
 
@@ -142,3 +153,11 @@ class CognitoIdentityProviderWrapper:
                 digestmod=hashlib.sha256).digest()).decode()
 
         return secret_hash
+
+
+class MyError(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)

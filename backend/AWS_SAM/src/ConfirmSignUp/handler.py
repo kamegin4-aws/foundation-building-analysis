@@ -1,6 +1,5 @@
 import json
 import boto3
-from botocore.exceptions import ClientError
 import os
 import logging
 import hmac
@@ -14,34 +13,50 @@ def handler(event, context):
     # Log the event argument for debugging and for use in local development.
     print(json.dumps(event))
 
-    # body = event["body"]
-    body = json.loads(event["body"])
+    try:
 
-    cognito_idp_client = boto3.client(
-        "cognito-idp", region_name="ap-northeast-1")
+        if ("body" in event):
+            # body = event["body"]
+            body = json.loads(event["body"])
 
-    user_pool_id = os.environ["USER_POOL_ID"]
+        cognito_idp_client = boto3.client(
+            "cognito-idp", region_name="ap-northeast-1")
 
-    client_id = os.environ["CLIENT_ID"]
+        user_pool_id = os.environ["USER_POOL_ID"]
 
-    client_secret = os.environ["CLIENT_SECRET"]
+        client_id = os.environ["CLIENT_ID"]
 
-    cognitoIdentityProviderWrapper = CognitoIdentityProviderWrapper(
-        cognito_idp_client=cognito_idp_client,
-        user_pool_id=user_pool_id,
-        client_id=client_id,
-        client_secret=client_secret)
+        client_secret = os.environ["CLIENT_SECRET"]
 
-    user_name = body["user_name"]
-    code = body["code"]
+        cognitoIdentityProviderWrapper = CognitoIdentityProviderWrapper(
+            cognito_idp_client=cognito_idp_client,
+            user_pool_id=user_pool_id,
+            client_id=client_id,
+            client_secret=client_secret)
 
-    confirmed_signup = cognitoIdentityProviderWrapper.confirm_sign_up(
-        user_name=user_name, confirmation_code=code)
+        user_name = body["user_name"]
+        code = body["code"]
 
-    return {
-        'statusCode': 200,
-        'body': json.dumps(confirmed_signup)
-    }
+        confirmed_signup = cognitoIdentityProviderWrapper.confirm_sign_up(
+            user_name=user_name, confirmation_code=code)
+
+        return {
+            'statusCode': 200,
+            'body': json.dumps(confirmed_signup)
+        }
+
+    except MyError as err:
+        logger.error(err)
+        return {
+            'statusCode': 501,
+            'body': json.dumps(err.value)
+        }
+    except Exception as err:
+        logger.error(err)
+        return {
+            'statusCode': 500,
+            'body': json.dumps("Internal server error")
+        }
 
 
 class CognitoIdentityProviderWrapper:
@@ -63,52 +78,6 @@ class CognitoIdentityProviderWrapper:
         self.user_pool_id = user_pool_id
         self.client_id = client_id
         self.client_secret = client_secret
-
-    def sign_up_user(self, user_name, password, user_email):
-        """
-        Signs up a new user with Amazon Cognito. This action prompts Amazon Cognito
-        to send an email to the specified email address. The email contains a code that
-        can be used to confirm the user.
-
-        When the user already exists, the user status is checked to determine whether
-        the user has been confirmed.
-
-        :param user_name: The user name that identifies the new user.
-        :param password: The password for the new user.
-        :param user_email: The email address for the new user.
-        :return: True when the user is already confirmed with Amazon Cognito.
-                 Otherwise, false.
-        """
-        try:
-            kwargs = {
-                "ClientId": self.client_id,
-                "Username": user_name,
-                "Password": password,
-                "UserAttributes": [{"Name": "email", "Value": user_email}],
-            }
-            if self.client_secret is not None:
-                kwargs["SecretHash"] = self.secret_hash(user_name=user_name)
-            response = self.cognito_idp_client.sign_up(**kwargs)
-            confirmed = response["UserConfirmed"]
-        except ClientError as err:
-            if err.response["Error"]["Code"] == "UsernameExistsException":
-                response = self.cognito_idp_client.admin_get_user(
-                    UserPoolId=self.user_pool_id, Username=user_name
-                )
-                logger.warning(
-                    "User %s exists and is %s.",
-                    user_name,
-                    response["UserStatus"])
-                confirmed = response["UserStatus"] == "CONFIRMED"
-            else:
-                logger.error(
-                    "Couldn't sign up %s. Here's why: %s: %s",
-                    user_name,
-                    err.response["Error"]["Code"],
-                    err.response["Error"]["Message"],
-                )
-                raise
-        return confirmed
 
     def secret_hash(self, user_name):
         """_summary_
@@ -141,10 +110,16 @@ class CognitoIdentityProviderWrapper:
             response = self.cognito_idp_client.confirm_sign_up(**kwargs)
             print(response)
 
-        except Exception:
-            return {
-                'statusCode': 500,
-                'body': json.dumps("Confirm Error")
-            }
+        except Exception as err:
+            raise MyError(
+                "Couldn't confirm sign up for {}.".format(user_name)) from err
 
         return True
+
+
+class MyError(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)

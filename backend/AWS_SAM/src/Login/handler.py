@@ -1,82 +1,102 @@
 import json
+import boto3
+import os
+import logging
+from pycognito.aws_srp import AWSSRP
+
+
+logger = logging.getLogger(__name__)
 
 
 def handler(event, context):
     # Log the event argument for debugging and for use in local development.
     print(json.dumps(event))
+    try:
 
-    return {}
+        if ("body" in event):
+            # body = event["body"]
+            body = json.loads(event["body"])
+
+        cognito_idp_client = boto3.client(
+            "cognito-idp", region_name="ap-northeast-1")
+
+        user_pool_id = os.environ["USER_POOL_ID"]
+
+        client_id = os.environ["CLIENT_ID"]
+
+        client_secret = os.environ["CLIENT_SECRET"]
+
+        user_name = body["user_name"]
+        password = body["password"]
+
+        aws_srp_wrapper = AWSSRPWrapper(
+            pool_id=user_pool_id,
+            client_id=client_id,
+            client_secret=client_secret,
+            client=cognito_idp_client)
+
+        sign_in = aws_srp_wrapper.sign_in(user_name, password)
+
+        return {
+            'statusCode': 200,
+            'body': json.dumps(sign_in)
+        }
+
+    except MyError as err:
+        logger.error(err)
+        return {
+            'statusCode': 500,
+            'body': json.dumps(err.value)
+        }
+
+    except Exception as err:
+        logger.error(err)
+        return {
+            'statusCode': 500,
+            'body': json.dumps("Internal server error")
+        }
 
 
-class CognitoIdentityProviderWrapper:
-    """Encapsulates Amazon Cognito actions"""
+class AWSSRPWrapper:
+    """AWSSRPのラッパークラス
+    """
 
     def __init__(
             self,
-            cognito_idp_client,
-            user_pool_id,
+            pool_id,
             client_id,
-            client_secret=None):
-        """
-        :param cognito_idp_client: A Boto3 Amazon Cognito Identity Provider client.
-        :param user_pool_id: The ID of an existing Amazon Cognito user pool.
-        :param client_id: The ID of a client application registered with the user pool.
-        :param client_secret: The client secret, if the client has a secret.
-        """
-        self.cognito_idp_client = cognito_idp_client
-        self.user_pool_id = user_pool_id
+            client_secret=None,
+            client=None,
+    ):
+        self.client = client
+        self.pool_id = pool_id
         self.client_id = client_id
         self.client_secret = client_secret
 
-    def start_sign_in(self, user_name, password):
-        """
-        Starts the sign-in process for a user by using administrator credentials.
-        This method of signing in is appropriate for code running on a secure server.
-
-        If the user pool is configured to require MFA and this is the first sign-in
-        for the user, Amazon Cognito returns a challenge response to set up an
-        MFA application. When this occurs, this function gets an MFA secret from
-        Amazon Cognito and returns it to the caller.
-
-        :param user_name: The name of the user to sign in.
-        :param password: The user's password.
-        :return: The result of the sign-in attempt. When sign-in is successful, this
-                 returns an access token that can be used to get AWS credentials. Otherwise,
-                 Amazon Cognito returns a challenge to set up an MFA application,
-                 or a challenge to enter an MFA code from a registered MFA application.
-        """
+    def sign_in(self, username, password):
         try:
             kwargs = {
-                "UserPoolId": self.user_pool_id,
-                "ClientId": self.client_id,
-                "AuthFlow": "ADMIN_USER_PASSWORD_AUTH",
-                "AuthParameters": {
-                    "USERNAME": user_name,
-                    "PASSWORD": password},
+                "username": username,
+                "password": password,
+                "pool_id": self.pool_id,
+                "client_id": self.client_id,
+                "client": self.client,
+                "client_secret": self.client_secret,
             }
-            if self.client_secret is not None:
-                kwargs["AuthParameters"]["SECRET_HASH"] = self._secret_hash(
-                    user_name)
-            response = self.cognito_idp_client.admin_initiate_auth(**kwargs)
-            challenge_name = response.get("ChallengeName", None)
-            if challenge_name == "MFA_SETUP":
-                if (
-                    "SOFTWARE_TOKEN_MFA"
-                    in response["ChallengeParameters"]["MFAS_CAN_SETUP"]
-                ):
-                    response.update(self.get_mfa_secret(response["Session"]))
-                else:
-                    raise RuntimeError(
-                        "The user pool requires MFA setup, but the user pool is not "
-                        "configured for TOTP MFA. This example requires TOTP MFA.")
-        except ClientError as err:
-            logger.error(
-                "Couldn't start sign in for %s. Here's why: %s: %s",
-                user_name,
-                err.response["Error"]["Code"],
-                err.response["Error"]["Message"],
-            )
-            raise
-        else:
-            response.pop("ResponseMetadata", None)
-            return response
+            aws = AWSSRP(**kwargs)
+            tokens = aws.authenticate_user()
+            print(tokens)
+
+            return tokens["AuthenticationResult"]
+
+        except Exception as err:
+            raise MyError(
+                "Couldn't sign in for {}.".format(username)) from err
+
+
+class MyError(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
