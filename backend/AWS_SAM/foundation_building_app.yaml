@@ -288,6 +288,19 @@ Resources:
     DeletionPolicy: Retain
     Properties:
       LogGroupName: !Sub /aws/lambda/${ConfirmConfiguration}
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: MyECSCluster
+      CapacityProviders:
+        - FARGATE
+        - FARGATE_SPOT
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties: {}
+  Service:
+    Type: AWS::ECS::Service
+    Properties: {}
 Transform: AWS::Serverless-2016-10-31
 Parameters:
   userPoolId:
