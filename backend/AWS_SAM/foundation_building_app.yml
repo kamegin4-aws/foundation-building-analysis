@@ -28,11 +28,11 @@ Resources:
       Tracing: Active
       Environment:
         Variables:
-          USERPOOL_USER_POOL_ID: '!Ref UserPool'
-          USERPOOL_USER_POOL_ARN: '!GetAtt UserPool.Arn'
+          USERPOOL_USER_POOL_ID: !Ref UserPool
+          USERPOOL_USER_POOL_ARN: !GetAtt UserPool.Arn
           USERPOOLCLIENT_USER_POOL_CLIENT_ID: !Ref UserPoolClient
-          USER_POOL_ID: !Ref userPoolId
-          CLIENT_ID: !Ref clientId
+          USER_POOL_ID: !GetAtt UserPool.UserPoolId
+          CLIENT_ID: !Ref UserPoolClient
           CLIENT_SECRET: !Ref clientSecret
       Events:
         CognitoPOSTcognitologin:
@@ -68,8 +68,8 @@ Resources:
       Environment:
         Variables:
           USERPOOLCLIENT_USER_POOL_CLIENT_ID: !Ref UserPoolClient
-          USER_POOL_ID: !Ref userPoolId
-          CLIENT_ID: !Ref clientId
+          USER_POOL_ID: !GetAtt UserPool.UserPoolId
+          CLIENT_ID: !Ref UserPoolClient
           CLIENT_SECRET: !Ref clientSecret
   LogoutLogGroup:
     Type: AWS::Logs::LogGroup
@@ -91,8 +91,8 @@ Resources:
       Environment:
         Variables:
           USERPOOLCLIENT_USER_POOL_CLIENT_ID: !Ref UserPoolClient
-          USER_POOL_ID: !Ref userPoolId
-          CLIENT_ID: !Ref clientId
+          USER_POOL_ID: !GetAtt UserPool.UserPoolId
+          CLIENT_ID: !Ref UserPoolClient
           CLIENT_SECRET: !Ref clientSecret
       Events:
         CognitoAuthorizedPOSTcognitoconfiguration:
@@ -117,6 +117,8 @@ Resources:
         ResourcePolicy:
           IpRangeWhitelist:
             - !Ref globalIP
+          SourceVpcWhitelist:
+            - !Ref vpcId
       DefinitionBody:
         openapi: '3.0'
         info: {}
@@ -178,8 +180,8 @@ Resources:
       Environment:
         Variables:
           USERPOOLCLIENT_USER_POOL_CLIENT_ID: !Ref UserPoolClient
-          USER_POOL_ID: !Ref userPoolId
-          CLIENT_ID: !Ref clientId
+          USER_POOL_ID: !GetAtt UserPool.UserPoolId
+          CLIENT_ID: !Ref UserPoolClient
           CLIENT_SECRET: !Ref clientSecret
   SignUpLogGroup:
     Type: AWS::Logs::LogGroup
@@ -213,8 +215,8 @@ Resources:
       Environment:
         Variables:
           USERPOOLCLIENT_USER_POOL_CLIENT_ID: !Ref UserPoolClient
-          USER_POOL_ID: !Ref userPoolId
-          CLIENT_ID: !Ref clientId
+          USER_POOL_ID: !GetAtt UserPool.UserPoolId
+          CLIENT_ID: !Ref UserPoolClient
           CLIENT_SECRET: !Ref clientSecret
   ConfirmSignUpLogGroup:
     Type: AWS::Logs::LogGroup
@@ -255,6 +257,8 @@ Resources:
         ResourcePolicy:
           IpRangeWhitelist:
             - !Ref globalIP
+          SourceVpcWhitelist:
+            - !Ref vpcId
         DefaultAuthorizer: Cognito
       Cors:
         AllowOrigin: '''*'''
@@ -276,6 +280,9 @@ Resources:
       Environment:
         Variables:
           USERPOOLCLIENT_USER_POOL_CLIENT_ID: !Ref UserPoolClient
+          USER_POOL_ID: !GetAtt UserPool.UserPoolId
+          CLIENT_ID: !Ref UserPoolClient
+          CLIENT_SECRET: !Ref clientSecret
       Events:
         CognitoAuthorizedPOSTcognitoconfirmconfiguration:
           Type: Api
@@ -291,23 +298,143 @@ Resources:
   Cluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: MyECSCluster
+      ClusterName: Cluster
       CapacityProviders:
         - FARGATE
         - FARGATE_SPOT
-  TaskDefinition:
+  ContainerFileSystem:
+    Type: AWS::EFS::FileSystem
+    Properties:
+      FileSystemTags:
+        - Key: Name
+          Value: ContainerFileSystem
+      PerformanceMode: generalPurpose
+      ThroughputMode: bursting
+      Encrypted: true
+      LifecyclePolicies:
+        - TransitionToIA: AFTER_30_DAYS
+        - TransitionToPrimaryStorageClass: AFTER_1_ACCESS
+  NextJsTaskDefinition:
     Type: AWS::ECS::TaskDefinition
-    Properties: {}
-  Service:
+    Properties:
+      Family: NextJsTaskDefinition
+      ExecutionRoleArn: !GetAtt ExecECSTaskRole.Arn
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - EC2
+      Cpu: '256'
+      Memory: '512'
+      ContainerDefinitions:
+        - Name: next_js
+          Image: kamegin4/foundation-building:next_js
+          Essential: true
+          PortMappings:
+            - ContainerPort: 8080
+              HostPort: 8080
+              Protocol: tcp
+            - ContainerPort: 80
+              HostPort: 80
+              Protocol: tcp
+            - ContainerPort: 443
+              HostPort: 443
+              Protocol: tcp
+          RepositoryCredentials:
+            CredentialsParameter: !Ref DockerHubSecret
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/NextJsTaskDefinition
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+              awslogs-create-group: 'true'
+          MountPoints:
+            - ContainerPath: /app/data
+              SourceVolume: efs-volume
+      Volumes:
+        - Name: efs-volume
+          EFSVolumeConfiguration:
+            FilesystemId: !Ref ContainerFileSystem
+            RootDirectory: /
+            TransitEncryption: ENABLED
+  ContainerFileSystemMountTarget:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      SecurityGroups:
+        - !Ref efsSecurityGroupId
+      FileSystemId: !Ref ContainerFileSystem
+      SubnetId: !Ref publicSubnet1Id
+  NextJSService:
     Type: AWS::ECS::Service
-    Properties: {}
+    Properties:
+      Cluster: !GetAtt Cluster.Arn
+      TaskDefinition: !Ref NextJsTaskDefinition
+      DesiredCount: 1
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 50
+      LoadBalancers:
+        - ContainerName: next_js
+          ContainerPort: 8080
+          TargetGroupArn: !Ref elbTargetGroupArn
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !Ref publicSecurityGroupId
+          Subnets:
+            - !Ref publicSubnet1Id
+  ExecECSTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+        - arn:aws:iam::aws:policy/SecretsManagerReadWrite
+        - arn:aws:iam::aws:policy/AmazonECS_FullAccess
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+      MaxSessionDuration: 3600
+      Policies:
+        - PolicyName: ECSUseDockerSecrets
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Ref DockerHubSecret
+                Effect: Allow
+      AssumeRolePolicyDocument:
+        Version: '2008-10-17'
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Sid: ''
+  DockerHubSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: DockerHubSecret
+      Description: DockerHubSecret
+      SecretString: !Ref dockerCredentialsParameter
 Transform: AWS::Serverless-2016-10-31
 Parameters:
-  userPoolId:
-    Type: String
-  clientId:
-    Type: String
   clientSecret:
     Type: String
   globalIP:
+    Type: String
+  vpcId:
+    Type: String
+  publicSecurityGroupId:
+    Type: String
+  efsSecurityGroupId:
+    Type: String
+  publicSubnet1Id:
+    Type: String
+  publicSubnet2Id:
+    Type: String
+  elbTargetGroupArn:
+    Type: String
+  dockerCredentialsParameter:
     Type: String
