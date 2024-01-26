@@ -6,6 +6,8 @@ import logging
 import hmac
 import hashlib
 import base64
+from cgi import parse_header, parse_multipart
+import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -16,8 +18,30 @@ def handler(event, context):
 
     try:
         if ("body" in event):
-            # body = event["body"]
-            body = json.loads(event["body"])
+            if 'content-type' in event['headers'].keys():
+                c_type, c_data = parse_header(event['headers']['content-type'])
+            elif 'Content-Type' in event['headers'].keys():
+                c_type, c_data = parse_header(event['headers']['Content-Type'])
+            else:
+                raise RuntimeError('content-type or Content-Type not found')
+
+            if c_type == "multipart/form-data":
+                encoded_string = event['body'].encode('utf-8')
+                # For Python 3: these two lines of bugfixing are mandatory
+                # see also:
+                # https://stackoverflow.com/questions/31486618/cgi-parse-multipart-function-throws-typeerror-in-python-3
+                c_data['boundary'] = bytes(c_data['boundary'], "utf-8")
+                # c_data['CONTENT-LENGTH'] = event['headers']['Content-length']
+                data_dict = parse_multipart(io.BytesIO(encoded_string), c_data)
+
+                # 整形
+                body = {k: v[0] for k, v in data_dict.items()}
+
+                print("c_type: {}.".format(c_type))
+                print("body: {}.".format(body))
+            else:
+                body = json.loads(event["body"])
+                # body = event["body"]
 
         cognito_idp_client = boto3.client(
             "cognito-idp", region_name="ap-northeast-1")
@@ -43,21 +67,22 @@ def handler(event, context):
 
         return {
             'statusCode': 200,
-            'body': json.dumps(confirmed)
-        }
+            'headers': {
+                "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*"},
+            'body': json.dumps(confirmed)}
 
-    except MyError as err:
-        logger.error(err)
-        return {
-            'statusCode': 501,
-            'body': json.dumps(err.value)
-        }
-    except Exception as err:
-        logger.error(err)
+    except Exception:
+        logger.error(traceback.format_exc())
         return {
             'statusCode': 500,
-            'body': json.dumps("Internal server error")
-        }
+            'headers': {
+                "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*"},
+            'body': json.dumps(
+                traceback.format_exc())}
 
 
 class CognitoIdentityProviderWrapper:
@@ -131,7 +156,7 @@ class CognitoIdentityProviderWrapper:
 
                 error_massage = "Couldn't sign up {}. Here's why: {}: {}".format(
                     user_name, err.response["Error"]["Code"], err.response["Error"]["Message"])
-            raise MyError(error_massage) from err
+            raise RuntimeError(error_massage) from err
 
         return confirmed
 
@@ -153,11 +178,3 @@ class CognitoIdentityProviderWrapper:
                 digestmod=hashlib.sha256).digest()).decode()
 
         return secret_hash
-
-
-class MyError(Exception):
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return repr(self.value)

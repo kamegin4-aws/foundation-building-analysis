@@ -13,7 +13,8 @@
     "@cloudscape-design/global-styles": "^1.0.13",
     "next": "13.5.5",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "eslint": "^8.53.0",

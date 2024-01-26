@@ -8,7 +8,7 @@ import {
   ITEMS,
 } from "@/ui/cloudscape/constant_group/constant_side_navigation";
 
-export default function CSideNavigation(props) {
+export default function SideNavigationWrapper(props) {
   const [activeHref, setActiveHref] = React.useState(props.initialActiveHref);
 
   return (

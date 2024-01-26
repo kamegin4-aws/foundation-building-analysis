@@ -7,7 +7,7 @@ import {
   USER_PROFILE_ITEMS,
 } from "@/ui/cloudscape/constant_group/constant_top_navigation";
 
-export default function CTopNavigation() {
+export default function TopNavigationWrapper() {
   return (
     <TopNavigation
       identity={{

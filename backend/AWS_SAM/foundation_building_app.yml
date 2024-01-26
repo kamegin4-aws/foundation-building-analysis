@@ -117,8 +117,6 @@ Resources:
         ResourcePolicy:
           IpRangeWhitelist:
             - !Ref globalIP
-          SourceVpcWhitelist:
-            - !Ref vpcId
       DefinitionBody:
         openapi: '3.0'
         info: {}
@@ -155,7 +153,7 @@ Resources:
       TracingEnabled: true
       Cors:
         AllowOrigin: '''*'''
-        AllowHeaders: '''*'''
+        AllowHeaders: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
         AllowMethods: '''*'''
         MaxAge: 5
   SignUp:
@@ -262,7 +260,7 @@ Resources:
         DefaultAuthorizer: Cognito
       Cors:
         AllowOrigin: '''*'''
-        AllowHeaders: '''*'''
+        AllowHeaders: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
         AllowMethods: '''*'''
         MaxAge: 5
   ConfirmConfiguration:
@@ -368,7 +366,7 @@ Resources:
     Properties:
       Cluster: !GetAtt Cluster.Arn
       TaskDefinition: !Ref NextJsTaskDefinition
-      DesiredCount: 1
+      DesiredCount: 0
       DeploymentConfiguration:
         MaximumPercent: 200
         MinimumHealthyPercent: 50
@@ -431,8 +429,6 @@ Parameters:
   efsSecurityGroupId:
     Type: String
   publicSubnet1Id:
-    Type: String
-  publicSubnet2Id:
     Type: String
   elbTargetGroupArn:
     Type: String
