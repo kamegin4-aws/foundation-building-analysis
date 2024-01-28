@@ -8,6 +8,7 @@ import hashlib
 import base64
 from cgi import parse_header, parse_multipart
 import traceback
+import io
 
 logger = logging.getLogger(__name__)
 
@@ -37,8 +38,8 @@ def handler(event, context):
                 # 整形
                 body = {k: v[0] for k, v in data_dict.items()}
 
-                print("c_type: {}.".format(c_type))
-                print("body: {}.".format(body))
+                print(f'c_type: {c_type}.')
+                print(f'body: {body}.')
             else:
                 body = json.loads(event["body"])
                 # body = event["body"]
@@ -90,6 +91,7 @@ class CognitoIdentityProviderWrapper:
 
     def __init__(
             self,
+            *,
             cognito_idp_client,
             user_pool_id,
             client_id,
@@ -105,7 +107,7 @@ class CognitoIdentityProviderWrapper:
         self.client_id = client_id
         self.client_secret = client_secret
 
-    def sign_up_user(self, user_name, password, user_email):
+    def sign_up_user(self, *, user_name, password, user_email):
         """
         Signs up a new user with Amazon Cognito. This action prompts Amazon Cognito
         to send an email to the specified email address. The email contains a code that
@@ -130,7 +132,7 @@ class CognitoIdentityProviderWrapper:
             if self.client_secret is not None:
                 kwargs["SecretHash"] = self.secret_hash(user_name=user_name)
             response = self.cognito_idp_client.sign_up(**kwargs)
-            print(response)
+            print(f'sign_up: {response}')
             confirmed = response["UserConfirmed"]
         except ClientError as err:
             if err.response["Error"]["Code"] == "UsernameExistsException":
@@ -160,7 +162,7 @@ class CognitoIdentityProviderWrapper:
 
         return confirmed
 
-    def secret_hash(self, user_name):
+    def secret_hash(self, *, user_name):
         """_summary_
         ハッシュ値の生成
         Args:

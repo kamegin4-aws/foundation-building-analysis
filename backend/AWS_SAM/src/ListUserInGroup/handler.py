@@ -37,13 +37,15 @@ def handler(event, context):
                 print(f'c_type: {c_type}.')
                 print(f'body: {body}.')
             else:
-                body = json.loads(event["body"])
-                # body = event["body"]
+                # body = json.loads(event["body"])
+                body = event["body"]
 
         cognito_idp_client = boto3.client(
             "cognito-idp", region_name="ap-northeast-1")
 
-        user_pool_id = os.environ["USER_POOL_ID"]
+        # user_pool_id = os.environ["USER_POOL_ID"]
+        user_pool_id = "ap-northeast-1_KPdaM8dxN"
+        print(f'user_pool_id: {user_pool_id}')
 
         client_id = os.environ["CLIENT_ID"]
 
@@ -55,12 +57,46 @@ def handler(event, context):
             client_id=client_id,
             client_secret=client_secret)
 
-        access_token = body["access_token"]
+        group_name = body["group_name"]
 
-        print("access_token: {}".format(access_token))
+        user_list = []
+        next_token = None
+        list_users_in_group = cognitoIdentityProviderWrapper.list_users_in_group(
+            group_name=group_name)
 
-        sign_out = cognitoIdentityProviderWrapper.sign_out(
-            access_token=access_token)
+        # 1週目
+        if ("Users" in list_users_in_group and len(
+                list_users_in_group["Users"])):
+            user_list.append(list_users_in_group["Users"])
+
+        # 次のトークン
+        if (
+                "NextToken" in list_users_in_group and list_users_in_group["NextToken"]):
+            next_token = list_users_in_group["NextToken"]
+
+        # 次のトークンがあるか、"Users"が0以上ならば繰り返す
+        while next_token is not None and "Users" in list_users_in_group and len(
+                list_users_in_group["Users"]) > 0:
+            # 2周目以降
+            list_users_in_group = cognitoIdentityProviderWrapper.list_users_in_group(
+                group_name=group_name, next_token=next_token)
+            if (
+                    "NextToken" in list_users_in_group and list_users_in_group["NextToken"]):
+                next_token = list_users_in_group["NextToken"]
+            else:
+                break
+            if ("Users" in list_users_in_group and len(
+                    list_users_in_group["Users"]) > 0):
+                user_list.append(list_users_in_group["Users"])
+
+        if (len(user_list) > 0):
+            user_list = check_user_in_group(user_list)
+
+        list_users_in_group = {
+            "Users": user_list
+        }
+
+        print(f'list_users_in_group: {list_users_in_group}')
 
         return {
             'statusCode': 200,
@@ -68,7 +104,7 @@ def handler(event, context):
                 "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "*"},
-            'body': json.dumps(sign_out)}
+            'body': json.dumps(list_users_in_group)}
 
     except Exception:
         logger.error(traceback.format_exc())
@@ -103,15 +139,27 @@ class CognitoIdentityProviderWrapper:
         self.client_id = client_id
         self.client_secret = client_secret
 
-    def sign_out(self, *, access_token):
+    def list_users_in_group(self, *, group_name, limit=60, next_token=None):
         try:
             kwargs = {
-                "AccessToken": access_token
+                "UserPoolId": self.user_pool_id,
+                "GroupName": group_name,
+                "Limit": int(limit)
             }
-            response = self.cognito_idp_client.global_sign_out(**kwargs)
-            print(f'global_sign_out: {response}')
+            if (next_token):
+                kwargs["NextToken"] = next_token
+            response = self.cognito_idp_client.list_users_in_group(
+                **kwargs)
+            print(f'list_users_in_group: {response}')
 
-            return True
+            return response
 
         except Exception as err:
-            raise RuntimeError("Couldn't sign out") from err
+            raise RuntimeError("Couldn't list user in group") from err
+
+
+def check_user_in_group(list_user):
+    print(f'list_user: {list_user}')
+    checked_user = [user for user in list_user if user["Enabled"] is True]
+
+    return checked_user

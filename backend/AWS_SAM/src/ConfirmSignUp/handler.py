@@ -5,6 +5,9 @@ import logging
 import hmac
 import hashlib
 import base64
+from cgi import parse_header, parse_multipart
+import traceback
+import io
 
 logger = logging.getLogger(__name__)
 
@@ -16,8 +19,30 @@ def handler(event, context):
     try:
 
         if ("body" in event):
-            # body = event["body"]
-            body = json.loads(event["body"])
+            if 'content-type' in event['headers'].keys():
+                c_type, c_data = parse_header(event['headers']['content-type'])
+            elif 'Content-Type' in event['headers'].keys():
+                c_type, c_data = parse_header(event['headers']['Content-Type'])
+            else:
+                raise RuntimeError('content-type or Content-Type not found')
+
+            if c_type == "multipart/form-data":
+                encoded_string = event['body'].encode('utf-8')
+                # For Python 3: these two lines of bugfixing are mandatory
+                # see also:
+                # https://stackoverflow.com/questions/31486618/cgi-parse-multipart-function-throws-typeerror-in-python-3
+                c_data['boundary'] = bytes(c_data['boundary'], "utf-8")
+                # c_data['CONTENT-LENGTH'] = event['headers']['Content-length']
+                data_dict = parse_multipart(io.BytesIO(encoded_string), c_data)
+
+                # 整形
+                body = {k: v[0] for k, v in data_dict.items()}
+
+                print(f'c_type: {c_type}.')
+                print(f'body: {body}.')
+            else:
+                body = json.loads(event["body"])
+                # body = event["body"]
 
         cognito_idp_client = boto3.client(
             "cognito-idp", region_name="ap-northeast-1")
@@ -42,21 +67,22 @@ def handler(event, context):
 
         return {
             'statusCode': 200,
-            'body': json.dumps(confirmed_signup)
-        }
+            'headers': {
+                "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*"},
+            'body': json.dumps(confirmed_signup)}
 
-    except MyError as err:
-        logger.error(err)
-        return {
-            'statusCode': 501,
-            'body': json.dumps(err.value)
-        }
-    except Exception as err:
-        logger.error(err)
+    except Exception:
+        logger.error(traceback.format_exc())
         return {
             'statusCode': 500,
-            'body': json.dumps("Internal server error")
-        }
+            'headers': {
+                "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*"},
+            'body': json.dumps(
+                traceback.format_exc())}
 
 
 class CognitoIdentityProviderWrapper:
@@ -64,6 +90,7 @@ class CognitoIdentityProviderWrapper:
 
     def __init__(
             self,
+            *,
             cognito_idp_client,
             user_pool_id,
             client_id,
@@ -79,7 +106,7 @@ class CognitoIdentityProviderWrapper:
         self.client_id = client_id
         self.client_secret = client_secret
 
-    def secret_hash(self, user_name):
+    def secret_hash(self, *, user_name):
         """_summary_
         ハッシュ値の生成
         Args:
@@ -98,7 +125,7 @@ class CognitoIdentityProviderWrapper:
 
         return secret_hash
 
-    def confirm_sign_up(self, user_name, confirmation_code):
+    def confirm_sign_up(self, *, user_name, confirmation_code):
         try:
             kwargs = {
                 "ClientId": self.client_id,
@@ -108,18 +135,10 @@ class CognitoIdentityProviderWrapper:
             if self.client_secret is not None:
                 kwargs["SecretHash"] = self.secret_hash(user_name=user_name)
             response = self.cognito_idp_client.confirm_sign_up(**kwargs)
-            print(response)
+            print(f'confirm_sign_up: {response}')
 
         except Exception as err:
-            raise MyError(
+            raise RuntimeError(
                 "Couldn't confirm sign up for {}.".format(user_name)) from err
 
         return True
-
-
-class MyError(Exception):
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return repr(self.value)

@@ -1,13 +1,10 @@
-
-from cgi import parse_header, parse_multipart
 import json
 import boto3
 import os
 import logging
-import io
+from cgi import parse_header, parse_multipart
 import traceback
-from pycognito.aws_srp import AWSSRP
-
+import io
 
 logger = logging.getLogger(__name__)
 
@@ -15,8 +12,8 @@ logger = logging.getLogger(__name__)
 def handler(event, context):
     # Log the event argument for debugging and for use in local development.
     print(json.dumps(event))
-    try:
 
+    try:
         if ("body" in event):
             if 'content-type' in event['headers'].keys():
                 c_type, c_data = parse_header(event['headers']['content-type'])
@@ -47,22 +44,22 @@ def handler(event, context):
             "cognito-idp", region_name="ap-northeast-1")
 
         user_pool_id = os.environ["USER_POOL_ID"]
+        # user_pool_id = ""
 
         client_id = os.environ["CLIENT_ID"]
 
         client_secret = os.environ["CLIENT_SECRET"]
 
-        user_name = body["user_name"]
-        password = body["password"]
-
-        aws_srp_wrapper = AWSSRPWrapper(
-            pool_id=user_pool_id,
+        cognitoIdentityProviderWrapper = CognitoIdentityProviderWrapper(
+            cognito_idp_client=cognito_idp_client,
+            user_pool_id=user_pool_id,
             client_id=client_id,
-            client_secret=client_secret,
-            client=cognito_idp_client)
+            client_secret=client_secret)
 
-        sign_in = aws_srp_wrapper.sign_in(
-            username=user_name, password=password)
+        access_token = body["access_token"]
+
+        get_user = cognitoIdentityProviderWrapper.get_user(
+            access_token=access_token)
 
         return {
             'statusCode': 200,
@@ -70,7 +67,7 @@ def handler(event, context):
                 "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "*"},
-            'body': json.dumps(sign_in)}
+            'body': json.dumps(get_user)}
 
     except Exception:
         logger.error(traceback.format_exc())
@@ -84,38 +81,37 @@ def handler(event, context):
                 traceback.format_exc())}
 
 
-class AWSSRPWrapper:
-    """AWSSRPのラッパークラス
-    """
+class CognitoIdentityProviderWrapper:
+    """Encapsulates Amazon Cognito actions"""
 
     def __init__(
             self,
             *,
-            pool_id,
+            cognito_idp_client,
+            user_pool_id,
             client_id,
-            client_secret=None,
-            client=None,
-    ):
-        self.client = client
-        self.pool_id = pool_id
+            client_secret=None):
+        """
+        :param cognito_idp_client: A Boto3 Amazon Cognito Identity Provider client.
+        :param user_pool_id: The ID of an existing Amazon Cognito user pool.
+        :param client_id: The ID of a client application registered with the user pool.
+        :param client_secret: The client secret, if the client has a secret.
+        """
+        self.cognito_idp_client = cognito_idp_client
+        self.user_pool_id = user_pool_id
         self.client_id = client_id
         self.client_secret = client_secret
 
-    def sign_in(self, *, username, password):
+    def get_user(self, *, access_token):
         try:
             kwargs = {
-                "username": username,
-                "password": password,
-                "pool_id": self.pool_id,
-                "client_id": self.client_id,
-                "client": self.client,
-                "client_secret": self.client_secret,
+                "AccessToken": access_token,
             }
-            aws = AWSSRP(**kwargs)
-            tokens = aws.authenticate_user()
-            print(f'sign_in: {tokens}')
+            response = self.cognito_idp_client.get_user(
+                **kwargs)
+            print(f'get_user: {response}')
 
-            return tokens["AuthenticationResult"]
+            return response
 
-        except Exception:
-            raise RuntimeError("Cognito(pycognito.aws_srp) Error")
+        except Exception as err:
+            raise RuntimeError("Couldn't get user") from err

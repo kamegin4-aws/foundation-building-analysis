@@ -76,47 +76,18 @@ Resources:
     DeletionPolicy: Retain
     Properties:
       LogGroupName: !Sub /aws/lambda/${Logout}
-  Configuration:
-    Type: AWS::Serverless::Function
-    Properties:
-      Description: !Sub
-        - Stack ${AWS::StackName} Function ${ResourceName}
-        - ResourceName: Configuration
-      CodeUri: src/Configuration
-      Handler: handler.handler
-      Runtime: python3.10
-      MemorySize: 3008
-      Timeout: 30
-      Tracing: Active
-      Environment:
-        Variables:
-          USERPOOLCLIENT_USER_POOL_CLIENT_ID: !Ref UserPoolClient
-          USER_POOL_ID: !GetAtt UserPool.UserPoolId
-          CLIENT_ID: !Ref UserPoolClient
-          CLIENT_SECRET: !Ref clientSecret
-      Events:
-        CognitoAuthorizedPOSTcognitoconfiguration:
-          Type: Api
-          Properties:
-            Path: /cognito/configuration
-            Method: POST
-            RestApiId: !Ref CognitoAuthorized
-  ConfigurationLogGroup:
-    Type: AWS::Logs::LogGroup
-    DeletionPolicy: Retain
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${Configuration}
   Cognito:
     Type: AWS::Serverless::Api
     Properties:
       Name: !Sub
         - ${ResourceName} From Stack ${AWS::StackName}
         - ResourceName: Cognito
-      StageName: Prod
+      StageName: sam
       Auth:
         ResourcePolicy:
           IpRangeWhitelist:
             - !Ref globalIP
+      OpenApiVersion: 3.1.0
       DefinitionBody:
         openapi: '3.0'
         info: {}
@@ -221,78 +192,6 @@ Resources:
     DeletionPolicy: Retain
     Properties:
       LogGroupName: !Sub /aws/lambda/${ConfirmSignUp}
-  CognitoAuthorized:
-    Type: AWS::Serverless::Api
-    Properties:
-      Name: !Sub
-        - ${ResourceName} From Stack ${AWS::StackName}
-        - ResourceName: CognitoAuthorized
-      StageName: Prod
-      DefinitionBody:
-        openapi: '3.0'
-        info: {}
-        paths:
-          /cognito/configuration:
-            post:
-              x-amazon-apigateway-integration:
-                httpMethod: POST
-                type: aws_proxy
-                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Configuration.Arn}/invocations
-              responses: {}
-          /cognito/confirm-configuration:
-            post:
-              x-amazon-apigateway-integration:
-                httpMethod: POST
-                type: aws_proxy
-                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConfirmConfiguration.Arn}/invocations
-              responses: {}
-      EndpointConfiguration: REGIONAL
-      TracingEnabled: true
-      Auth:
-        Authorizers:
-          Cognito:
-            UserPoolArn: !GetAtt UserPool.Arn
-        ResourcePolicy:
-          IpRangeWhitelist:
-            - !Ref globalIP
-          SourceVpcWhitelist:
-            - !Ref vpcId
-        DefaultAuthorizer: Cognito
-      Cors:
-        AllowOrigin: '''*'''
-        AllowHeaders: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
-        AllowMethods: '''*'''
-        MaxAge: 5
-  ConfirmConfiguration:
-    Type: AWS::Serverless::Function
-    Properties:
-      Description: !Sub
-        - Stack ${AWS::StackName} Function ${ResourceName}
-        - ResourceName: ConfirmConfiguration
-      CodeUri: src/ConfirmConfiguration
-      Handler: handler.handler
-      Runtime: python3.10
-      MemorySize: 3008
-      Timeout: 30
-      Tracing: Active
-      Environment:
-        Variables:
-          USERPOOLCLIENT_USER_POOL_CLIENT_ID: !Ref UserPoolClient
-          USER_POOL_ID: !GetAtt UserPool.UserPoolId
-          CLIENT_ID: !Ref UserPoolClient
-          CLIENT_SECRET: !Ref clientSecret
-      Events:
-        CognitoAuthorizedPOSTcognitoconfirmconfiguration:
-          Type: Api
-          Properties:
-            Path: /cognito/confirm-configuration
-            Method: POST
-            RestApiId: !Ref CognitoAuthorized
-  ConfirmConfigurationLogGroup:
-    Type: AWS::Logs::LogGroup
-    DeletionPolicy: Retain
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${ConfirmConfiguration}
   Cluster:
     Type: AWS::ECS::Cluster
     Properties:
@@ -416,13 +315,294 @@ Resources:
       Name: DockerHubSecret
       Description: DockerHubSecret
       SecretString: !Ref dockerCredentialsParameter
+  FreeUserPoolGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      UserPoolId: !GetAtt UserPool.UserPoolId
+      GroupName: FreeUserPoolGroup
+      Description: Free user group
+      RoleArn: !GetAtt InvokeAPIWithS3Role.Arn
+  InvokeAPIWithS3Role:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+      MaxSessionDuration: 3600
+      Policies:
+        - PolicyName: DenyS3Delete
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              Action:
+                - s3:DeleteObject
+              Resource:
+                - '*'
+              Effect: Deny
+      AssumeRolePolicyDocument:
+        Version: '2008-10-17'
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Sid: ''
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+            Sid: ''
+  DeploymentDevCognito:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref Cognito
+      Description: Dev deployment
+  StageDevCognito:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref Cognito
+      StageName: dev
+      Description: Develop stage
+      DeploymentId: !GetAtt DeploymentDevCognito.DeploymentId
+      Variables:
+        ailias: dev
+      AccessLogSetting:
+        DestinationArn: !GetAtt LogGroupCognito.Arn
+        Format: $context.requestId
+      MethodSettings:
+        - ResourcePath: /*
+          HttpMethod: '*'
+          DataTraceEnabled: true
+          LoggingLevel: INFO
+  AliasDevLogin:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref Login
+      FunctionVersion: $LATEST
+      Name: dev
+  LogGroupCognito:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: LogGroupCognito
+      RetentionInDays: 30
+  AccountApi:
+    Type: AWS::ApiGateway::Account
+    Properties:
+      CloudWatchRoleArn: !GetAtt RoleCloudWatchLogs.Arn
+  RoleCloudWatchLogs:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: '2008-10-17'
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Sid: ''
+  AliasDevSignUp:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref SignUp
+      FunctionVersion: $LATEST
+      Name: dev
+  AliasDevConfirmSignUp:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref ConfirmSignUp
+      FunctionVersion: $LATEST
+      Name: dev
+  AliasDevLogout:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref Logout
+      FunctionVersion: $LATEST
+      Name: dev
+  AddGroup:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: AddGroup
+      CodeUri: src/AddGroup
+      Handler: handler.handler
+      Runtime: python3.10
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Environment:
+        Variables:
+          USERPOOLCLIENT_USER_POOL_CLIENT_ID: !Ref UserPoolClient
+          USER_POOL_ID: !GetAtt UserPool.UserPoolId
+          CLIENT_ID: !Ref UserPoolClient
+          CLIENT_SECRET: !Ref clientSecret
+      Events:
+        CognitoAuthorizedPOSTcognitogroupadd:
+          Type: Api
+          Properties:
+            Path: /cognito/group/add
+            Method: POST
+            RestApiId: !Ref CognitoAuthorized
+  AddGroupLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${AddGroup}
+  GetUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: GetUser
+      CodeUri: src/GetUser
+      Handler: handler.handler
+      Runtime: python3.10
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Environment:
+        Variables:
+          USERPOOLCLIENT_USER_POOL_CLIENT_ID: !Ref UserPoolClient
+          USER_POOL_ID: !GetAtt UserPool.UserPoolId
+          CLIENT_ID: !Ref UserPoolClient
+          CLIENT_SECRET: !Ref clientSecret
+      Events:
+        CognitoAuthorizedPOSTcognitouserget:
+          Type: Api
+          Properties:
+            Path: /cognito/user/get
+            Method: POST
+            RestApiId: !Ref CognitoAuthorized
+  GetUserLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${GetUser}
+  CognitoAuthorized:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub
+        - ${ResourceName} From Stack ${AWS::StackName}
+        - ResourceName: CognitoAuthorized
+      StageName: sam
+      OpenApiVersion: 3.1.0
+      DefinitionBody:
+        openapi: '3.0'
+        info: {}
+        paths:
+          /cognito/group/add:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddGroup.Arn}/invocations
+              responses: {}
+          /cognito/user/get:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUser.Arn}/invocations
+              responses: {}
+          /cognito/group/user/list:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListUserInGroup.Arn}/invocations
+              responses: {}
+      EndpointConfiguration: REGIONAL
+      TracingEnabled: true
+      Auth:
+        Authorizers:
+          Cognito:
+            UserPoolArn: !GetAtt UserPool.Arn
+        DefaultAuthorizer: Cognito
+      Cors:
+        MaxAge: 5
+        AllowOrigin: '''*'''
+        AllowHeaders: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
+        AllowMethods: '''*'''
+  AliasDevAddGroup:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref AddGroup
+      FunctionVersion: $LATEST
+      Name: dev
+  AliasDevGetUser:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref GetUser
+      FunctionVersion: $LATEST
+      Name: dev
+  StageDevCognitoAuthorized:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref CognitoAuthorized
+      StageName: dev
+      Description: Develop stage
+      DeploymentId: !GetAtt DeploymentDevCognitoAuthorized.DeploymentId
+      Variables:
+        ailias: dev
+      AccessLogSetting:
+        DestinationArn: !GetAtt LogGroupCognito.Arn
+        Format: $context.requestId
+      MethodSettings:
+        - ResourcePath: /*
+          HttpMethod: '*'
+          DataTraceEnabled: true
+          LoggingLevel: INFO
+  DeploymentDevCognitoAuthorized:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref CognitoAuthorized
+      Description: Dev deployment
+  ListUserInGroup:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: ListUserInGroup
+      CodeUri: src/ListUserInGroup
+      Handler: handler.handler
+      Runtime: python3.10
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Events:
+        CognitoAuthorizedPOSTcognitogroupuserlist:
+          Type: Api
+          Properties:
+            Path: /cognito/group/user/list
+            Method: POST
+            RestApiId: !Ref CognitoAuthorized
+      Environment:
+        Variables:
+          USERPOOLCLIENT_USER_POOL_CLIENT_ID: !Ref UserPoolClient
+          USER_POOL_ID: !GetAtt UserPool.UserPoolId
+          CLIENT_ID: !Ref UserPoolClient
+          CLIENT_SECRET: !Ref clientSecret
+  ListUserInGroupLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${ListUserInGroup}
+  AliasDevListUserInGroup:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref ListUserInGroup
+      FunctionVersion: $LATEST
+      Name: dev
 Transform: AWS::Serverless-2016-10-31
 Parameters:
   clientSecret:
     Type: String
   globalIP:
-    Type: String
-  vpcId:
     Type: String
   publicSecurityGroupId:
     Type: String
