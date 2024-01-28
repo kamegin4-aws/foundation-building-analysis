@@ -37,15 +37,14 @@ def handler(event, context):
                 print(f'c_type: {c_type}.')
                 print(f'body: {body}.')
             else:
-                # body = json.loads(event["body"])
-                body = event["body"]
+                body = json.loads(event["body"])
+                # body = event["body"]
 
         cognito_idp_client = boto3.client(
             "cognito-idp", region_name="ap-northeast-1")
 
-        # user_pool_id = os.environ["USER_POOL_ID"]
-        user_pool_id = "ap-northeast-1_KPdaM8dxN"
-        print(f'user_pool_id: {user_pool_id}')
+        user_pool_id = os.environ["USER_POOL_ID"]
+        # user_pool_id = ""
 
         client_id = os.environ["CLIENT_ID"]
 
@@ -67,7 +66,7 @@ def handler(event, context):
         # 1週目
         if ("Users" in list_users_in_group and len(
                 list_users_in_group["Users"])):
-            user_list.append(list_users_in_group["Users"])
+            user_list.extend(list_users_in_group["Users"])
 
         # 次のトークン
         if (
@@ -87,10 +86,10 @@ def handler(event, context):
                 break
             if ("Users" in list_users_in_group and len(
                     list_users_in_group["Users"]) > 0):
-                user_list.append(list_users_in_group["Users"])
+                user_list.extend(list_users_in_group["Users"])
 
         if (len(user_list) > 0):
-            user_list = check_user_in_group(user_list)
+            user_list = check_list_users_in_group(user_list)
 
         list_users_in_group = {
             "Users": user_list
@@ -158,8 +157,26 @@ class CognitoIdentityProviderWrapper:
             raise RuntimeError("Couldn't list user in group") from err
 
 
-def check_user_in_group(list_user):
-    print(f'list_user: {list_user}')
+def check_list_users_in_group(list_user):
+    """
+    'Enabled'がFalseのものを除外する
+    'UserCreateDate','UserLastModifiedDate'を文字列に変換する
+
+    Args:
+        list_user (Array): list_users_in_group['Users']
+
+    Returns:
+        Array: list_users_in_group['Users']
+    """
+    # print(f'list_user: {list_user}')
     checked_user = [user for user in list_user if user["Enabled"] is True]
+
+    for i, user in enumerate(checked_user):
+        if ("UserCreateDate" in user):
+            user["UserCreateDate"] = user["UserCreateDate"].strftime(
+                "%Y-%m-%d %H:%M:%S")
+        if ("UserLastModifiedDate" in user):
+            user["UserLastModifiedDate"] = user["UserLastModifiedDate"].strftime(
+                "%Y-%m-%d %H:%M:%S")
 
     return checked_user
