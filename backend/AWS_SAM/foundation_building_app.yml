@@ -83,10 +83,8 @@ Resources:
         - ${ResourceName} From Stack ${AWS::StackName}
         - ResourceName: Cognito
       StageName: sam
-      Auth:
-        ResourcePolicy:
-          IpRangeWhitelist:
-            - !Ref globalIP
+      Variables:
+        alias: prod
       OpenApiVersion: 3.1.0
       DefinitionBody:
         openapi: '3.0'
@@ -122,6 +120,15 @@ Resources:
               responses: {}
       EndpointConfiguration: REGIONAL
       TracingEnabled: true
+      Auth:
+        ResourcePolicy:
+          IpRangeWhitelist:
+            - !Ref globalIP
+          CustomStatements:
+            - Effect: Allow
+              Principal: '*'
+              Action: execute-api:Invoke
+              Resource: '*'
       Cors:
         AllowOrigin: '''*'''
         AllowHeaders: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
@@ -486,6 +493,8 @@ Resources:
         - ${ResourceName} From Stack ${AWS::StackName}
         - ResourceName: CognitoAuthorized
       StageName: sam
+      Variables:
+        alias: prod
       OpenApiVersion: 3.1.0
       DefinitionBody:
         openapi: '3.0'
@@ -519,6 +528,12 @@ Resources:
           Cognito:
             UserPoolArn: !GetAtt UserPool.Arn
         DefaultAuthorizer: Cognito
+        ResourcePolicy:
+          CustomStatements:
+            - Effect: Allow
+              Principal: '*'
+              Action: execute-api:Invoke
+              Resource: '*'
       Cors:
         MaxAge: 5
         AllowOrigin: '''*'''
