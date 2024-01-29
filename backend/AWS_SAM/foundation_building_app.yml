@@ -353,20 +353,15 @@ Resources:
             Principal:
               Service: s3.amazonaws.com
             Sid: ''
-  DeploymentDevCognito:
-    Type: AWS::ApiGateway::Deployment
-    Properties:
-      RestApiId: !Ref Cognito
-      Description: Dev deployment
   StageDevCognito:
     Type: AWS::ApiGateway::Stage
     Properties:
       RestApiId: !Ref Cognito
       StageName: dev
       Description: Develop stage
-      DeploymentId: !GetAtt DeploymentDevCognito.DeploymentId
+      DeploymentId: !GetAtt DeploymentCognito.DeploymentId
       Variables:
-        ailias: dev
+        alias: dev
       AccessLogSetting:
         DestinationArn: !GetAtt LogGroupCognito.Arn
         Format: $context.requestId
@@ -435,6 +430,7 @@ Resources:
       MemorySize: 3008
       Timeout: 30
       Tracing: Active
+      Role: !GetAtt RoleCognito.Arn
       Environment:
         Variables:
           USERPOOLCLIENT_USER_POOL_CLIENT_ID: !Ref UserPoolClient
@@ -546,9 +542,9 @@ Resources:
       RestApiId: !Ref CognitoAuthorized
       StageName: dev
       Description: Develop stage
-      DeploymentId: !GetAtt DeploymentDevCognitoAuthorized.DeploymentId
+      DeploymentId: !GetAtt DeploymentCognitoAuthorized.DeploymentId
       Variables:
-        ailias: dev
+        alias: dev
       AccessLogSetting:
         DestinationArn: !GetAtt LogGroupCognito.Arn
         Format: $context.requestId
@@ -557,11 +553,6 @@ Resources:
           HttpMethod: '*'
           DataTraceEnabled: true
           LoggingLevel: INFO
-  DeploymentDevCognitoAuthorized:
-    Type: AWS::ApiGateway::Deployment
-    Properties:
-      RestApiId: !Ref CognitoAuthorized
-      Description: Dev deployment
   ListUserInGroup:
     Type: AWS::Serverless::Function
     Properties:
@@ -574,6 +565,7 @@ Resources:
       MemorySize: 3008
       Timeout: 30
       Tracing: Active
+      Role: !GetAtt RoleCognito.Arn
       Events:
         CognitoAuthorizedPOSTcognitogroupuserlist:
           Type: Api
@@ -598,6 +590,151 @@ Resources:
       FunctionName: !Ref ListUserInGroup
       FunctionVersion: $LATEST
       Name: dev
+  RoleCognito:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      MaxSessionDuration: 3600
+      Policies:
+        - PolicyName: CognitoAdmin
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              Action:
+                - cognito-identity:*
+                - cognito-idp:*
+              Resource:
+                - '*'
+              Effect: Allow
+      AssumeRolePolicyDocument:
+        Version: '2008-10-17'
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Sid: ''
+  VersionLogin:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref Login
+      Description: v1
+  VersionSignUp:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref SignUp
+      Description: v1
+  VersionConfirmSignUp:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref ConfirmSignUp
+      Description: v1
+  VersionLogout:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref Logout
+      Description: v1
+  VersionAddGroup:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref AddGroup
+      Description: v1
+  VersionGetUser:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref GetUser
+      Description: v1
+  VersionListUserInGroup:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref ListUserInGroup
+      Description: v1
+  AliasProdLogin:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref Login
+      FunctionVersion: !GetAtt VersionLogin.Version
+      Name: prod
+  AliasProdSignUp:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref SignUp
+      FunctionVersion: !GetAtt VersionSignUp.Version
+      Name: prod
+  AliasProdConfirmSignUp:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref ConfirmSignUp
+      FunctionVersion: !GetAtt VersionConfirmSignUp.Version
+      Name: prod
+  AliasProdLogout:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref Logout
+      FunctionVersion: !GetAtt VersionLogout.Version
+      Name: prod
+  AliasProdAddGroup:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref AddGroup
+      FunctionVersion: !GetAtt VersionAddGroup.Version
+      Name: prod
+  AliasProdGetUser:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref GetUser
+      FunctionVersion: !GetAtt VersionGetUser.Version
+      Name: prod
+  AliasProdListUserInGroup:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref ListUserInGroup
+      FunctionVersion: !GetAtt VersionListUserInGroup.Version
+      Name: prod
+  DeploymentCognito:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref Cognito
+      Description: Cognito deployment
+  DeploymentCognitoAuthorized:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref CognitoAuthorized
+      Description: CognitoAuthorized deployment
+  StageProdCognito:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref Cognito
+      StageName: prod
+      Description: Production stage
+      DeploymentId: !GetAtt DeploymentCognito.DeploymentId
+      Variables:
+        alias: prod
+      AccessLogSetting:
+        DestinationArn: !GetAtt LogGroupCognito.Arn
+        Format: $context.requestId
+      MethodSettings:
+        - ResourcePath: /*
+          HttpMethod: '*'
+          DataTraceEnabled: true
+          LoggingLevel: INFO
+  StageProdCognitoAuthorized:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref CognitoAuthorized
+      StageName: prod
+      Description: Production stage
+      DeploymentId: !GetAtt DeploymentCognitoAuthorized.DeploymentId
+      Variables:
+        alias: prod
+      AccessLogSetting:
+        DestinationArn: !GetAtt LogGroupCognito.Arn
+        Format: $context.requestId
+      MethodSettings:
+        - ResourcePath: /*
+          HttpMethod: '*'
+          DataTraceEnabled: true
+          LoggingLevel: INFO
 Transform: AWS::Serverless-2016-10-31
 Parameters:
   clientSecret:
