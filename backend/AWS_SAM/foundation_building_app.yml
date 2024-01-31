@@ -128,7 +128,15 @@ Resources:
             - Effect: Allow
               Principal: '*'
               Action: execute-api:Invoke
-              Resource: '*'
+              Resource:
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/POST/cognito/login
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/OPTIONS/cognito/login
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/POST/cognito/signup
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/OPTIONS/cognito/signup
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/POST/cognito/confirm-signup
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/OPTIONS/cognito/confirm-signup
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/POST/cognito/logout
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/OPTIONS/cognito/logout
       Cors:
         AllowOrigin: '''*'''
         AllowHeaders: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
@@ -533,7 +541,8 @@ Resources:
             - Effect: Allow
               Principal: '*'
               Action: execute-api:Invoke
-              Resource: '*'
+              Resource:
+                - '*'
       Cors:
         MaxAge: 5
         AllowOrigin: '''*'''
@@ -765,4 +774,6 @@ Parameters:
   elbTargetGroupArn:
     Type: String
   dockerCredentialsParameter:
+    Type: String
+  apiCognitoId:
     Type: String
