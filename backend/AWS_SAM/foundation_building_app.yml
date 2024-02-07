@@ -84,7 +84,7 @@ Resources:
         - ResourceName: Cognito
       StageName: sam
       Variables:
-        alias: prod
+        alias: dev
       OpenApiVersion: 3.1.0
       DefinitionBody:
         openapi: '3.0'

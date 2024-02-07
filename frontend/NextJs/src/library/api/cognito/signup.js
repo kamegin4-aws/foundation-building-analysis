@@ -1,16 +1,11 @@
-//"use server";
-
-//import { cookies } from "next/headers";
-
-export async function userNameLogin(formData) {
+export async function signup(formData) {
   try {
     const url =
-      "https://up8wjt0dp5.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/login";
+      "https://up8wjt0dp5.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/signup";
     const response = fetch(url, {
       method: "POST", // *GET, POST, PUT, DELETE, etc.
       cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
       mode: "cors",
-      //credentials: "include",
       /*
       headers: {
         "Content-Type": "application/json",

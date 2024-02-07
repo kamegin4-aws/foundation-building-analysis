@@ -44,6 +44,24 @@ class ZodWrapper {
       }
     }
   }
+
+  emailValidation(email) {
+    try {
+      const result = this.#zod.string().email().safeParse(email);
+
+      if (result.success) {
+        return true;
+      } else {
+        return JSON.stringify(result.error.format());
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(e.message);
+      } else {
+        throw new Error("Zod Error");
+      }
+    }
+  }
 }
 
 export const validationZod = new ZodWrapper(z);

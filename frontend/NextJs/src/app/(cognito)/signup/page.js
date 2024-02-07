@@ -7,17 +7,17 @@ import FormWrapper from "@/ui/cloudscape/form";
 import HeaderWrapper from "@/ui/cloudscape/header";
 import LinkWrapper from "@/ui/cloudscape/link";
 import SpaceBetweenWrapper from "@/ui/cloudscape/space_between";
-import TabsWrapper from "@/ui/cloudscape/tabs";
 import ButtonWrapper from "@/ui/cloudscape/button";
 import FormFieldWrapper from "@/ui/cloudscape/form_field";
 import InputWrapper from "@/ui/cloudscape/input";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-import { loginValidation } from "@/library/validation/cognito/login";
-import { userNameLogin } from "@/library/api/cognito/login";
+import { signupValidation } from "@/library/validation/cognito/signup";
+import { signup } from "@/library/api/cognito/signup";
+import ModalWrapper from "@/ui/cloudscape/modal";
 
-export default function LoginPage() {
+export default function signupPage() {
   //Alert
   const [alertDisplay, setAlertDisplay] = useState(false);
   const [alertType, setAlertType] = useState();
@@ -31,54 +31,88 @@ export default function LoginPage() {
   const [emailInputInvalid, setEmailInputInvalid] = useState(false);
   const [passwordInputValue, setPasswordInputValue] = useState("");
   const [passwordInputInvalid, setPasswordInputInvalid] = useState(false);
+  const [signupButtonLoading, setSignupButtonLoading] = useState(false);
+  const [signupButtonLoadingText, setSignupButtonLoadingText] = useState("");
+
+  //Modal
+  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    const formData = new FormData();
+    try {
+      setSignupButtonLoading(true);
+      setSignupButtonLoadingText("サインアップ中...");
 
-    formData.append("user_name", userNameInputValue);
-    formData.append("password", passwordInputValue);
+      const formData = new FormData();
+      formData.append("user_name", userNameInputValue);
+      formData.append("user_email", emailInputValue);
+      formData.append("password", passwordInputValue);
 
-    const validationResult = loginValidation(formData);
-    let validationMessage = "";
-    setUserNameInputInvalid(false);
-    setPasswordInputInvalid(false);
-    setAlertDisplay(false);
+      const validationResult = signupValidation(formData);
+      let validationMessage = "";
+      setUserNameInputInvalid(false);
+      setEmailInputInvalid(false);
+      setPasswordInputInvalid(false);
+      setAlertDisplay(false);
 
-    if (validationResult == true) {
-      console.log("loginValidation: true");
-      const apiResponse = await userNameLogin(formData);
+      if (validationResult == true) {
+        console.log("signupValidation: true");
+        const apiResponse = await signup(formData);
 
-      if (apiResponse.ok) {
-        const apiResponseObject = await apiResponse.json();
-        console.log(apiResponseObject);
+        if (apiResponse.ok) {
+          const apiResponseObject = await apiResponse.json();
+          console.log("apiResponseObject", apiResponseObject);
+          setAlertDisplay(true);
+          setAlertType("success");
+          setAlertHeader("確認番号を送信しました。");
+          setAlertMessage(
+            <ModalWrapper
+              header={確認コード}
+              visible={confirmModalVisible}
+              parentSetVisible={setConfirmModalVisible}
+            />
+          );
+          setConfirmModalVisible(true);
+        } else {
+          setAlertDisplay(true);
+          setAlertType("error");
+          setAlertHeader("サインアップに失敗しました。");
+          setAlertMessage(JSON.stringify(apiResponseObject));
+        }
+      } else {
+        console.log("signupValidation: false: ", validationResult);
+        const validationResultObject = JSON.parse(validationResult);
+        for (const validation of validationResultObject) {
+          if (validation["index"] == "userName") setUserNameInputInvalid(true);
+          else if (validation["index"] == "password")
+            setPasswordInputInvalid(true);
+          else if (validation["index"] == "email") setEmailInputValue(true);
+
+          validationMessage += validation["message"] + "\n";
+        }
+
         setAlertDisplay(true);
-        setAlertType("success");
-        setAlertHeader("ログインしました。");
-        setAlertMessage(JSON.stringify(apiResponseObject));
+        setAlertType("error");
+        setAlertHeader("入力が間違えています。");
+        setAlertMessage(validationMessage);
+
+        return false;
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        console.log(e.message);
+        setAlertDisplay(true);
+        setAlertType("error");
+        setAlertHeader("エラーが発生しました。");
+        setAlertMessage(e.message);
       } else {
         setAlertDisplay(true);
         setAlertType("error");
-        setAlertHeader("ログインに失敗しました。");
-        setAlertMessage(JSON.stringify(apiResponseObject));
+        setAlertHeader("エラーが発生しました。");
+        setAlertMessage("Client Error");
       }
-    } else {
-      console.log("loginValidation: false: ", validationResult);
-      const validationResultObject = JSON.parse(validationResult);
-      for (const validation of validationResultObject) {
-        if (validation["index"] == "userName") setUserNameInputInvalid(true);
-        else if (validation["index"] == "password")
-          setPasswordInputInvalid(true);
-
-        validationMessage += validation["message"] + "\n";
-      }
-
-      setAlertDisplay(true);
-      setAlertType("error");
-      setAlertHeader("入力が間違えています。");
-      setAlertMessage(validationMessage);
-
-      return false;
+    } finally {
+      setSignupButtonLoading(false);
     }
   };
 
@@ -87,6 +121,7 @@ export default function LoginPage() {
     console.log(event.detail);
     setUserNameInputValue("");
     setPasswordInputValue("");
+    setEmailInputValue("");
   };
 
   /*
@@ -144,6 +179,8 @@ export default function LoginPage() {
                         <ButtonWrapper
                           formAction={"submit"}
                           name={"サインアップ"}
+                          loading={signupButtonLoading}
+                          loadingText={signupButtonLoadingText}
                         />
                       </>
                     }

@@ -1,10 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: [
-    '@cloudscape-design/components',
-    '@cloudscape-design/component-toolkit'
+    "@cloudscape-design/components",
+    "@cloudscape-design/component-toolkit",
   ],
-  output: 'standalone'
+  output: "standalone",
+  experimental: { serverActions: true },
 };
-  
+
 module.exports = nextConfig;
