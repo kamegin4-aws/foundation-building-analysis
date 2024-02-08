@@ -1,4 +1,3 @@
-import * as React from "react";
 import FormField from "@cloudscape-design/components/form-field";
 
 export default function FormFieldWrapper(props) {

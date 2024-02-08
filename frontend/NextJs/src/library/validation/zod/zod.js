@@ -62,6 +62,25 @@ class ZodWrapper {
       }
     }
   }
+
+  codeValidation(code) {
+    try {
+      const regex = /^[0-9]{6}$/;
+      const result = this.#zod.string().regex(regex).safeParse(code);
+
+      if (result.success) {
+        return true;
+      } else {
+        return JSON.stringify(result.error.format());
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(e.message);
+      } else {
+        throw new Error("Zod Error");
+      }
+    }
+  }
 }
 
 export const validationZod = new ZodWrapper(z);

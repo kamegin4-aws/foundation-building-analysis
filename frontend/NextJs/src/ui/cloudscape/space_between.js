@@ -1,4 +1,3 @@
-import * as React from "react";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 
 export default function SpaceBetweenWrapper(props) {

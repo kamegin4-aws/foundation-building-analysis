@@ -1,8 +1,6 @@
-import * as React from "react";
 import Modal from "@cloudscape-design/components/modal";
 import Box from "@cloudscape-design/components/box";
 import SpaceBetween from "@cloudscape-design/components/space-between";
-import Button from "@cloudscape-design/components/button";
 
 export default function ModalWrapper(props) {
   //const [visible, setVisible] = React.useState(false);
@@ -24,7 +22,11 @@ export default function ModalWrapper(props) {
       }
       header={props.header ? props.header : undefined}
     >
-      {props.content ? props.content : <></>}
+      {props.content ? (
+        <SpaceBetween size="l">{props.content}</SpaceBetween>
+      ) : (
+        <></>
+      )}
     </Modal>
   );
 }

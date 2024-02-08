@@ -1,4 +1,3 @@
-import * as React from "react";
 import TopNavigation from "@cloudscape-design/components/top-navigation";
 import Input from "@cloudscape-design/components/input";
 import {

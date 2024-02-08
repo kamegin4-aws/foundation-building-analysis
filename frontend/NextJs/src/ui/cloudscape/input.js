@@ -1,6 +1,3 @@
-//"use client";
-
-import * as React from "react";
 import Input from "@cloudscape-design/components/input";
 
 export default function InputWrapper(props) {
@@ -14,6 +11,7 @@ export default function InputWrapper(props) {
       }}
       value={props.value ? props.value : ""}
       type={props.type ? props.type : "text"}
+      inputMode={props.inputMode ? props.inputMode : "text"}
       invalid={props.invalid ? props.invalid : false}
     />
   );

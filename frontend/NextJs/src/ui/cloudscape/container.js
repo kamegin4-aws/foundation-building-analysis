@@ -1,4 +1,3 @@
-import * as React from "react";
 import Container from "@cloudscape-design/components/container";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 

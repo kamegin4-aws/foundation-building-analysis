@@ -6,21 +6,22 @@ import ContentLayoutWrapper from "@/ui/cloudscape/content_layout";
 import FormWrapper from "@/ui/cloudscape/form";
 import HeaderWrapper from "@/ui/cloudscape/header";
 import LinkWrapper from "@/ui/cloudscape/link";
-import SpaceBetweenWrapper from "@/ui/cloudscape/space_between";
 import TabsWrapper from "@/ui/cloudscape/tabs";
 import ButtonWrapper from "@/ui/cloudscape/button";
 import FormFieldWrapper from "@/ui/cloudscape/form_field";
 import InputWrapper from "@/ui/cloudscape/input";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { CognitoLayoutContext } from "@/app/(cognito)/layout";
 
 import { loginValidation } from "@/library/validation/cognito/login";
 import { userNameLogin } from "@/library/api/cognito/login";
-import {
-  setCognitoTokens,
-  getCognitoTokens,
-} from "@/library/cookies/cognito/login";
+import { setCognitoTokens } from "@/library/cookies/cognito/login";
 export default function LoginPage() {
+  //CognitoLayoutContext
+  const { breadcrumbItems, setBreadcrumbItems } =
+    useContext(CognitoLayoutContext);
+
   //Alert
   const [alertDisplay, setAlertDisplay] = useState(false);
   const [alertType, setAlertType] = useState();
@@ -67,7 +68,7 @@ export default function LoginPage() {
           setAlertDisplay(true);
           setAlertType("error");
           setAlertHeader("ログインに失敗しました。");
-          setAlertMessage(JSON.stringify(apiResponseObject));
+          setAlertMessage(await apiResponse.json());
         }
       } else {
         console.log("loginValidation: false: ", validationResult);
@@ -112,10 +113,13 @@ export default function LoginPage() {
     setPasswordInputValue("");
   };
 
-  /*
   useEffect(() => {
+    setBreadcrumbItems([
+      { text: "Home", href: "#" },
+      { text: "Login", href: "/login" },
+    ]);
   }, []);
-  */
+
   return (
     <ContentLayoutWrapper
       content={
@@ -159,25 +163,19 @@ export default function LoginPage() {
                       id={"login_form"}
                       onSubmit={onSubmit}
                       actions={
-                        <SpaceBetweenWrapper
-                          size={"m"}
-                          direction={"horizontal"}
-                          contents={
-                            <>
-                              <ButtonWrapper
-                                variant={"normal"}
-                                name={"クリア"}
-                                onClick={clearOnClick}
-                              />
-                              <ButtonWrapper
-                                formAction={"submit"}
-                                name={"ログイン"}
-                                loading={loginButtonLoading}
-                                loadingText={loginButtonLoadingText}
-                              />
-                            </>
-                          }
-                        />
+                        <>
+                          <ButtonWrapper
+                            variant={"normal"}
+                            name={"クリア"}
+                            onClick={clearOnClick}
+                          />
+                          <ButtonWrapper
+                            formAction={"submit"}
+                            name={"ログイン"}
+                            loading={loginButtonLoading}
+                            loadingText={loginButtonLoadingText}
+                          />
+                        </>
                       }
                       container={
                         <>
