@@ -1,15 +1,23 @@
-export async function signup(formData) {
+import { getCognitoTokens } from "@/library/cookies/cognito/login";
+
+export async function addUserToGroup(formData) {
   try {
-    const url = "/sam/cognito/signup";
+    const CognitoTokens = await getCognitoTokens();
+    if (!CognitoTokens) {
+      throw new Error("Not Cognito Tokens");
+    }
+
+    const url = "/sam/cognito/group/user/add";
     const response = fetch(url, {
       method: "POST", // *GET, POST, PUT, DELETE, etc.
       cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
       mode: "cors",
-      /*
+      //credentials: "include",
+
       headers: {
-        "Content-Type": "application/json",
+        Authorization: `Bearer ${CognitoTokens.IdToken.value}`,
       },
-      */
+
       body: formData, // 本体のデータ型は "Content-Type" ヘッダーと一致させる必要があります
     });
 

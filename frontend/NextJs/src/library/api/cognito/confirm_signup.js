@@ -1,7 +1,6 @@
 export async function confirmSignup(formData) {
   try {
-    const url =
-      "https://up8wjt0dp5.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/confirm-signup";
+    const url = "/sam/cognito/signup/confirm";
     const response = fetch(url, {
       method: "POST", // *GET, POST, PUT, DELETE, etc.
       cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached

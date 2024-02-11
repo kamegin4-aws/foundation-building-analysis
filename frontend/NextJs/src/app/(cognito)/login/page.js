@@ -13,13 +13,16 @@ import InputWrapper from "@/ui/cloudscape/input";
 import Image from "next/image";
 import { useEffect, useState, useContext } from "react";
 import { CognitoLayoutContext } from "@/app/(cognito)/layout";
+import { usePathname, useSearchParams } from "next/navigation";
 
 import { loginValidation } from "@/library/validation/cognito/login";
 import { userNameLogin } from "@/library/api/cognito/login";
-import { setCognitoTokens } from "@/library/cookies/cognito/login";
 export default function LoginPage() {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   //CognitoLayoutContext
-  const { breadcrumbItems, setBreadcrumbItems } =
+  const { setBreadcrumbItems, setFlashBarItems } =
     useContext(CognitoLayoutContext);
 
   //Alert
@@ -62,7 +65,7 @@ export default function LoginPage() {
           setAlertDisplay(true);
           setAlertType("success");
           setAlertHeader("ログインしました。");
-          setCognitoTokens(apiResponseObject);
+          //setCognitoTokens(apiResponseObject);
           //setAlertMessage(JSON.stringify(apiResponseObject));
         } else {
           setAlertDisplay(true);
@@ -118,7 +121,23 @@ export default function LoginPage() {
       { text: "Home", href: "#" },
       { text: "Login", href: "/login" },
     ]);
-  }, []);
+
+    const searchSuccessMessages = searchParams.getAll("messageSuccess");
+    let flashBarItems = [];
+    if (searchSuccessMessages) {
+      for (let searchSuccessMessage of searchSuccessMessages) {
+        flashBarItems.push({
+          type: "success",
+          dismissible: true,
+          dismissLabel: "Dismiss message",
+          onDismiss: () => setFlashBarItems([]),
+          content: <>{searchSuccessMessage}</>,
+        });
+      }
+
+      setFlashBarItems(flashBarItems);
+    } else setFlashBarItems([]);
+  }, [pathname]);
 
   return (
     <ContentLayoutWrapper

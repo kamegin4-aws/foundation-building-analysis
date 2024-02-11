@@ -84,7 +84,7 @@ Resources:
         - ResourceName: Cognito
       StageName: sam
       Variables:
-        alias: dev
+        alias: prod
       OpenApiVersion: 3.1.0
       DefinitionBody:
         openapi: '3.0'
@@ -111,7 +111,7 @@ Resources:
                 type: aws_proxy
                 uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SignUp.Arn}/invocations
               responses: {}
-          /cognito/confirm-signup:
+          /cognito/signup/confirm:
             post:
               x-amazon-apigateway-integration:
                 httpMethod: POST
@@ -133,13 +133,13 @@ Resources:
                 - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/OPTIONS/cognito/login
                 - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/POST/cognito/signup
                 - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/OPTIONS/cognito/signup
-                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/POST/cognito/confirm-signup
-                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/OPTIONS/cognito/confirm-signup
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/POST/cognito/signup/confirm
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/OPTIONS/cognito/signup/confirm
                 - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/POST/cognito/logout
                 - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/OPTIONS/cognito/logout
       Cors:
         AllowOrigin: '''*'''
-        AllowHeaders: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
+        AllowHeaders: '''Content-Type, X-Amz-Date, Authorization, X-Api-Key, X-Amz-Security-Token'''
         AllowMethods: '''*'''
         MaxAge: 5
   SignUp:
@@ -189,19 +189,19 @@ Resources:
       MemorySize: 3008
       Timeout: 30
       Tracing: Active
-      Events:
-        CognitoPOSTcognitoconfirmsignup:
-          Type: Api
-          Properties:
-            Path: /cognito/confirm-signup
-            Method: POST
-            RestApiId: !Ref Cognito
       Environment:
         Variables:
           USERPOOLCLIENT_USER_POOL_CLIENT_ID: !Ref UserPoolClient
           USER_POOL_ID: !GetAtt UserPool.UserPoolId
           CLIENT_ID: !Ref UserPoolClient
           CLIENT_SECRET: !Ref clientSecret
+      Events:
+        CognitoPOSTcognitosignupconfirm:
+          Type: Api
+          Properties:
+            Path: /cognito/signup/confirm
+            Method: POST
+            RestApiId: !Ref Cognito
   ConfirmSignUpLogGroup:
     Type: AWS::Logs::LogGroup
     DeletionPolicy: Retain
@@ -453,10 +453,10 @@ Resources:
           CLIENT_ID: !Ref UserPoolClient
           CLIENT_SECRET: !Ref clientSecret
       Events:
-        CognitoAuthorizedPOSTcognitogroupadd:
+        CognitoAuthorizedPOSTcognitogroupuseradd:
           Type: Api
           Properties:
-            Path: /cognito/group/add
+            Path: /cognito/group/user/add
             Method: POST
             RestApiId: !Ref CognitoAuthorized
   AddGroupLogGroup:
@@ -483,10 +483,10 @@ Resources:
           CLIENT_ID: !Ref UserPoolClient
           CLIENT_SECRET: !Ref clientSecret
       Events:
-        CognitoAuthorizedPOSTcognitouserget:
+        CognitoAuthorizedPOSTcognitouserinfo:
           Type: Api
           Properties:
-            Path: /cognito/user/get
+            Path: /cognito/user/info
             Method: POST
             RestApiId: !Ref CognitoAuthorized
   GetUserLogGroup:
@@ -508,26 +508,26 @@ Resources:
         openapi: '3.0'
         info: {}
         paths:
-          /cognito/group/add:
-            post:
-              x-amazon-apigateway-integration:
-                httpMethod: POST
-                type: aws_proxy
-                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddGroup.Arn}/invocations
-              responses: {}
-          /cognito/user/get:
-            post:
-              x-amazon-apigateway-integration:
-                httpMethod: POST
-                type: aws_proxy
-                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUser.Arn}/invocations
-              responses: {}
           /cognito/group/user/list:
             post:
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 type: aws_proxy
                 uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListUserInGroup.Arn}/invocations
+              responses: {}
+          /cognito/user/info:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUser.Arn}/invocations
+              responses: {}
+          /cognito/group/user/add:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddGroup.Arn}/invocations
               responses: {}
       EndpointConfiguration: REGIONAL
       TracingEnabled: true
@@ -542,11 +542,16 @@ Resources:
               Principal: '*'
               Action: execute-api:Invoke
               Resource:
-                - '*'
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoAuthorizedId}/*/POST/cognito/group/user/list
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoAuthorizedId}/*/OPTIONS/cognito/group/user/list
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoAuthorizedId}/*/POST/cognito/group/user/add
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoAuthorizedId}/*/OPTIONS/cognito/group/user/add
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoAuthorizedId}/*/POST/cognito/user/info
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoAuthorizedId}/*/OPTIONS/cognito/user/info
       Cors:
         MaxAge: 5
         AllowOrigin: '''*'''
-        AllowHeaders: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
+        AllowHeaders: '''Content-Type, X-Amz-Date, Authorization, X-Api-Key, X-Amz-Security-Token'''
         AllowMethods: '''*'''
   AliasDevAddGroup:
     Type: AWS::Lambda::Alias
@@ -776,4 +781,6 @@ Parameters:
   dockerCredentialsParameter:
     Type: String
   apiCognitoId:
+    Type: String
+  apiCognitoAuthorizedId:
     Type: String

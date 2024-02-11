@@ -186,7 +186,7 @@ export default function SignupPage() {
           setAlertHeader("確認完了。");
           setAlertMessage("メールアドレス確認を完了しました。");
 
-          router.push("/login");
+          router.push("/login?messageSuccess=ユーザーを作成しました。");
         } else {
           setAlertDisplay(true);
           setAlertType("error");

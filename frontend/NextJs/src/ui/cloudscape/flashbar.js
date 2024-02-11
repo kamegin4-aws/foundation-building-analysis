@@ -1,0 +1,22 @@
+import Flashbar from "@cloudscape-design/components/flashbar";
+
+export default function FlashBarWrapper(props) {
+  /*
+  const [items, setItems] = React.useState([
+    {
+      type: "info",
+      dismissible: true,
+      dismissLabel: "Dismiss message",
+      onDismiss: () => setItems([]),
+      content: (
+        <>
+          This is an info flash message. It contains{" "}
+          <Link color="inverted">a link to another page</Link>.
+        </>
+      ),
+    },
+  ]);
+  */
+
+  return <Flashbar items={props.items} />;
+}

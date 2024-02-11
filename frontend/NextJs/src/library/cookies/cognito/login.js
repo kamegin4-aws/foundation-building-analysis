@@ -54,11 +54,11 @@ export async function getCognitoTokens() {
     console.log("cookies:", cookies);
 
     return {
-      AccessToken: getCookie("AccessToken"),
-      ExpiresIn: getCookie("ExpiresIn"),
-      IdToken: getCookie("IdToken"),
-      RefreshToken: getCookie("RefreshToken"),
-      TokenType: getCookie("TokenType"),
+      AccessToken: await getCookie("AccessToken"),
+      ExpiresIn: await getCookie("ExpiresIn"),
+      IdToken: await getCookie("IdToken"),
+      RefreshToken: await getCookie("RefreshToken"),
+      TokenType: await getCookie("TokenType"),
     };
   } catch (e) {
     if (e instanceof Error) {
