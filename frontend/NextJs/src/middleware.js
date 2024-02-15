@@ -1,30 +1,37 @@
 import { NextResponse } from "next/server";
+import { CognitoTokensCookie } from "@/library/cookies/cognito/login";
+import { UserInfoCookie } from "@/library/cookies/cognito/user_info";
 
-export function middleware(request) {
-  /*
-  // Assume a "Cookie:nextjs=fast" header to be present on the incoming request
-  // Getting cookies from the request using the `RequestCookies` API
-  //let cookie = request.cookies.get("nextjs");
-  //console.log(cookie); // => { name: 'nextjs', value: 'fast', Path: '/' }
-  onst allCookies = request.cookies.getAll();
-  console.log(allCookies); c// => [{ name: 'nextjs', value: 'fast' }]
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    "/((?!api|sam|signup|_next/static|_next/image|favicon.ico).*)",
+  ],
+};
 
-  request.cookies.has("nextjs"); // => true
-  request.cookies.delete("nextjs");
-  request.cookies.has("nextjs"); // => false
+export function middleware(request, event) {
+  const url = request.nextUrl.clone();
+  const matcher = /\.svg$/;
+  const regex = new RegExp(matcher);
 
-  // Setting cookies on the response using the `ResponseCookies` API
-  const response = NextResponse.next();
-  response.cookies.set("vercel", "fast");
-  response.cookies.set({
-    name: "vercel",
-    value: "fast",
-    path: "/",
-  });
-  let cookie = response.cookies.get("vercel");
-  console.log(cookie); // => { name: 'vercel', value: 'fast', Path: '/' }
-  // The outgoing response will have a `Set-Cookie:vercel=fast;path=/test` header.
+  const cognitoTokensCookie = new CognitoTokensCookie();
+  const serInfoCookie = new UserInfoCookie();
 
-  return response;
-  */
+  console.log("pathname:", url.pathname);
+  if (url.pathname != "/" && !regex.test(url)) {
+    if (
+      !event.waitUntil(cognitoTokensCookie.get()) ||
+      !event.waitUntil(serInfoCookie.get())
+    ) {
+      return NextResponse.rewrite(new URL("/login", request.url));
+    }
+  }
+
+  return NextResponse.next();
 }

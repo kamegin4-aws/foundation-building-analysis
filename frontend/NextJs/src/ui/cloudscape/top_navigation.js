@@ -6,18 +6,19 @@ import {
   USER_PROFILE_ITEMS,
 } from "@/ui/cloudscape/constant_group/constant_top_navigation";
 
-export default function TopNavigationWrapper() {
+export default function TopNavigationWrapper(props) {
   return (
     <TopNavigation
       identity={{
         href: "#",
-        title: "Service",
+        title: "基本基盤アプリ",
         logo: {
           src: LOGO_SRC,
-          alt: "Service",
+          alt: "Foundation Building App",
         },
       }}
       utilities={[
+        /*
         {
           type: "button",
           iconName: "notification",
@@ -26,6 +27,8 @@ export default function TopNavigationWrapper() {
           badge: true,
           disableUtilityCollapse: false,
         },
+        */
+        /*
         {
           type: "menu-dropdown",
           iconName: "settings",
@@ -33,6 +36,7 @@ export default function TopNavigationWrapper() {
           title: "Settings",
           items: SETTINGS_ITEMS,
         },
+
         {
           type: "menu-dropdown",
           text: "Customer Name",
@@ -40,8 +44,10 @@ export default function TopNavigationWrapper() {
           iconName: "user-profile",
           items: USER_PROFILE_ITEMS,
         },
+        */
+        props.menuDropdown,
       ]}
-      search={<Input type="search" placeholder="Search" ariaLabel="Search" />}
+      //search={<Input type="search" placeholder="Search" ariaLabel="Search" />}
     />
   );
 }

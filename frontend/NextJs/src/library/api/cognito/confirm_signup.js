@@ -1,24 +1,28 @@
-export async function confirmSignup(formData) {
-  try {
-    const url = "/sam/cognito/signup/confirm";
-    const response = fetch(url, {
-      method: "POST", // *GET, POST, PUT, DELETE, etc.
-      cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-      mode: "cors",
-      /*
-      headers: {
-        "Content-Type": "application/json",
-      },
-      */
-      body: formData, // 本体のデータ型は "Content-Type" ヘッダーと一致させる必要があります
-    });
+import { ApiInterface } from "@/library/api/interface/api";
 
-    return response;
-  } catch (e) {
-    if (e instanceof Error) {
-      throw new Error(e.message);
-    } else {
-      throw new Error("API Error");
+export class ConfirmSignup extends ApiInterface {
+  #url = "/sam/cognito/signup/confirm";
+  #options = {
+    method: "POST", // *GET, POST, PUT, DELETE, etc.
+    cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+    mode: "cors",
+  };
+  constructor() {
+    super();
+  }
+
+  async execute(formData) {
+    try {
+      this.#options.body = formData;
+      const response = fetch(this.#url, this.#options);
+
+      return response;
+    } catch {
+      if (e instanceof Error) {
+        throw new Error(e.message);
+      } else {
+        throw new Error("API Error");
+      }
     }
   }
 }

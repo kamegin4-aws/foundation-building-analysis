@@ -1,41 +1,53 @@
-import { validationZod } from "@/library/validation/zod/zod";
+import { ValidationInterface } from "@/library/validation/interface/validation";
 
-export function signupValidation(formData) {
-  try {
-    const validationList = [];
-    const errorMessageList = [];
-    const index = ["userName", "email", "password"];
+export class SignupValidation extends ValidationInterface {
+  #validationInstance;
+  #validationList = [];
+  #errorMessageList = [];
+  #index = ["userName", "email", "password"];
 
-    console.log("formData");
-    for (let value of formData.entries()) {
-      console.log(value);
-    }
+  constructor(validationInstance) {
+    super();
+    this.#validationInstance = validationInstance;
+  }
 
-    const userName = validationZod.userNameValidation(
-      formData.get("user_name")
-    );
-    validationList.push(userName);
-    const email = validationZod.emailValidation(formData.get("user_email"));
-    validationList.push(email);
-    const password = validationZod.passwordValidation(formData.get("password"));
-    validationList.push(password);
-
-    for (let i = 0; i < validationList.length; i++) {
-      if (validationList[i] !== true) {
-        errorMessageList.push({
-          index: index[i],
-          message: validationList[i],
-        });
+  execute(formData) {
+    try {
+      console.log("formData");
+      for (let value of formData.entries()) {
+        console.log(value);
       }
-    }
 
-    if (errorMessageList.length == 0) return true;
-    else return JSON.stringify(errorMessageList);
-  } catch (e) {
-    if (e instanceof Error) {
-      throw new Error(e.message);
-    } else {
-      throw new Error("Input Validation Error");
+      const userName = this.#validationInstance.userNameValidation(
+        formData.get("user_name")
+      );
+      this.#validationList.push(userName);
+      const email = this.#validationInstance.emailValidation(
+        formData.get("user_email")
+      );
+      this.#validationList.push(email);
+      const password = this.#validationInstance.passwordValidation(
+        formData.get("password")
+      );
+      this.#validationList.push(password);
+
+      for (let i = 0; i < this.#validationList.length; i++) {
+        if (this.#validationList[i] !== true) {
+          this.#errorMessageList.push({
+            index: this.#index[i],
+            message: this.#validationList[i],
+          });
+        }
+      }
+
+      if (this.#errorMessageList.length == 0) return true;
+      else return this.#errorMessageList;
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(e.message);
+      } else {
+        throw new Error("Input Validation Error");
+      }
     }
   }
 }

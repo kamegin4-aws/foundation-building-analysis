@@ -19,28 +19,26 @@ export default function CognitoLayout({ children, params }) {
   const [breadcrumbItems, setBreadcrumbItems] = useState([
     { text: "Home", href: "#" },
   ]);
-  const [topNavigationItems, setTopNavigationItems] = useState(
-    <TopNavigationWrapper />
-  );
   const [sideNavigationItems, setSideNavigationItems] = useState(
     <SideNavigationWrapper />
   );
   const [helpPanel, setHelpPanel] = useState();
   const [splitPanel, setSplitPanel] = useState();
   const [flashBarItems, setFlashBarItems] = useState([]);
+  const [menuDropdownItems, setMenuDropdownItems] = useState([]);
 
   return (
     <CognitoLayoutContext.Provider
       value={{
         setBreadcrumbItems,
-        setTopNavigationItems,
         setSideNavigationItems,
         setHelpPanel,
         setSplitPanel,
         setFlashBarItems,
+        setMenuDropdownItems,
       }}
     >
-      {topNavigationItems}
+      {<TopNavigationWrapper menuDropdown={menuDropdownItems} />}
       <AppLayoutWrapper
         breadCrumbGroup={<BreadcrumbGroupWrapper items={breadcrumbItems} />}
         sideNavigation={sideNavigationItems}

@@ -13,13 +13,16 @@ import InputWrapper from "@/ui/cloudscape/input";
 import Image from "next/image";
 import { useEffect, useState, useContext } from "react";
 import { CognitoLayoutContext } from "@/app/(cognito)/layout";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 
-import { loginValidation } from "@/library/validation/cognito/login";
-import { userNameLogin } from "@/library/api/cognito/login";
+import { LoginValidation } from "@/library/validation/cognito/login";
+import { validationZod } from "@/library/validation/infrastructure/zod/zod";
+import { UserNameLogin } from "@/library/api/cognito/login";
+
 export default function LoginPage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   //CognitoLayoutContext
   const { setBreadcrumbItems, setFlashBarItems } =
@@ -44,12 +47,15 @@ export default function LoginPage() {
     try {
       setLoginButtonLoading(true);
       setLoginButtonLoadingText("ログイン中...");
-      const formData = new FormData();
 
+      const loginValidation = new LoginValidation(validationZod);
+      const userNameLogin = new UserNameLogin();
+
+      const formData = new FormData();
       formData.append("user_name", userNameInputValue);
       formData.append("password", passwordInputValue);
 
-      const validationResult = loginValidation(formData);
+      const validationResult = loginValidation.execute(formData);
       let validationMessage = "";
       setUserNameInputInvalid(false);
       setPasswordInputInvalid(false);
@@ -57,7 +63,7 @@ export default function LoginPage() {
 
       if (validationResult == true) {
         console.log("loginValidation: true");
-        const apiResponse = await userNameLogin(formData);
+        const apiResponse = await userNameLogin.execute(formData);
 
         if (apiResponse.ok) {
           const apiResponseObject = await apiResponse.json();
@@ -117,11 +123,13 @@ export default function LoginPage() {
   };
 
   useEffect(() => {
+    //パンくずリスト
     setBreadcrumbItems([
       { text: "Home", href: "#" },
       { text: "Login", href: "/login" },
     ]);
 
+    //ヘッダーメッセージ
     const searchSuccessMessages = searchParams.getAll("messageSuccess");
     let flashBarItems = [];
     if (searchSuccessMessages) {

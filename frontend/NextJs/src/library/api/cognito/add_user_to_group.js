@@ -1,32 +1,39 @@
-import { getCognitoTokens } from "@/library/cookies/cognito/login";
+import { CognitoTokensCookie } from "@/library/cookies/cognito/login";
+import { ApiInterface } from "@/library/api/interface/api";
 
-export async function addUserToGroup(formData) {
-  try {
-    const CognitoTokens = await getCognitoTokens();
-    if (!CognitoTokens) {
-      throw new Error("Not Cognito Tokens");
-    }
+export class AddUserToGroup extends ApiInterface {
+  #url = "/sam/cognito/group/user/add";
+  #options = {
+    method: "POST", // *GET, POST, PUT, DELETE, etc.
+    cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+    mode: "cors",
+  };
+  constructor() {
+    super();
+  }
 
-    const url = "/sam/cognito/group/user/add";
-    const response = fetch(url, {
-      method: "POST", // *GET, POST, PUT, DELETE, etc.
-      cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-      mode: "cors",
-      //credentials: "include",
+  async execute(formData) {
+    try {
+      const cognitoTokensCookie = new CognitoTokensCookie();
+      const tokens = await cognitoTokensCookie.get();
+      if (!tokens) {
+        throw new Error("Not Cognito Tokens");
+      }
 
-      headers: {
-        Authorization: `Bearer ${CognitoTokens.IdToken.value}`,
-      },
+      this.#options.headers = {
+        Authorization: `${tokens.TokenType} ${tokens.IdToken}`,
+      };
+      this.#options.body = formData;
 
-      body: formData, // 本体のデータ型は "Content-Type" ヘッダーと一致させる必要があります
-    });
+      const response = fetch(this.#url, this.#options);
 
-    return response;
-  } catch (e) {
-    if (e instanceof Error) {
-      throw new Error(e.message);
-    } else {
-      throw new Error("API Error");
+      return response;
+    } catch {
+      if (e instanceof Error) {
+        throw new Error(e.message);
+      } else {
+        throw new Error("API Error");
+      }
     }
   }
 }

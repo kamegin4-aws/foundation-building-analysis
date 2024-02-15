@@ -38,6 +38,11 @@ const nextConfig = {
         destination:
           "https://j0b4v5x38g.execute-api.ap-northeast-1.amazonaws.com/sam/cognito/group/user/add",
       },
+      {
+        source: "/sam/cognito/user/info",
+        destination:
+          "https://j0b4v5x38g.execute-api.ap-northeast-1.amazonaws.com/sam/cognito/user/info",
+      },
     ];
   },
 };
