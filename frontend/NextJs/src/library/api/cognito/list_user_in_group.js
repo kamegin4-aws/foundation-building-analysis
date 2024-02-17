@@ -28,7 +28,7 @@ export class ListUserInGroup extends ApiInterface {
       const response = fetch(this.#url, this.#options);
 
       return response;
-    } catch {
+    } catch (e) {
       if (e instanceof Error) {
         throw new Error(e.message);
       } else {

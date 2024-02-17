@@ -39,15 +39,29 @@ export class UserInfoCookie extends CookieInterface {
       }
 
       return {
-        Username: (await getCookie("Username")).value,
-        Email: (await getCookie("email")).value,
-        UserId: (await getCookie("sub")).value,
+        userName: (await getCookie("Username")).value,
+        email: (await getCookie("email")).value,
+        userId: (await getCookie("sub")).value,
       };
     } catch (e) {
       if (e instanceof Error) {
         throw new Error(e.message);
       } else {
         throw new Error("Get Cookie Error");
+      }
+    }
+  }
+
+  delete() {
+    try {
+      deleteCookie("Username");
+      deleteCookie("email");
+      deleteCookie("sub");
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(e.message);
+      } else {
+        throw new Error("Delete Cookie Error");
       }
     }
   }

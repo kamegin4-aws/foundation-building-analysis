@@ -19,4 +19,11 @@ export class CookieInterface {
   async get() {
     throw new Error("Not implemented");
   }
+
+  /**
+   * クッキーの削除
+   */
+  delete() {
+    throw new Error("Not implemented");
+  }
 }

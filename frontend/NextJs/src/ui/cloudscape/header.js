@@ -13,8 +13,8 @@ export default function HeaderWrapper(props) {
         ) : undefined
       }
     >
-      <>{props.title ? props.title : "HeaderUndefined"}</>
-      <>{props.alert ? props.alert : <></>}</>
+      {props.title ? props.title : <></>}
+      {props.alert ? props.alert : <></>}
     </Header>
   );
 }

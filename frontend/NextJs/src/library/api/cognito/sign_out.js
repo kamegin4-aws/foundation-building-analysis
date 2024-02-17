@@ -1,8 +1,9 @@
 import { CognitoTokensCookie } from "@/library/cookies/cognito/login";
+import { UserInfoCookie } from "@/library/cookies/cognito/user_info";
 import { ApiInterface } from "@/library/api/interface/api";
 
-export class AddUserToGroup extends ApiInterface {
-  #url = "/sam/cognito/group/user/add";
+export class SignOut extends ApiInterface {
+  #url = "/sam/cognito/logout";
   #options = {
     method: "POST", // *GET, POST, PUT, DELETE, etc.
     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
@@ -12,18 +13,24 @@ export class AddUserToGroup extends ApiInterface {
     super();
   }
 
-  async execute(formData) {
+  async execute() {
     try {
       const cognitoTokensCookie = new CognitoTokensCookie();
+      const userInfoCookie = new UserInfoCookie();
+
       const tokens = await cognitoTokensCookie.get();
       if (!tokens) {
         throw new Error("Not Cognito Tokens");
       }
 
-      this.#options.headers = {
-        Authorization: `${tokens.TokenType} ${tokens.IdToken}`,
-      };
+      const formData = new FormData();
+      formData.append("access_token", tokens.AccessToken);
+      console.log("access_token", tokens.AccessToken);
       this.#options.body = formData;
+
+      //cookieの削除
+      userInfoCookie.delete();
+      cognitoTokensCookie.delete();
 
       const response = fetch(this.#url, this.#options);
 

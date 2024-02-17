@@ -40,7 +40,7 @@ export class GetUserInfo extends ApiInterface {
       }
 
       return response;
-    } catch {
+    } catch (e) {
       if (e instanceof Error) {
         throw new Error(e.message);
       } else {

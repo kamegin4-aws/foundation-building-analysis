@@ -90,6 +90,8 @@ export default function SignupPage() {
           setAlertAction(
             <ButtonWrapper
               variant={"normal"}
+              iconName={"treeview-expand"}
+              iconAlt={"確認コードを入力"}
               name={"確認コードを入力"}
               onClick={openConfirmCodeModal}
             />
@@ -240,7 +242,7 @@ export default function SignupPage() {
 
   useEffect(() => {
     setBreadcrumbItems([
-      { text: "Home", href: "#" },
+      { text: "Home", href: "/" },
       { text: "Signup", href: "/signup" },
     ]);
   }, []);
@@ -248,89 +250,93 @@ export default function SignupPage() {
   return (
     <>
       <ContentLayoutWrapper
+        header={<HeaderWrapper title={"Signup"} />}
         content={
-          <>
-            <ContainerWrapper
-              header={
-                <HeaderWrapper
-                  title={"SignUp Form"}
-                  alert={
-                    alertDisplay ? (
-                      <AlertWrapper
-                        type={alertType}
-                        header={alertHeader}
-                        message={alertMessage}
-                        parentAlertDisplay={setAlertDisplay}
-                        action={alertAction}
-                      />
-                    ) : undefined
-                  }
+          <ContainerWrapper
+            header={
+              <HeaderWrapper
+                title={"SignUp Form"}
+                alert={
+                  alertDisplay ? (
+                    <AlertWrapper
+                      type={alertType}
+                      header={alertHeader}
+                      message={alertMessage}
+                      parentAlertDisplay={setAlertDisplay}
+                      action={alertAction}
+                    />
+                  ) : undefined
+                }
+              />
+            }
+            footer={<LinkWrapper href={"/login"} alt={"ログインに戻る"} />}
+            media={{
+              content: (
+                <Image
+                  src="/cognito.svg"
+                  alt="cognito"
+                  width={500}
+                  height={500}
                 />
-              }
-              footer={<LinkWrapper href={"/login"} alt={"ログインに戻る"} />}
-              media={{
-                content: (
-                  <Image
-                    src="/cognito.svg"
-                    alt="cognito"
-                    width={500}
-                    height={500}
-                  />
-                ),
-                position: "side",
-                width: "25%",
-              }}
-              content={
-                <FormWrapper
-                  id={"login_form"}
-                  onSubmit={onSubmit}
-                  actions={
-                    <>
-                      <ButtonWrapper
-                        variant={"normal"}
-                        name={"クリア"}
-                        onClick={clearOnClick}
-                      />
-                      <ButtonWrapper
-                        formAction={"submit"}
-                        name={"サインアップ"}
-                        loading={signupButtonLoading}
-                        loadingText={signupButtonLoadingText}
-                      />
-                    </>
-                  }
-                  container={
-                    <>
-                      <FormFieldWrapper
-                        label={"ユーザー名"}
-                        description={"ユーザー名を入力してください。(例)太郎"}
-                        formField={
-                          <InputWrapper
-                            value={userNameInputValue}
-                            invalid={userNameInputInvalid}
-                            parentSetValue={setUserNameInputValue}
-                          />
-                        }
-                      />
-                      <FormFieldWrapper
-                        label={"メールアドレス"}
-                        description={`
+              ),
+              position: "side",
+              width: "25%",
+            }}
+            content={
+              <FormWrapper
+                id={"login_form"}
+                onSubmit={onSubmit}
+                actions={
+                  <>
+                    <ButtonWrapper
+                      variant={"normal"}
+                      iconName={"refresh"}
+                      iconAlt={"クリア"}
+                      name={"クリア"}
+                      onClick={clearOnClick}
+                    />
+                    <ButtonWrapper
+                      formAction={"submit"}
+                      iconName={"user-profile"}
+                      iconAlt={"サインアップ"}
+                      name={"サインアップ"}
+                      loading={signupButtonLoading}
+                      loadingText={signupButtonLoadingText}
+                    />
+                  </>
+                }
+                container={
+                  <>
+                    <FormFieldWrapper
+                      label={"ユーザー名"}
+                      description={"ユーザー名を入力してください。(例)太郎"}
+                      formField={
+                        <InputWrapper
+                          value={userNameInputValue}
+                          invalid={userNameInputInvalid}
+                          parentSetValue={setUserNameInputValue}
+                        />
+                      }
+                    />
+                    <FormFieldWrapper
+                      label={"メールアドレス"}
+                      description={`
                                 メースアドレスを入力してください。(例)example@example.com。\n
                                 サインアップに必要な確認番号が送られてきます。
                               `}
-                        formField={
-                          <InputWrapper
-                            value={emailInputValue}
-                            invalid={emailInputInvalid}
-                            parentSetValue={setEmailInputValue}
-                            type={"email"}
-                            inputMode={"email"}
-                          />
-                        }
-                      />
-                      <FormFieldWrapper
-                        label={"パスワード"}
-                        description={`
+                      formField={
+                        <InputWrapper
+                          value={emailInputValue}
+                          invalid={emailInputInvalid}
+                          parentSetValue={setEmailInputValue}
+                          type={"email"}
+                          inputMode={"email"}
+                        />
+                      }
+                    />
+                    <FormFieldWrapper
+                      label={"パスワード"}
+                      description={`
                                 パスワードを入力してください。\n
                                 パスワードの最小文字数:8 文字。\n
                                 少なくとも 1 つの数字を含む。\n
@@ -338,55 +344,58 @@ export default function SignupPage() {
                                 少なくとも 1 つの大文字を含む。\n
                                 少なくとも 1 つの小文字を含む。\n
                                 `}
-                        formField={
-                          <InputWrapper
-                            type={"password"}
-                            value={passwordInputValue}
-                            invalid={passwordInputInvalid}
-                            parentSetValue={setPasswordInputValue}
-                          />
-                        }
-                      />
-                    </>
-                  }
-                />
-              }
-            />
-            <ModalWrapper
-              header={"確認コード"}
-              visible={confirmModalVisible}
-              parentSetVisible={setConfirmModalVisible}
-              content={
-                <FormFieldWrapper
-                  label={"確認コード"}
-                  description={`
+                      formField={
+                        <InputWrapper
+                          type={"password"}
+                          value={passwordInputValue}
+                          invalid={passwordInputInvalid}
+                          parentSetValue={setPasswordInputValue}
+                        />
+                      }
+                    />
+                  </>
+                }
+              />
+            }
+          />
+        }
+      />
+      <ModalWrapper
+        header={"確認コード"}
+        visible={confirmModalVisible}
+        parentSetVisible={setConfirmModalVisible}
+        content={
+          <FormFieldWrapper
+            label={"確認コード"}
+            description={`
                                 メースアドレスに記載の confirmation code を入力してください。
                               `}
-                  formField={
-                    <InputWrapper
-                      value={confirmCodeInputValue}
-                      invalid={confirmCodeInputInvalid}
-                      parentSetValue={setConfirmCodeInputValue}
-                      inputMode={"numeric"}
-                    />
-                  }
-                />
-              }
-              footer={
-                <>
-                  <ButtonWrapper
-                    variant={"normal"}
-                    name={"キャンセル"}
-                    onClick={confirmCodeCancelOnClick}
-                  />
-                  <ButtonWrapper
-                    onClick={confirmCodeSubmitOnClick}
-                    name={"送信"}
-                    loading={confirmCodeButtonLoading}
-                    loadingText={confirmCodeButtonLoadingText}
-                  />
-                </>
-              }
+            formField={
+              <InputWrapper
+                value={confirmCodeInputValue}
+                invalid={confirmCodeInputInvalid}
+                parentSetValue={setConfirmCodeInputValue}
+                inputMode={"numeric"}
+              />
+            }
+          />
+        }
+        footer={
+          <>
+            <ButtonWrapper
+              variant={"normal"}
+              iconName={"redo"}
+              iconAlt={"キャンセル"}
+              name={"キャンセル"}
+              onClick={confirmCodeCancelOnClick}
+            />
+            <ButtonWrapper
+              onClick={confirmCodeSubmitOnClick}
+              iconName={"upload-download"}
+              iconAlt={"送信"}
+              name={"送信"}
+              loading={confirmCodeButtonLoading}
+              loadingText={confirmCodeButtonLoadingText}
             />
           </>
         }

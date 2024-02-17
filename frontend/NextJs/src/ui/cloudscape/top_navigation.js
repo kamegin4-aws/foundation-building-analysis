@@ -17,7 +17,7 @@ export default function TopNavigationWrapper(props) {
           alt: "Foundation Building App",
         },
       }}
-      utilities={[
+      utilities={
         /*
         {
           type: "button",
@@ -45,8 +45,8 @@ export default function TopNavigationWrapper(props) {
           items: USER_PROFILE_ITEMS,
         },
         */
-        props.menuDropdown,
-      ]}
+        props.menuDropdown
+      }
       //search={<Input type="search" placeholder="Search" ariaLabel="Search" />}
     />
   );

@@ -26,8 +26,8 @@ export function middleware(request, event) {
   console.log("pathname:", url.pathname);
   if (url.pathname != "/" && !regex.test(url)) {
     if (
-      !event.waitUntil(cognitoTokensCookie.get()) ||
-      !event.waitUntil(serInfoCookie.get())
+      event.waitUntil(cognitoTokensCookie.get()) == false ||
+      event.waitUntil(serInfoCookie.get()) == false
     ) {
       return NextResponse.rewrite(new URL("/login", request.url));
     }

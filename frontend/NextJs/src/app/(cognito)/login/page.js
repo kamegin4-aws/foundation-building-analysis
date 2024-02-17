@@ -20,7 +20,6 @@ import { validationZod } from "@/library/validation/infrastructure/zod/zod";
 import { UserNameLogin } from "@/library/api/cognito/login";
 
 export default function LoginPage() {
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -125,7 +124,7 @@ export default function LoginPage() {
   useEffect(() => {
     //パンくずリスト
     setBreadcrumbItems([
-      { text: "Home", href: "#" },
+      { text: "Home", href: "/" },
       { text: "Login", href: "/login" },
     ]);
 
@@ -145,10 +144,11 @@ export default function LoginPage() {
 
       setFlashBarItems(flashBarItems);
     } else setFlashBarItems([]);
-  }, [pathname]);
+  }, []);
 
   return (
     <ContentLayoutWrapper
+      header={<HeaderWrapper title={"Login"} />}
       content={
         <ContainerWrapper
           header={
@@ -193,11 +193,15 @@ export default function LoginPage() {
                         <>
                           <ButtonWrapper
                             variant={"normal"}
+                            iconName={"refresh"}
+                            iconAlt={"クリア"}
                             name={"クリア"}
                             onClick={clearOnClick}
                           />
                           <ButtonWrapper
                             formAction={"submit"}
+                            iconName={"user-profile-active"}
+                            iconAlt={"ログイン"}
                             name={"ログイン"}
                             loading={loginButtonLoading}
                             loadingText={loginButtonLoadingText}

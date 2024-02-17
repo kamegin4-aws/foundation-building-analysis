@@ -23,3 +23,7 @@ export async function getCookies() {
 export async function getCookie(key) {
   return cookies().get(key);
 }
+
+export async function deleteCookie(key) {
+  return cookies().delete(key);
+}

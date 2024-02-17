@@ -2,6 +2,7 @@ import {
   setCookie,
   getCookie,
   getCookies,
+  deleteCookie,
 } from "@/library/cookies/infrastructure/cookies";
 import { CookieInterface } from "@/library/cookies/interface/cookies";
 
@@ -65,6 +66,22 @@ export class CognitoTokensCookie extends CookieInterface {
         throw new Error(e.message);
       } else {
         throw new Error("Get Cookie Error");
+      }
+    }
+  }
+
+  delete() {
+    try {
+      deleteCookie("AccessToken");
+      deleteCookie("ExpiresIn");
+      deleteCookie("IdToken");
+      deleteCookie("RefreshToken");
+      deleteCookie("TokenType");
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(e.message);
+      } else {
+        throw new Error("Delete Cookie Error");
       }
     }
   }

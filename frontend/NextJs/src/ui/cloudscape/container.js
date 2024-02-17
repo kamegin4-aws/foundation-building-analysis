@@ -4,7 +4,8 @@ import SpaceBetween from "@cloudscape-design/components/space-between";
 export default function ContainerWrapper(props) {
   return (
     <Container
-      header={props.header ? props.header : "ContainerUndefined"}
+      variant={props.variant ? props.variant : "default"}
+      header={props.header ? props.header : ""}
       footer={props.footer ? props.footer : undefined}
       media={props.media ? props.media : undefined}
     >
