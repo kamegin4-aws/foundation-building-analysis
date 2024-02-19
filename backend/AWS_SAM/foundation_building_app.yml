@@ -262,8 +262,6 @@ Resources:
           MountPoints:
             - ContainerPath: /app/efs_volume
               SourceVolume: efs-volume
-            - ContainerPath: /app/ebs_volume
-              SourceVolume: ebs-volume
       Volumes:
         - Name: efs-volume
           EFSVolumeConfiguration:
@@ -272,8 +270,6 @@ Resources:
             FilesystemId: !Ref ContainerFileSystem
             RootDirectory: /
             TransitEncryption: ENABLED
-        - Name: ebs-volume
-          ConfiguredAtLaunch: true
   ContainerFileSystemMountTarget:
     Type: AWS::EFS::MountTarget
     Properties:
@@ -302,13 +298,6 @@ Resources:
             - !Ref publicSecurityGroupId
           Subnets:
             - !Ref publicSubnet1Id
-      VolumeConfigurations:
-        - Name: ebs-volume
-          ManagedEBSVolume:
-            VolumeType: gp3
-            SizeInGiB: 1
-            RoleArn: !GetAtt ECSServiceEBSRole.Arn
-            Encrypted: true
   ExecECSTaskRole:
     Type: AWS::IAM::Role
     Properties:
@@ -336,21 +325,6 @@ Resources:
             Effect: Allow
             Principal:
               Service: ecs-tasks.amazonaws.com
-            Sid: ''
-  ECSServiceEBSRole:
-    Type: AWS::IAM::Role
-    Properties:
-      Path: /
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonECSInfrastructureRolePolicyForVolumes
-      MaxSessionDuration: 3600
-      AssumeRolePolicyDocument:
-        Version: '2008-10-17'
-        Statement:
-          - Action: sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service: ecs.amazonaws.com
             Sid: ''
   DockerHubSecret:
     Type: AWS::SecretsManager::Secret
@@ -805,6 +779,22 @@ Resources:
           OwnerGid: '1000'
           OwnerUid: '1000'
           Permissions: '777'
+  CacheCluster:
+    Type: AWS::ElastiCache::CacheCluster
+    Properties:
+      CacheNodeType: cache.t3.micro
+      Engine: memcached
+      NumCacheNodes: 1
+      PreferredAvailabilityZone: ap-northeast-1a
+      CacheSubnetGroupName: !Ref SubnetGroupElastiCache
+      VpcSecurityGroupIds:
+        - !Ref elastiCacheSecurityGroupId
+  SubnetGroupElastiCache:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      Description: Subnet group for my ElastiCache cluster
+      SubnetIds:
+        - !Ref publicSubnet1Id
 Transform: AWS::Serverless-2016-10-31
 Parameters:
   clientSecret:
@@ -820,6 +810,8 @@ Parameters:
   elbTargetGroupArn:
     Type: String
   dockerCredentialsParameter:
+    Type: String
+  elastiCacheSecurityGroupId:
     Type: String
   apiCognitoId:
     Type: String

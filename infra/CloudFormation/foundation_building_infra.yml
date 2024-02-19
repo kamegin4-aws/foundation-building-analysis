@@ -21,8 +21,9 @@ Metadata:
         - 3d63d8d7-768c-4598-a3f7-3dffdbc00411
         - 9384b3df-130b-4b04-8107-2ea01180adfb
         - ac9c17dc-48e6-4001-abf5-767138f4c670
-        - 67c2bab4-f28f-462a-a9ab-ca985467d3d4
         - c9b4d4ee-cfb4-4913-a8b1-6b079f2de24a
+        - ed43b443-0134-463d-92fa-97721a39eb33
+        - 67c2bab4-f28f-462a-a9ab-ca985467d3d4
     e616c472-8719-4b09-ade8-958721f4dbfa:
       size:
         width: 360
@@ -266,6 +267,11 @@ Metadata:
         - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
         - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
         - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
     c9b4d4ee-cfb4-4913-a8b1-6b079f2de24a:
       size:
         width: 60
@@ -277,6 +283,11 @@ Metadata:
       parent: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
       embeds: []
       iscontainedinside:
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
         - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
         - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
         - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
@@ -680,6 +691,11 @@ Metadata:
         - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
         - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
         - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
     d77346db-2158-49fd-a44a-cf19413170ab:
       size:
         width: 60
@@ -834,6 +850,11 @@ Metadata:
         - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
         - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
         - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
     3d63d8d7-768c-4598-a3f7-3dffdbc00411:
       size:
         width: 60
@@ -876,6 +897,11 @@ Metadata:
         - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
         - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
         - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
     f81eefea-d3c2-4fc6-8452-9fc5338f6a65:
       size:
         width: 140
@@ -886,6 +912,22 @@ Metadata:
       z: 1
       parent: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
       embeds: []
+    ed43b443-0134-463d-92fa-97721a39eb33:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 1370
+        'y': 480
+      z: 1
+      parent: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+      embeds: []
+      iscontainedinside:
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+        - 350108e5-ca85-47f8-8d29-9a2ad77fceeb
 Resources:
   VPC:
     Type: 'AWS::EC2::VPC'
@@ -1207,7 +1249,7 @@ Resources:
   EFSSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
-      GroupDescription: Allow access from public subnet
+      GroupDescription: Allow access from public and private subnet
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 2049
@@ -1329,6 +1371,28 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: f81eefea-d3c2-4fc6-8452-9fc5338f6a65
+  ElastiCacheSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Allow access from public and private subnet
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 11211
+          ToPort: 11211
+          SourceSecurityGroupId: !Ref PublicSecurityGroup
+        - IpProtocol: tcp
+          FromPort: 11211
+          ToPort: 11211
+          SourceSecurityGroupId: !Ref PrivateSecurityGroup
+      SecurityGroupEgress:
+        - IpProtocol: '-1'
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref VPC
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: ed43b443-0134-463d-92fa-97721a39eb33
 Parameters:
   SSHLocation:
     Description: ' The IP address range that can be used to access the web server using SSH.'
