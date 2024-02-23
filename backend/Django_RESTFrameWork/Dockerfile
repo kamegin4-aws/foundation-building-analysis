@@ -2,13 +2,13 @@ FROM python:3.10
 
 WORKDIR /usr/src/app
 
-COPY ./requirements.txt ./
+COPY ./requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ./tutorial ./tutorial
-
-WORKDIR /usr/src/app/tutorial
+COPY ./Foundation_Building/Foundation_Building ./Foundation_Building
+COPY ./Foundation_Building/mini_aws ./mini_aws
+COPY ./Foundation_Building/manage.py .
 
 EXPOSE 8081
 
