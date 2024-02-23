@@ -14,7 +14,7 @@ def handler(event, context):
     print(json.dumps(event))
 
     try:
-        if ("body" in event):
+        if ('body' in event):
             if 'content-type' in event['headers'].keys():
                 c_type, c_data = parse_header(event['headers']['content-type'])
             elif 'Content-Type' in event['headers'].keys():
@@ -22,12 +22,12 @@ def handler(event, context):
             else:
                 raise RuntimeError('content-type or Content-Type not found')
 
-            if c_type == "multipart/form-data":
+            if c_type == 'multipart/form-data':
                 encoded_string = event['body'].encode('utf-8')
                 # For Python 3: these two lines of bugfixing are mandatory
                 # see also:
                 # https://stackoverflow.com/questions/31486618/cgi-parse-multipart-function-throws-typeerror-in-python-3
-                c_data['boundary'] = bytes(c_data['boundary'], "utf-8")
+                c_data['boundary'] = bytes(c_data['boundary'], 'utf-8')
                 # c_data['CONTENT-LENGTH'] = event['headers']['Content-length']
                 data_dict = parse_multipart(io.BytesIO(encoded_string), c_data)
 
@@ -37,17 +37,17 @@ def handler(event, context):
                 print(f'c_type: {c_type}.')
                 print(f'body: {body}.')
             else:
-                body = json.loads(event["body"])
+                body = json.loads(event['body'])
                 # body = event["body"]
 
         cognito_idp_client = boto3.client(
-            "cognito-idp", region_name="ap-northeast-1")
+            'cognito-idp', region_name='ap-northeast-1')
 
-        user_pool_id = os.environ["USER_POOL_ID"]
+        user_pool_id = os.environ['USER_POOL_ID']
 
-        client_id = os.environ["CLIENT_ID"]
+        client_id = os.environ['CLIENT_ID']
 
-        client_secret = os.environ["CLIENT_SECRET"]
+        client_secret = os.environ['CLIENT_SECRET']
 
         cognitoIdentityProviderWrapper = CognitoIdentityProviderWrapper(
             cognito_idp_client=cognito_idp_client,
@@ -55,9 +55,9 @@ def handler(event, context):
             client_id=client_id,
             client_secret=client_secret)
 
-        access_token = body["access_token"]
+        access_token = body['access_token']
 
-        print("access_token: {}".format(access_token))
+        print('access_token: {}'.format(access_token))
 
         sign_out = cognitoIdentityProviderWrapper.sign_out(
             access_token=access_token)
@@ -65,9 +65,9 @@ def handler(event, context):
         return {
             'statusCode': 200,
             'headers': {
-                "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "*"},
+                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': '*'},
             'body': json.dumps(sign_out)}
 
     except Exception:
@@ -75,9 +75,9 @@ def handler(event, context):
         return {
             'statusCode': 500,
             'headers': {
-                "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "*"},
+                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': '*'},
             'body': json.dumps(
                 traceback.format_exc())}
 
@@ -106,7 +106,7 @@ class CognitoIdentityProviderWrapper:
     def sign_out(self, *, access_token):
         try:
             kwargs = {
-                "AccessToken": access_token
+                'AccessToken': access_token
             }
             response = self.cognito_idp_client.global_sign_out(**kwargs)
             print(f'global_sign_out: {response}')

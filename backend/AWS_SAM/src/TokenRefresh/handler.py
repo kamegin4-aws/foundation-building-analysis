@@ -1,5 +1,6 @@
 import json
 import boto3
+from botocore.exceptions import ClientError
 import os
 import logging
 import hmac
@@ -42,7 +43,7 @@ def handler(event, context):
                 print(f'body: {body}.')
             else:
                 body = json.loads(event['body'])
-                # body = event["body"]
+                # body = event['body']
 
         cognito_idp_client = boto3.client(
             'cognito-idp', region_name='ap-northeast-1')
@@ -59,11 +60,11 @@ def handler(event, context):
             client_id=client_id,
             client_secret=client_secret)
 
+        refresh_token = body['refresh_token']
         user_name = body['user_name']
-        code = body['code']
 
-        confirmed_signup = cognitoIdentityProviderWrapper.confirm_sign_up(
-            user_name=user_name, confirmation_code=code)
+        refresh_token_result = cognitoIdentityProviderWrapper.refresh_token(
+            user_name=user_name, refresh_token=refresh_token)
 
         return {
             'statusCode': 200,
@@ -71,7 +72,7 @@ def handler(event, context):
                 'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': '*'},
-            'body': json.dumps(confirmed_signup)}
+            'body': json.dumps(refresh_token_result)}
 
     except Exception:
         logger.error(traceback.format_exc())
@@ -125,20 +126,28 @@ class CognitoIdentityProviderWrapper:
 
         return secret_hash
 
-    def confirm_sign_up(self, *, user_name, confirmation_code):
+    def refresh_token(self, *, refresh_token, user_name):
         try:
             kwargs = {
+                'AuthFlow': 'REFRESH_TOKEN',
+                'AuthParameters': {'REFRESH_TOKEN': refresh_token},
                 'ClientId': self.client_id,
-                'Username': user_name,
-                'ConfirmationCode': confirmation_code
             }
             if self.client_secret is not None:
-                kwargs['SecretHash'] = self.secret_hash(user_name=user_name)
-            response = self.cognito_idp_client.confirm_sign_up(**kwargs)
-            print(f'confirm_sign_up: {response}')
+                kwargs['AuthParameters']['SECRET_HASH'] = self.secret_hash(
+                    user_name=user_name)
 
-        except Exception as err:
+            response_init = self.cognito_idp_client.initiate_auth(**kwargs)
+            print(f'refresh token: {response_init}')
+            auth_tokens = response_init['AuthenticationResult']
+        except ClientError as err:
+            logger.error(
+                "Couldn't start client sign in for %s. Here's why: %s: %s",
+                user_name,
+                err.response['Error']['Code'],
+                err.response['Error']['Message'],
+            )
             raise RuntimeError(
                 "Couldn't confirm sign up for {}.".format(user_name)) from err
 
-        return True
+        return auth_tokens

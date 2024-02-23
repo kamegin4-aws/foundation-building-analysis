@@ -18,7 +18,7 @@ def handler(event, context):
     print(json.dumps(event))
 
     try:
-        if ("body" in event):
+        if ('body' in event):
             if 'content-type' in event['headers'].keys():
                 c_type, c_data = parse_header(event['headers']['content-type'])
             elif 'Content-Type' in event['headers'].keys():
@@ -26,12 +26,12 @@ def handler(event, context):
             else:
                 raise RuntimeError('content-type or Content-Type not found')
 
-            if c_type == "multipart/form-data":
+            if c_type == 'multipart/form-data':
                 encoded_string = event['body'].encode('utf-8')
                 # For Python 3: these two lines of bugfixing are mandatory
                 # see also:
                 # https://stackoverflow.com/questions/31486618/cgi-parse-multipart-function-throws-typeerror-in-python-3
-                c_data['boundary'] = bytes(c_data['boundary'], "utf-8")
+                c_data['boundary'] = bytes(c_data['boundary'], 'utf-8')
                 # c_data['CONTENT-LENGTH'] = event['headers']['Content-length']
                 data_dict = parse_multipart(io.BytesIO(encoded_string), c_data)
 
@@ -41,17 +41,17 @@ def handler(event, context):
                 print(f'c_type: {c_type}.')
                 print(f'body: {body}.')
             else:
-                body = json.loads(event["body"])
+                body = json.loads(event['body'])
                 # body = event["body"]
 
         cognito_idp_client = boto3.client(
-            "cognito-idp", region_name="ap-northeast-1")
+            'cognito-idp', region_name='ap-northeast-1')
 
-        user_pool_id = os.environ["USER_POOL_ID"]
+        user_pool_id = os.environ['USER_POOL_ID']
 
-        client_id = os.environ["CLIENT_ID"]
+        client_id = os.environ['CLIENT_ID']
 
-        client_secret = os.environ["CLIENT_SECRET"]
+        client_secret = os.environ['CLIENT_SECRET']
 
         cognitoIdentityProviderWrapper = CognitoIdentityProviderWrapper(
             cognito_idp_client=cognito_idp_client,
@@ -59,9 +59,9 @@ def handler(event, context):
             client_id=client_id,
             client_secret=client_secret)
 
-        user_name = body["user_name"]
-        password = body["password"]
-        user_email = body["user_email"]
+        user_name = body['user_name']
+        password = body['password']
+        user_email = body['user_email']
 
         confirmed = cognitoIdentityProviderWrapper.sign_up_user(
             user_name=user_name, password=password, user_email=user_email)
@@ -69,9 +69,9 @@ def handler(event, context):
         return {
             'statusCode': 200,
             'headers': {
-                "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "*"},
+                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': '*'},
             'body': json.dumps(confirmed)}
 
     except Exception:
@@ -79,9 +79,9 @@ def handler(event, context):
         return {
             'statusCode': 500,
             'headers': {
-                "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "*"},
+                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': '*'},
             'body': json.dumps(
                 traceback.format_exc())}
 
@@ -124,40 +124,40 @@ class CognitoIdentityProviderWrapper:
         """
         try:
             kwargs = {
-                "ClientId": self.client_id,
-                "Username": user_name,
-                "Password": password,
-                "UserAttributes": [{"Name": "email", "Value": user_email}],
+                'ClientId': self.client_id,
+                'Username': user_name,
+                'Password': password,
+                'UserAttributes': [{'Name': 'email', 'Value': user_email}],
             }
             if self.client_secret is not None:
-                kwargs["SecretHash"] = self.secret_hash(user_name=user_name)
+                kwargs['SecretHash'] = self.secret_hash(user_name=user_name)
             response = self.cognito_idp_client.sign_up(**kwargs)
             print(f'sign_up: {response}')
-            confirmed = response["UserConfirmed"]
+            confirmed = response['UserConfirmed']
         except ClientError as err:
-            if err.response["Error"]["Code"] == "UsernameExistsException":
+            if err.response['Error']['Code'] == 'UsernameExistsException':
                 response = self.cognito_idp_client.admin_get_user(
                     UserPoolId=self.user_pool_id, Username=user_name
                 )
 
                 logger.warning(
-                    "User %s exists and is %s.",
+                    'User %s exists and is %s.',
                     user_name,
-                    response["UserStatus"])
+                    response['UserStatus'])
 
                 error_massage = 'User {} exists and is {}.'.format(
-                    user_name, response["UserStatus"])
-                confirmed = response["UserStatus"] == "CONFIRMED"
+                    user_name, response['UserStatus'])
+                confirmed = response['UserStatus'] == 'CONFIRMED'
             else:
                 logger.error(
                     "Couldn't sign up %s. Here's why: %s: %s",
                     user_name,
-                    err.response["Error"]["Code"],
-                    err.response["Error"]["Message"],
+                    err.response['Error']['Code'],
+                    err.response['Error']['Message'],
                 )
 
                 error_massage = "Couldn't sign up {}. Here's why: {}: {}".format(
-                    user_name, err.response["Error"]["Code"], err.response["Error"]["Message"])
+                    user_name, err.response['Error']['Code'], err.response['Error']['Message'])
             raise RuntimeError(error_massage) from err
 
         return confirmed

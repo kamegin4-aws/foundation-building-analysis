@@ -84,7 +84,7 @@ Resources:
         - ResourceName: Cognito
       StageName: sam
       Variables:
-        alias: prod
+        alias: dev
       OpenApiVersion: 3.1.0
       DefinitionBody:
         openapi: '3.0'
@@ -118,6 +118,13 @@ Resources:
                 type: aws_proxy
                 uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConfirmSignUp.Arn}/invocations
               responses: {}
+          /cognito/token/refresh:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TokenRefresh.Arn}/invocations
+              responses: {}
       EndpointConfiguration: REGIONAL
       TracingEnabled: true
       Auth:
@@ -137,6 +144,8 @@ Resources:
                 - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/OPTIONS/cognito/signup/confirm
                 - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/POST/cognito/logout
                 - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/OPTIONS/cognito/logout
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/POST/cognito/token/refresh
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiCognitoId}/*/OPTIONS/cognito/token/refresh
       Cors:
         AllowOrigin: '''*'''
         AllowHeaders: '''Content-Type, X-Amz-Date, Authorization, X-Api-Key, X-Amz-Security-Token'''
@@ -504,7 +513,7 @@ Resources:
         - ResourceName: CognitoAuthorized
       StageName: sam
       Variables:
-        alias: prod
+        alias: dev
       OpenApiVersion: 3.1.0
       DefinitionBody:
         openapi: '3.0'
@@ -795,6 +804,53 @@ Resources:
       Description: Subnet group for my ElastiCache cluster
       SubnetIds:
         - !Ref publicSubnet1Id
+  TokenRefresh:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: TokenRefresh
+      CodeUri: src/TokenRefresh
+      Handler: handler.handler
+      Runtime: python3.10
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Environment:
+        Variables:
+          USERPOOLCLIENT_USER_POOL_CLIENT_ID: !Ref UserPoolClient
+          USER_POOL_ID: !GetAtt UserPool.UserPoolId
+          CLIENT_ID: !Ref UserPoolClient
+          CLIENT_SECRET: !Ref clientSecret
+      Events:
+        CognitoPOSTcognitotokenrefresh:
+          Type: Api
+          Properties:
+            Path: /cognito/token/refresh
+            Method: POST
+            RestApiId: !Ref Cognito
+  TokenRefreshLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${TokenRefresh}
+  AliasDevTokenRefresh:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref TokenRefresh
+      FunctionVersion: $LATEST
+      Name: dev
+  VersionTokenRefresh:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref TokenRefresh
+      Description: v1
+  AliasProdTokenRefresh:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref TokenRefresh
+      FunctionVersion: !GetAtt VersionTokenRefresh.Version
+      Name: prod
 Transform: AWS::Serverless-2016-10-31
 Parameters:
   clientSecret:
