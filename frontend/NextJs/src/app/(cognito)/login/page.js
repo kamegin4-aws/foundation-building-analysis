@@ -18,6 +18,7 @@ import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { LoginValidation } from "@/library/validation/cognito/login";
 import { validationZod } from "@/library/validation/infrastructure/zod/zod";
 import { UserNameLogin } from "@/library/api/cognito/login";
+import TextContentWrapper from "@/ui/cloudscape/text_content";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
@@ -35,9 +36,9 @@ export default function LoginPage() {
 
   //Form
   const [userNameInputValue, setUserNameInputValue] = useState("");
-  const [userNameInputInvalid, setUserNameInputInvalid] = useState(false);
+  const [userNameErrorText, setUserNameErrorText] = useState();
   const [passwordInputValue, setPasswordInputValue] = useState("");
-  const [passwordInputInvalid, setPasswordInputInvalid] = useState(false);
+  const [passwordErrorText, setPasswordErrorText] = useState();
   const [loginButtonLoading, setLoginButtonLoading] = useState(false);
   const [loginButtonLoadingText, setLoginButtonLoadingText] = useState("");
 
@@ -55,9 +56,8 @@ export default function LoginPage() {
       formData.append("password", passwordInputValue);
 
       const validationResult = loginValidation.execute(formData);
-      let validationMessage = "";
-      setUserNameInputInvalid(false);
-      setPasswordInputInvalid(false);
+      setUserNameErrorText();
+      setPasswordErrorText();
       setAlertDisplay(false);
 
       if (validationResult == true) {
@@ -80,19 +80,13 @@ export default function LoginPage() {
         }
       } else {
         console.log("loginValidation: false: ", validationResult);
-        const validationResultObject = JSON.parse(validationResult);
-        for (const validation of validationResultObject) {
-          if (validation["index"] == "userName") setUserNameInputInvalid(true);
+        const validationResultObject = validationResult;
+        for (let validation of validationResultObject) {
+          if (validation["index"] == "userName")
+            setUserNameErrorText(validation["message"]);
           else if (validation["index"] == "password")
-            setPasswordInputInvalid(true);
-
-          validationMessage += validation["message"] + "\n";
+            setPasswordErrorText(validation["message"]);
         }
-
-        setAlertDisplay(true);
-        setAlertType("error");
-        setAlertHeader("入力が間違えています。");
-        setAlertMessage(validationMessage);
 
         return false;
       }
@@ -119,6 +113,8 @@ export default function LoginPage() {
     console.log(event.detail);
     setUserNameInputValue("");
     setPasswordInputValue("");
+    setUserNameErrorText();
+    setPasswordErrorText();
   };
 
   useEffect(() => {
@@ -129,21 +125,20 @@ export default function LoginPage() {
     ]);
 
     //ヘッダーメッセージ
-    const searchSuccessMessages = searchParams.getAll("messageSuccess");
+    const searchType = searchParams.get("type");
+    const searchMessages = searchParams.get("message");
     let flashBarItems = [];
-    if (searchSuccessMessages) {
-      for (let searchSuccessMessage of searchSuccessMessages) {
-        flashBarItems.push({
-          type: "success",
-          dismissible: true,
-          dismissLabel: "Dismiss message",
-          onDismiss: () => setFlashBarItems([]),
-          content: <>{searchSuccessMessage}</>,
-        });
-      }
+    if (searchType) {
+      flashBarItems.push({
+        type: searchType,
+        dismissible: true,
+        dismissLabel: "Dismiss message",
+        onDismiss: () => setFlashBarItems([]),
+        content: <>{searchMessages}</>,
+      });
 
       setFlashBarItems(flashBarItems);
-    } else setFlashBarItems([]);
+    }
   }, []);
 
   return (
@@ -217,30 +212,36 @@ export default function LoginPage() {
                             }
                             formField={
                               <InputWrapper
-                                invalid={userNameInputInvalid}
                                 value={userNameInputValue}
                                 parentSetValue={setUserNameInputValue}
                               />
                             }
+                            errorText={userNameErrorText}
                           />
                           <FormFieldWrapper
                             label={"パスワード"}
-                            description={`
-                                パスワードを入力してください。\n
-                                パスワードの最小文字数:8 文字。\n
-                                少なくとも 1 つの数字を含む。\n
-                                少なくとも 1 つの特殊文字を含む(^ $ * . [ ] { } ( ) ? - " ! @ # % & / \ , > < ' : ; | _ ~ \` + =)。\n
-                                少なくとも 1 つの大文字を含む。\n
-                                少なくとも 1 つの小文字を含む。\n
-                                `}
+                            description={
+                              <TextContentWrapper
+                                contents={
+                                  <ul style={{ color: "gray" }}>
+                                    <li>パスワードを入力してください。</li>
+                                    <li>パスワードの最小文字数:8 文字。</li>
+                                    <li>少なくとも 1 つの数字を含む。</li>
+                                    <li>{`少なくとも 1 つの特殊文字を含む(^ $ * . [ ] { } ( ) ? - " ! @ # % & / \ , > < ' : ; | _ ~ \` + =)。`}</li>
+                                    <li>少なくとも 1 つの大文字を含む。</li>
+                                    <li>少なくとも 1 つの小文字を含む。</li>
+                                  </ul>
+                                }
+                              />
+                            }
                             formField={
                               <InputWrapper
                                 type={"password"}
                                 value={passwordInputValue}
-                                invalid={passwordInputInvalid}
                                 parentSetValue={setPasswordInputValue}
                               />
                             }
+                            errorText={passwordErrorText}
                           />
                         </>
                       }

@@ -13,6 +13,7 @@ import SpaceBetweenWrapper from "@/ui/cloudscape/space_between";
 import IconWrapper from "@/ui/cloudscape/icon";
 import ColumnLayoutWrapper from "@/ui/cloudscape/column_layout";
 import ContainerWrapper from "@/ui/cloudscape/container";
+import Image from "next/image";
 
 import { UserInfoCookie } from "@/library/cookies/cognito/user_info";
 import { SignOut } from "@/library/api/cognito/sign_out";
@@ -170,6 +171,18 @@ export default function UserInfoPage() {
           <>
             <ContainerWrapper
               variant={"embedded"}
+              media={{
+                content: (
+                  <Image
+                    src="/cognito.svg"
+                    alt="cognito"
+                    width={500}
+                    height={500}
+                  />
+                ),
+                position: "side",
+                width: "25%",
+              }}
               content={
                 <ColumnLayoutWrapper
                   columnNumber={2}

@@ -20,6 +20,7 @@ import ModalWrapper from "@/ui/cloudscape/modal";
 import { ConfirmSignupValidation } from "@/library/validation/cognito/confirm_signup";
 import { ConfirmSignup } from "@/library/api/cognito/confirm_signup";
 import { CognitoLayoutContext } from "@/app/(cognito)/layout";
+import TextContentWrapper from "@/ui/cloudscape/text_content";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -36,18 +37,18 @@ export default function SignupPage() {
 
   //Form
   const [userNameInputValue, setUserNameInputValue] = useState("");
-  const [userNameInputInvalid, setUserNameInputInvalid] = useState(false);
+  const [userNameErrorText, setUserNameErrorText] = useState();
   const [emailInputValue, setEmailInputValue] = useState("");
-  const [emailInputInvalid, setEmailInputInvalid] = useState(false);
+  const [emailErrorText, setEmailErrorText] = useState();
   const [passwordInputValue, setPasswordInputValue] = useState("");
-  const [passwordInputInvalid, setPasswordInputInvalid] = useState(false);
+  const [passwordErrorText, setPasswordErrorText] = useState();
   const [signupButtonLoading, setSignupButtonLoading] = useState(false);
   const [signupButtonLoadingText, setSignupButtonLoadingText] = useState("");
 
   //Modal
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [confirmCodeInputValue, setConfirmCodeInputValue] = useState("");
-  const [confirmCodeInputInvalid, setConfirmCodeInputInvalid] = useState(false);
+  const [confirmCodeErrorText, setConfirmCodeErrorText] = useState();
   const [confirmCodeButtonLoading, setConfirmCodeButtonLoading] =
     useState(false);
   const [confirmCodeButtonLoadingText, setConfirmCodeButtonLoadingText] =
@@ -68,10 +69,9 @@ export default function SignupPage() {
       formData.append("password", passwordInputValue);
 
       const validationResult = signupValidation.execute(formData);
-      let validationMessage = "";
-      setUserNameInputInvalid(false);
-      setEmailInputInvalid(false);
-      setPasswordInputInvalid(false);
+      setUserNameErrorText();
+      setEmailErrorText();
+      setPasswordErrorText();
       setAlertDisplay(false);
 
       if (validationResult == true) {
@@ -104,20 +104,15 @@ export default function SignupPage() {
         }
       } else {
         console.log("signupValidation: false: ", validationResult);
-        const validationResultObject = JSON.parse(validationResult);
+        const validationResultObject = validationResult;
         for (const validation of validationResultObject) {
-          if (validation["index"] == "userName") setUserNameInputInvalid(true);
+          if (validation["index"] == "userName")
+            setUserNameErrorText(validation["message"]);
           else if (validation["index"] == "password")
-            setPasswordInputInvalid(true);
-          else if (validation["index"] == "email") setEmailInputValue(true);
-
-          validationMessage += validation["message"] + "\n";
+            setEmailErrorText(validation["message"]);
+          else if (validation["index"] == "email")
+            setPasswordErrorText(validation["message"]);
         }
-
-        setAlertDisplay(true);
-        setAlertType("error");
-        setAlertHeader("入力が間違えています。");
-        setAlertMessage(validationMessage);
 
         return false;
       }
@@ -146,6 +141,9 @@ export default function SignupPage() {
     setUserNameInputValue("");
     setPasswordInputValue("");
     setEmailInputValue("");
+    setUserNameErrorText();
+    setEmailErrorText();
+    setPasswordErrorText();
   };
 
   const openConfirmCodeModal = (event) => {
@@ -158,6 +156,8 @@ export default function SignupPage() {
     event.preventDefault();
     console.log(event.detail);
     setConfirmModalVisible(false);
+    setUserNameErrorText();
+    setConfirmCodeErrorText();
   };
 
   const confirmCodeSubmitOnClick = async (event) => {
@@ -177,11 +177,8 @@ export default function SignupPage() {
       formData.append("code", confirmCodeInputValue);
 
       const validationResult = confirmSignupValidation.execute(formData);
-      let validationMessage = "";
-      setUserNameInputInvalid(false);
-      setEmailInputInvalid(false);
-      setPasswordInputInvalid(false);
-      setConfirmCodeInputInvalid(false);
+      setUserNameErrorText();
+      setConfirmCodeErrorText();
       setAlertDisplay(false);
 
       if (validationResult == true) {
@@ -196,7 +193,7 @@ export default function SignupPage() {
           setAlertHeader("確認完了。");
           setAlertMessage("メールアドレス確認を完了しました。");
 
-          router.push("/login?messageSuccess=ユーザーを作成しました。");
+          router.push("/login?type=success&message=ユーザーを作成しました。");
         } else {
           setAlertDisplay(true);
           setAlertType("error");
@@ -205,19 +202,13 @@ export default function SignupPage() {
         }
       } else {
         console.log("confirmSignupValidation: false: ", validationResult);
-        const validationResultObject = JSON.parse(validationResult);
+        const validationResultObject = validationResult;
         for (const validation of validationResultObject) {
-          if (validation["index"] == "userName") setUserNameInputInvalid(true);
+          if (validation["index"] == "userName")
+            setUserNameErrorText(validation["message"]);
           else if (validation["index"] == "code")
-            setConfirmCodeInputInvalid(true);
-
-          validationMessage += validation["message"] + "\n";
+            setConfirmCodeErrorText(validation["message"]);
         }
-
-        setAlertDisplay(true);
-        setAlertType("error");
-        setAlertHeader("入力が間違えています。");
-        setAlertMessage(validationMessage);
 
         return false;
       }
@@ -313,45 +304,58 @@ export default function SignupPage() {
                       formField={
                         <InputWrapper
                           value={userNameInputValue}
-                          invalid={userNameInputInvalid}
                           parentSetValue={setUserNameInputValue}
                         />
                       }
+                      errorText={userNameErrorText}
                     />
                     <FormFieldWrapper
                       label={"メールアドレス"}
-                      description={`
-                                メースアドレスを入力してください。(例)example@example.com。\n
-                                サインアップに必要な確認番号が送られてきます。
-                              `}
+                      description={
+                        <TextContentWrapper
+                          contents={
+                            <p style={{ color: "gray" }}>
+                              メースアドレスを入力してください。(例)example@example.com。
+                              <br />
+                              サインアップに必要な確認番号が送られてきます。
+                            </p>
+                          }
+                        />
+                      }
                       formField={
                         <InputWrapper
                           value={emailInputValue}
-                          invalid={emailInputInvalid}
                           parentSetValue={setEmailInputValue}
                           type={"email"}
                           inputMode={"email"}
                         />
                       }
+                      errorText={emailErrorText}
                     />
                     <FormFieldWrapper
                       label={"パスワード"}
-                      description={`
-                                パスワードを入力してください。\n
-                                パスワードの最小文字数:8 文字。\n
-                                少なくとも 1 つの数字を含む。\n
-                                少なくとも 1 つの特殊文字を含む(^ $ * . [ ] { } ( ) ? - " ! @ # % & / \ , > < ' : ; | _ ~ \` + =)。\n
-                                少なくとも 1 つの大文字を含む。\n
-                                少なくとも 1 つの小文字を含む。\n
-                                `}
+                      description={
+                        <TextContentWrapper
+                          contents={
+                            <ul style={{ color: "gray" }}>
+                              <li>パスワードを入力してください。</li>
+                              <li>パスワードの最小文字数:8 文字。</li>
+                              <li>少なくとも 1 つの数字を含む。</li>
+                              <li>{`少なくとも 1 つの特殊文字を含む(^ $ * . [ ] { } ( ) ? - " ! @ # % & / \ , > < ' : ; | _ ~ \` + =)。`}</li>
+                              <li>少なくとも 1 つの大文字を含む。</li>
+                              <li>少なくとも 1 つの小文字を含む。</li>
+                            </ul>
+                          }
+                        />
+                      }
                       formField={
                         <InputWrapper
                           type={"password"}
                           value={passwordInputValue}
-                          invalid={passwordInputInvalid}
                           parentSetValue={setPasswordInputValue}
                         />
                       }
+                      errorText={passwordErrorText}
                     />
                   </>
                 }
@@ -367,17 +371,15 @@ export default function SignupPage() {
         content={
           <FormFieldWrapper
             label={"確認コード"}
-            description={`
-                                メースアドレスに記載の confirmation code を入力してください。
-                              `}
+            description={`メースアドレスに記載の confirmation code を入力してください。`}
             formField={
               <InputWrapper
                 value={confirmCodeInputValue}
-                invalid={confirmCodeInputInvalid}
                 parentSetValue={setConfirmCodeInputValue}
                 inputMode={"numeric"}
               />
             }
+            errorText={confirmCodeErrorText}
           />
         }
         footer={

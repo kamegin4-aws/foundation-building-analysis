@@ -4,7 +4,7 @@ export default function FlashBarWrapper(props) {
   /*
   const [items, setItems] = React.useState([
     {
-      type: "info",
+      type: "info", //success, error, warning, info
       dismissible: true,
       dismissLabel: "Dismiss message",
       onDismiss: () => setItems([]),

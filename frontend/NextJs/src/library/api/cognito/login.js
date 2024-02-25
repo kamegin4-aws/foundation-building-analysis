@@ -3,7 +3,7 @@ import { UserInfoCookie } from "@/library/cookies/cognito/user_info";
 import { ListUserInGroup } from "@/library/api/cognito/list_user_in_group";
 import { GetUserInfo } from "@/library/api/cognito/get_user_info";
 import { AddUserToGroup } from "@/library/api/cognito/add_user_to_group";
-import { FREE_USER_GROUP } from "@/library/api/constant_group/constant_list_user_in_group";
+import { FREE_USER_GROUP } from "@/library/api/constant/constant_list_user_in_group";
 import { ApiInterface } from "@/library/api/interface/api";
 
 export class UserNameLogin extends ApiInterface {

@@ -11,42 +11,42 @@ const nextConfig = {
       {
         source: "/sam/cognito/login",
         destination:
-          "https://428hmjva0h.execute-api.ap-northeast-1.amazonaws.com/sam/cognito/login",
+          "https://r3ox5lldch.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/login",
       },
       {
         source: "/sam/cognito/logout",
         destination:
-          "https://428hmjva0h.execute-api.ap-northeast-1.amazonaws.com/sam/cognito/logout",
+          "https://r3ox5lldch.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/logout",
       },
       {
         source: "/sam/cognito/signup",
         destination:
-          "https://428hmjva0h.execute-api.ap-northeast-1.amazonaws.com/sam/cognito/signup",
+          "https://r3ox5lldch.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/signup",
       },
       {
         source: "/sam/cognito/signup/confirm",
         destination:
-          "https://428hmjva0h.execute-api.ap-northeast-1.amazonaws.com/sam/cognito/signup/confirm",
+          "https://r3ox5lldch.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/signup/confirm",
       },
       {
         source: "/sam/cognito/group/user/list",
         destination:
-          "https://j0b4v5x38g.execute-api.ap-northeast-1.amazonaws.com/sam/cognito/group/user/list",
+          "https://l9ghq7rx8j.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/group/user/list",
       },
       {
         source: "/sam/cognito/group/user/add",
         destination:
-          "https://j0b4v5x38g.execute-api.ap-northeast-1.amazonaws.com/sam/cognito/group/user/add",
+          "https://l9ghq7rx8j.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/group/user/add",
       },
       {
         source: "/sam/cognito/user/info",
         destination:
-          "https://j0b4v5x38g.execute-api.ap-northeast-1.amazonaws.com/sam/cognito/user/info",
+          "https://l9ghq7rx8j.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/user/info",
       },
       {
         source: "/sam/cognito/logout",
         destination:
-          "https://428hmjva0h.execute-api.ap-northeast-1.amazonaws.com/sam/cognito/logout",
+          "https://r3ox5lldch.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/logout",
       },
     ];
   },
