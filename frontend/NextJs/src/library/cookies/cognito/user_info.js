@@ -3,9 +3,9 @@ import {
   getCookie,
   getCookies,
 } from "@/library/cookies/infrastructure/cookies";
-import { CookieInterface } from "@/library/cookies/interface/cookies";
+import { ICookie } from "@/library/cookies/interface/cookies";
 
-export class UserInfoCookie extends CookieInterface {
+export class UserInfoCookie extends ICookie {
   constructor() {
     super();
   }

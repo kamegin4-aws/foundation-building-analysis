@@ -43,9 +43,6 @@ def handler(event, context):
                 body = json.loads(event['body'])
                 # body = event["body"]
 
-        cognito_idp_client = boto3.client(
-            'cognito-idp', region_name='ap-northeast-1')
-
         user_pool_id = os.environ['USER_POOL_ID']
 
         client_id = os.environ['CLIENT_ID']
@@ -59,7 +56,7 @@ def handler(event, context):
             pool_id=user_pool_id,
             client_id=client_id,
             client_secret=client_secret,
-            client=cognito_idp_client)
+        )
 
         sign_in = aws_srp_wrapper.sign_in(
             username=user_name, password=password)
@@ -96,7 +93,8 @@ class AWSSRPWrapper:
             client_secret=None,
             client=None,
     ):
-        self.client = client
+        self.client = client if client is not None else boto3.client(
+            'cognito-idp', region_name='ap-northeast-1')
         self.pool_id = pool_id
         self.client_id = client_id
         self.client_secret = client_secret

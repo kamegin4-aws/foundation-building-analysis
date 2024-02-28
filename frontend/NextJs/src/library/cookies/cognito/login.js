@@ -4,9 +4,9 @@ import {
   getCookies,
   deleteCookie,
 } from "@/library/cookies/infrastructure/cookies";
-import { CookieInterface } from "@/library/cookies/interface/cookies";
+import { ICookie } from "@/library/cookies/interface/cookies";
 
-export class CognitoTokensCookie extends CookieInterface {
+export class CognitoTokensCookie extends ICookie {
   constructor() {
     super();
   }

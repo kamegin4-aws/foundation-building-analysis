@@ -40,9 +40,6 @@ def handler(event, context):
                 body = json.loads(event['body'])
                 # body = event["body"]
 
-        cognito_idp_client = boto3.client(
-            'cognito-idp', region_name='ap-northeast-1')
-
         user_pool_id = os.environ['USER_POOL_ID']
         # user_pool_id = ""
         print(f'user_pool_id: {user_pool_id}')
@@ -52,7 +49,6 @@ def handler(event, context):
         client_secret = os.environ['CLIENT_SECRET']
 
         cognitoIdentityProviderWrapper = CognitoIdentityProviderWrapper(
-            cognito_idp_client=cognito_idp_client,
             user_pool_id=user_pool_id,
             client_id=client_id,
             client_secret=client_secret)
@@ -89,9 +85,9 @@ class CognitoIdentityProviderWrapper:
     def __init__(
             self,
             *,
-            cognito_idp_client,
             user_pool_id,
             client_id,
+            cognito_idp_client=None,
             client_secret=None):
         """
         :param cognito_idp_client: A Boto3 Amazon Cognito Identity Provider client.
@@ -99,7 +95,8 @@ class CognitoIdentityProviderWrapper:
         :param client_id: The ID of a client application registered with the user pool.
         :param client_secret: The client secret, if the client has a secret.
         """
-        self.cognito_idp_client = cognito_idp_client
+        self.cognito_idp_client = cognito_idp_client if cognito_idp_client is not None else boto3.client(
+            'cognito-idp', region_name='ap-northeast-1')
         self.user_pool_id = user_pool_id
         self.client_id = client_id
         self.client_secret = client_secret

@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { ValidationInfraInterface } from "@/library/validation/infrastructure/interface/validation";
+import { IValidationInstance } from "@/library/validation/infrastructure/interface/validation";
 
-class ZodWrapper extends ValidationInfraInterface {
+export class ZodWrapper extends IValidationInstance {
   userNameValidation(userName) {
     try {
       const result = z.string().min(1).max(256).safeParse(userName);
@@ -77,5 +77,3 @@ class ZodWrapper extends ValidationInfraInterface {
     }
   }
 }
-
-export const validationZod = new ZodWrapper();

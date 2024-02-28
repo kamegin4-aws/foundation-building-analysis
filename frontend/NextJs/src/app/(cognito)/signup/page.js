@@ -14,7 +14,7 @@ import { useEffect, useState, useContext } from "react";
 import { useRouter } from "next/navigation";
 
 import { SignupValidation } from "@/library/validation/cognito/signup";
-import { validationZod } from "@/library/validation/infrastructure/zod/zod";
+import { ZodWrapper } from "@/library/validation/infrastructure/zod/zod";
 import { Signup } from "@/library/api/cognito/signup";
 import ModalWrapper from "@/ui/cloudscape/modal";
 import { ConfirmSignupValidation } from "@/library/validation/cognito/confirm_signup";
@@ -60,7 +60,7 @@ export default function SignupPage() {
       setSignupButtonLoading(true);
       setSignupButtonLoadingText("サインアップ中...");
 
-      const signupValidation = new SignupValidation(validationZod);
+      const signupValidation = new SignupValidation(new ZodWrapper());
       const signup = new Signup();
 
       const formData = new FormData();
@@ -168,7 +168,7 @@ export default function SignupPage() {
       setConfirmCodeButtonLoadingText("確認中...");
 
       const confirmSignupValidation = new ConfirmSignupValidation(
-        validationZod
+        new ZodWrapper()
       );
       const confirmSignup = new ConfirmSignup();
 

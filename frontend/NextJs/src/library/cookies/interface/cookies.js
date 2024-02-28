@@ -1,7 +1,7 @@
 /**
  * クッキーインターフェース
  */
-export class CookieInterface {
+export class ICookie {
   /**
    * クッキーの保存
    * @typedef { {[key:string]:string} } Data

@@ -1,6 +1,6 @@
-import { ValidationInterface } from "@/library/validation/interface/validation";
+import { IValidation } from "@/library/validation/interface/validation";
 
-export class ConfirmSignupValidation extends ValidationInterface {
+export class ConfirmSignupValidation extends IValidation {
   #validationInstance;
   #validationList = [];
   #errorMessageList = [];

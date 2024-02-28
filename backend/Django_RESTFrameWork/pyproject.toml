@@ -1,0 +1,53 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "Foundation_Building"
+version = "0.1.0"
+packages = [
+    { include = "Foundation_Building/library" }
+]
+authors = ["kamegin4-aws <kamegin4@outlook.jp>"]
+description = "Backend App of Foundation_Building"
+readme = "README.md"
+license = "MIT"
+#keywords = ["egg", "bacon", "sausage", "tomatoes", "Lobster Thermidor"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python"
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+#Django DRF
+django = "^5.0.2"
+djangorestframework = "^3.14.0"
+markdown = "^3.5.2"
+django-filter = "^23.5"
+pygments = "^2.17.2"
+#AWS
+pymemcache = "^4.0.0"
+
+[project.optional-dependencies]
+#gui = ["PyQt5"]
+#cli = [
+#  "rich",
+#  "click",
+#]
+
+[project.urls]
+Homepage = "https://example.com"
+Documentation = "https://readthedocs.org"
+Repository = "https://github.com/me/spam.git"
+"Bug Tracker" = "https://github.com/me/spam/issues"
+Changelog = "https://github.com/me/spam/blob/master/CHANGELOG.md"
+
+[project.scripts]
+#spam-cli = "spam:main_cli"
+
+[project.gui-scripts]
+#spam-gui = "spam:main_gui"
+
+[project.entry-points."spam.magical"]
+tomatoes = "spam:main_tomatoes"

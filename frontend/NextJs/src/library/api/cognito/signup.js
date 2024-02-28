@@ -1,6 +1,6 @@
-import { ApiInterface } from "@/library/api/interface/api";
+import { IApi } from "@/library/api/interface/api";
 
-export class Signup extends ApiInterface {
+export class Signup extends IApi {
   #url = "/sam/cognito/signup";
   #options = {
     method: "POST", // *GET, POST, PUT, DELETE, etc.

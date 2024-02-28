@@ -1,8 +1,8 @@
 import { CognitoTokensCookie } from "@/library/cookies/cognito/login";
 import { UserInfoCookie } from "@/library/cookies/cognito/user_info";
-import { ApiInterface } from "@/library/api/interface/api";
+import { IApi } from "@/library/api/interface/api";
 
-export class GetUserInfo extends ApiInterface {
+export class GetUserInfo extends IApi {
   #url = "/sam/cognito/user/info";
   #options = {
     method: "POST", // *GET, POST, PUT, DELETE, etc.

@@ -16,7 +16,7 @@ import { CognitoLayoutContext } from "@/app/(cognito)/layout";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 
 import { LoginValidation } from "@/library/validation/cognito/login";
-import { validationZod } from "@/library/validation/infrastructure/zod/zod";
+import { ZodWrapper } from "@/library/validation/infrastructure/zod/zod";
 import { UserNameLogin } from "@/library/api/cognito/login";
 import TextContentWrapper from "@/ui/cloudscape/text_content";
 
@@ -48,7 +48,7 @@ export default function LoginPage() {
       setLoginButtonLoading(true);
       setLoginButtonLoadingText("ログイン中...");
 
-      const loginValidation = new LoginValidation(validationZod);
+      const loginValidation = new LoginValidation(new ZodWrapper());
       const userNameLogin = new UserNameLogin();
 
       const formData = new FormData();

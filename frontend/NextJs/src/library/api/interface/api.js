@@ -1,7 +1,7 @@
 /**
  * API実行インターフェース
  */
-export class ApiInterface {
+export class IApi {
   /**
    * API実行
    * @param {FormData} [FormData=undefined] formData フォームデータ

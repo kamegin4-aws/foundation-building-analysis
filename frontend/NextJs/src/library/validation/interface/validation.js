@@ -1,7 +1,7 @@
 /**
  * 入力バリデーションインターフェース
  */
-export class ValidationInterface {
+export class IValidation {
   /**
    * バリデーションチェック
    * @param {FormData} formData フォームデータ

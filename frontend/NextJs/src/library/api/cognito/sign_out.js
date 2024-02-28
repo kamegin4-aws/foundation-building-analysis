@@ -1,8 +1,8 @@
 import { CognitoTokensCookie } from "@/library/cookies/cognito/login";
 import { UserInfoCookie } from "@/library/cookies/cognito/user_info";
-import { ApiInterface } from "@/library/api/interface/api";
+import { IApi } from "@/library/api/interface/api";
 
-export class SignOut extends ApiInterface {
+export class SignOut extends IApi {
   #url = "/sam/cognito/logout";
   #options = {
     method: "POST", // *GET, POST, PUT, DELETE, etc.

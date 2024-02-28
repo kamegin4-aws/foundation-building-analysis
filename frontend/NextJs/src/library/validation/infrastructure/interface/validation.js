@@ -1,7 +1,7 @@
 /**
  *バリデーション用インスタンスのインターフェース
  */
-export class ValidationInfraInterface {
+export class IValidationInstance {
   /**
    * ユーザーネームのバリデーション
    * @param {string} userName ユーザーネーム

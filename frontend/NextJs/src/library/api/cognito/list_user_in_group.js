@@ -1,7 +1,7 @@
 import { CognitoTokensCookie } from "@/library/cookies/cognito/login";
-import { ApiInterface } from "@/library/api/interface/api";
+import { IApi } from "@/library/api/interface/api";
 
-export class ListUserInGroup extends ApiInterface {
+export class ListUserInGroup extends IApi {
   #url = "/sam/cognito/group/user/list";
   #options = {
     method: "POST", // *GET, POST, PUT, DELETE, etc.
