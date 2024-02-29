@@ -851,25 +851,67 @@ Resources:
       FunctionName: !Ref TokenRefresh
       FunctionVersion: !GetAtt VersionTokenRefresh.Version
       Name: prod
+  DBCluster:
+    Type: AWS::RDS::DBCluster
+    Properties:
+      DBClusterIdentifier: aurora-postgresql-cluster
+      Engine: aurora-postgresql
+      EngineVersion: '16.1'
+      DatabaseName: foundation_building
+      DBClusterParameterGroupName: default.aurora-postgresql16
+      EnableCloudwatchLogsExports:
+        - postgresql
+      MasterUsername: !Ref rdsUserName
+      MasterUserPassword: !Ref rdsPassword
+      StorageEncrypted: true
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      VpcSecurityGroupIds:
+        - !Ref rdsSecurityGroupId
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: DBSubnetGroup
+      SubnetIds:
+        - !Ref privateSubnet1Id
+        - !Ref privateSubnet2Id
+  DBInstance1:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: aurora-postgresql-instance1
+      DBInstanceClass: db.t3.medium
+      Engine: aurora-postgresql
+      DBClusterIdentifier: !Ref DBCluster
 Transform: AWS::Serverless-2016-10-31
 Parameters:
   clientSecret:
     Type: String
   globalIP:
     Type: String
-  publicSecurityGroupId:
-    Type: String
-  efsSecurityGroupId:
-    Type: String
-  publicSubnet1Id:
-    Type: String
   elbTargetGroupArn:
     Type: String
   dockerCredentialsParameter:
     Type: String
-  elastiCacheSecurityGroupId:
-    Type: String
   apiCognitoId:
     Type: String
   apiCognitoAuthorizedId:
+    Type: String
+  rdsUserName:
+    Type: String
+  rdsPassword:
+    Type: String
+  publicSubnet1Id:
+    Type: String
+  publicSubnet2Id:
+    Type: String
+  privateSubnet1Id:
+    Type: String
+  privateSubnet2Id:
+    Type: String
+  publicSecurityGroupId:
+    Type: String
+  efsSecurityGroupId:
+    Type: String
+  elastiCacheSecurityGroupId:
+    Type: String
+  rdsSecurityGroupId:
     Type: String
