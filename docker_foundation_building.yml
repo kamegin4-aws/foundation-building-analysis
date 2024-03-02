@@ -12,25 +12,33 @@ services:
       - 8080
     ports:
       - '8080:8080'
-    extra_hosts:
-      - local_dev:${HOST_IP}
+    #extra_hosts:
+    #  - local_dev:${HOST_IP}
     #command:
   application:
     build:
       context: ./backend/Django_RESTFrameWork
       dockerfile: Dockerfile
-    image: django_drf
-    container_name: django_drf
+      args:
+        - SECRET_KEY=${SECRET_KEY}
+        - DEBUG=${DEBUG}
+        - RDS_USER=${RDS_USER}
+        - RDS_PASSWORD=${RDS_PASSWORD}
+        - RDS_HOST=${RDS_HOST}
+        - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
+        - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
+        - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+    image: django_rf
+    container_name: django_rf
     restart: always
     tty: true
-    environment:
-      - SECRET_KEY=${SECRET_KEY}
+    #environment:
     expose:
       - 8081
     ports:
       - '8081:8081'
-    extra_hosts:
-      - local_dev:${HOST_IP}
+    #extra_hosts:
+    #  - local_dev:${HOST_IP}
     volumes:
       - ./backend/Django_RESTFrameWork/Foundation_Building/db.sqlite3:/usr/src/app/db.sqlite3
     #command:
