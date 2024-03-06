@@ -14,8 +14,10 @@ RUN poetry install
 
 ARG SECRET_KEY
 ENV SECRET_KEY=${SECRET_KEY}
-ARG DEBUG
-ENV DEBUG=${DEBUG}
+ARG DJANGO_DEBUG
+ENV DJANGO_DEBUG=${DJANGO_DEBUG}
+ARG ELASTICACHE_ENDPOINT
+ENV ELASTICACHE_ENDPOINT=${ELASTICACHE_ENDPOINT}
 ARG RDS_USER
 ENV RDS_USER=${RDS_USER}
 ARG RDS_PASSWORD
@@ -35,4 +37,4 @@ ENV PORT 8081
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
 
-CMD sh -c "poetry run python manage.py createsuperuser --noinput; poetry run python manage.py migrate && poetry run python manage.py runserver 0.0.0.0:8081"
+CMD sh -c "poetry run python manage.py migrate && poetry run python manage.py createsuperuser --noinput ; poetry run python manage.py runserver 0.0.0.0:8081"

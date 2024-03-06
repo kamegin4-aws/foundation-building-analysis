@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = str_to_bool(os.environ.get('DEBUG'))
+DEBUG = str_to_bool(os.environ.get('DJANGO_DEBUG'))
 
 ALLOWED_HOSTS = ['*']
 
@@ -92,12 +92,19 @@ if DEBUG:
 else:
     DATABASES = {
         'default': {
-            'ENGINE': 'postgresql',
+            'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'foundation_building',
             'USER': os.environ.get('RDS_USER'),
             'PASSWORD': os.environ.get('RDS_PASSWORD'),
             'HOST': os.environ.get('RDS_HOST'),
             'PORT': '3306',
+        }
+    }
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+            'LOCATION': os.environ.get('ELASTICACHE_ENDPOINT'),
         }
     }
 
