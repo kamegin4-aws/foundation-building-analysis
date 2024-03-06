@@ -9,9 +9,8 @@ class ICacheInstance(metaclass=abc.ABCMeta):
     def get_cache_all(self):
         """コンテンツをすべて返す
 
-
         Returns:
-            result (Iterable[Tuple(str,str)] or bool): 成功:キー・バリューの配列。失敗:False
+            result (List[Tuple(str,str)]): 成功:キー・バリューの配列。
         """
         raise NotImplementedError()
 

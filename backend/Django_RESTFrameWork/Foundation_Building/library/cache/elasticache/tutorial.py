@@ -6,12 +6,18 @@ class ElastiCache(ICache):
     def __init__(self, *, instance):
         self.instance = instance
 
-    def cache_list(self):
+    def cache_list(self, *, keys):
         try:
             self.instance.flush_cache()
-            result = self.instance.get_cache_all()
-            print(f'type: {type(result)}')
-            print(f'result: {result}')
+
+            result = []
+            for key in keys:
+                value = self.instance.get_cache(key)
+                if value:
+                    result.append({
+                        'key': key,
+                        'value': value
+                    })
 
             return result
         except Exception:

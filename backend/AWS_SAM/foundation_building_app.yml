@@ -874,7 +874,7 @@ Resources:
     Properties:
       Cluster: !GetAtt Cluster.Arn
       TaskDefinition: !Ref DjangoRFTaskDefinition
-      DesiredCount: 1
+      DesiredCount: 0
       DeploymentConfiguration:
         MaximumPercent: 200
         MinimumHealthyPercent: 50

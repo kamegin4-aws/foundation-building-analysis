@@ -6,12 +6,14 @@ class ICache(metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def cache_list(self):
+    def cache_list(self, *, keys):
         """コンテンツをすべて返す
 
+        Args:
+            key (List[str]): キーの配列
 
         Returns:
-            result (Iterable[Tuple(str,str)] or bool): 成功:キー・バリューの配列。失敗:False
+            result (List[Dict{str:str}] or bool): 成功:キー・バリューの配列。失敗:False
         """
         raise NotImplementedError()
 

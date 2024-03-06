@@ -1,6 +1,6 @@
 # from django.shortcuts import render
-from library.cache.elasticache.tutorial import ElastiCache as ElastiCacheWrapper
-from library.cache.infrastructure.pymemcache_client import PymemcacheWrapper
+# from library.cache.elasticache.tutorial import ElastiCache as ElastiCacheWrapper
+# from library.cache.infrastructure.pymemcache_client import PymemcacheWrapper
 from mini_aws.models import ElastiCache, ResultLog
 from mini_aws.serializers import ElastiCacheSerializer, ResultLogSerializer
 from rest_framework import generics, permissions, response, status, parsers, filters
@@ -85,23 +85,6 @@ class ElastiCacheList(generics.ListCreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        validated_data = serializer.validated_data
-        print(f'validated_data: {validated_data}')
-        """
-        elasticache = ElastiCacheWrapper(instance=PymemcacheWrapper())
-        if elasticache.cache_create_update(
-                key=validated_data['key'],
-                value=validated_data['value']):
-
-            self.perform_create(serializer)
-            return response.Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED)
-        else:
-            return response.Response(
-                serializer.errors,
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        """
         self.perform_create(serializer)
         return response.Response(
             serializer.data, status=status.HTTP_201_CREATED)

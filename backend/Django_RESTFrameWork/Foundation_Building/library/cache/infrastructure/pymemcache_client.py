@@ -16,13 +16,7 @@ class PymemcacheWrapper(ICacheInstance):
             self.endpoint,
             tls_context=self.tls_context, serde=self.sered_cache)
 
-    def get_cache_all(self):
-        try:
-            result = self.client.stats().items()
-            return result if result else False
-        except Exception:
-            print(traceback.format_exc())
-            raise RuntimeError(traceback.format_exc())
+    # Memcachedではget_cache_allに該当するメソッドがない
 
     def get_cache(self, *, key):
         try:
