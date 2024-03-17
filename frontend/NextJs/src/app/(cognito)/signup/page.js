@@ -14,7 +14,7 @@ import { useEffect, useState, useContext } from "react";
 import { useRouter } from "next/navigation";
 
 import { SignupValidation } from "@/library/validation/cognito/signup";
-import { ZodWrapper } from "@/library/validation/infrastructure/zod/zod";
+import { ZodWrapper } from "@/library/validation/infrastructure/zod/zod_client";
 import { Signup } from "@/library/api/cognito/signup";
 import ModalWrapper from "@/ui/cloudscape/modal";
 import { ConfirmSignupValidation } from "@/library/validation/cognito/confirm_signup";

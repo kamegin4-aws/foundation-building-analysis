@@ -33,6 +33,10 @@ DEBUG = str_to_bool(os.environ.get('DJANGO_DEBUG'))
 
 ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://foundation-building.kamegin.com',
+]
+
 
 # Application definition
 
@@ -98,6 +102,10 @@ else:
             'PASSWORD': os.environ.get('RDS_PASSWORD'),
             'HOST': os.environ.get('RDS_HOST'),
             'PORT': '3306',
+            'OPTIONS': {
+                'sslmode': 'require',
+                'sslrootcert': BASE_DIR / 'global-bundle.pem',
+            },
         }
     }
 

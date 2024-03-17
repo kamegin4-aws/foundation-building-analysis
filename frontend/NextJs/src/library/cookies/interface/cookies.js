@@ -4,7 +4,7 @@
 export class ICookie {
   /**
    * クッキーの保存
-   * @typedef { {[key:string]:string} } Data
+   * @typedef { Record<string,string>} Data
    * @param {Data} data インプット
    */
   set(data) {
@@ -13,7 +13,7 @@ export class ICookie {
 
   /**
    * クッキーの取得
-   * @typedef { {[key:string]:string} } Data
+   * @typedef { Record<string,string>} Data
    * @returns {Data|boolean} data アウトプット
    */
   async get() {

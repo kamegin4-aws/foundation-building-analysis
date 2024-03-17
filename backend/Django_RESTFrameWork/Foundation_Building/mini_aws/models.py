@@ -1,8 +1,13 @@
 from django.db import models
+import uuid
 
 
 class ElastiCache(models.Model):
-    id = models.AutoField(primary_key=True, auto_created=True, blank=True)
+    id = models.UUIDField(
+        primary_key=True,
+        auto_created=True,
+        blank=True,
+        default=uuid.uuid4)
     key = models.CharField(
         max_length=5120,
         unique=True,
@@ -57,10 +62,6 @@ class ResultLog(models.Model):
         auto_now_add=True,
         blank=True,
         null=True)
-    updated_at = models.DateTimeField(
-        auto_now=True,
-        blank=True,
-        null=True)
 
     def getID(self):
         return self.id
@@ -77,8 +78,5 @@ class ResultLog(models.Model):
     def getCreate_at(self):
         return self.create_at
 
-    def getUpdated_at(self):
-        return self.updated_at
-
     class Meta:
-        ordering = ['user_name', 'updated_at', 'create_at']
+        ordering = ['user_name', 'create_at']

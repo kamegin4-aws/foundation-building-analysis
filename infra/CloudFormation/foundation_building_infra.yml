@@ -878,9 +878,9 @@ Resources:
           FromPort: -1
           ToPort: -1
           SourceSecurityGroupId: !Ref PublicSecurityGroup
-        - IpProtocol: tcp
-          FromPort: 8081
-          ToPort: 8081
+        - IpProtocol: '-1'
+          FromPort: -1
+          ToPort: -1
           SourceSecurityGroupId: !Ref ExternalLoadBalancerSecurityGroup
         - IpProtocol: tcp
           FromPort: 22

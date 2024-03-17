@@ -2,7 +2,7 @@ import {
   setCookie,
   getCookie,
   getCookies,
-} from "@/library/cookies/infrastructure/cookies";
+} from "@/library/cookies/infrastructure/cookies_client";
 import { ICookie } from "@/library/cookies/interface/cookies";
 
 export class UserInfoCookie extends ICookie {

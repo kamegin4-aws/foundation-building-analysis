@@ -18,6 +18,8 @@ import Image from "next/image";
 import { UserInfoCookie } from "@/library/cookies/cognito/user_info";
 import { SignOut } from "@/library/api/cognito/sign_out";
 
+import CognitoProvider from "@/ui/components/provider/cognito_provider";
+
 export default function UserInfoPage() {
   const router = useRouter();
 
@@ -131,7 +133,7 @@ export default function UserInfoPage() {
   }, []);
 
   return (
-    <>
+    <CognitoProvider>
       <ContentLayoutWrapper
         disableOverlap={true}
         header={
@@ -229,6 +231,6 @@ export default function UserInfoPage() {
           </>
         }
       />
-    </>
+    </CognitoProvider>
   );
 }

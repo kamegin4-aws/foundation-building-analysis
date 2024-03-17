@@ -16,7 +16,7 @@ import { CognitoLayoutContext } from "@/app/(cognito)/layout";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 
 import { LoginValidation } from "@/library/validation/cognito/login";
-import { ZodWrapper } from "@/library/validation/infrastructure/zod/zod";
+import { ZodWrapper } from "@/library/validation/infrastructure/zod/zod_client";
 import { UserNameLogin } from "@/library/api/cognito/login";
 import TextContentWrapper from "@/ui/cloudscape/text_content";
 

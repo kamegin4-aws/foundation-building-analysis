@@ -156,8 +156,8 @@ class ResultLogList(generics.ListCreateAPIView):
         filters.OrderingFilter]
     filter_fields = ['user_name']
     search_fields = ['user_name']
-    ordering_fields = ['updated_at', 'user_name']
-    ordering = ['updated_at', 'user_name']
+    ordering_fields = ['create_at', 'user_name']
+    ordering = ['create_at', 'user_name']
 
     def get(self, request, *args, **kwargs):
         """

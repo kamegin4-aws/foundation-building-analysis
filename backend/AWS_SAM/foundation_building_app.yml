@@ -860,6 +860,12 @@ Resources:
             - ContainerPort: 8081
               HostPort: 8081
               Protocol: tcp
+            - ContainerPort: 80
+              HostPort: 80
+              Protocol: tcp
+            - ContainerPort: 443
+              HostPort: 443
+              Protocol: tcp
           RepositoryCredentials:
             CredentialsParameter: !Ref DockerHubSecret
           LogConfiguration:
@@ -904,6 +910,8 @@ Resources:
         RestrictPublicBuckets: true
         BlockPublicAcls: true
         BlockPublicPolicy: true
+      VersioningConfiguration:
+        Status: Enabled
   ObjectStorageBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:

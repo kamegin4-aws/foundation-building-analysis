@@ -5,7 +5,7 @@ export class IValidation {
   /**
    * バリデーションチェック
    * @param {FormData} formData フォームデータ
-   * @typedef {Object} FunctionReturn
+   * @typedef {Record<string,string>} FunctionReturn
    * @property {string} index エラーインデックス
    * @property {string} message エラーメッセージ
    * @typedef {Array<FunctionReturn>} FunctionReturnArray

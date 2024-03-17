@@ -3,7 +3,7 @@ import {
   getCookie,
   getCookies,
   deleteCookie,
-} from "@/library/cookies/infrastructure/cookies";
+} from "@/library/cookies/infrastructure/cookies_client";
 import { ICookie } from "@/library/cookies/interface/cookies";
 
 export class CognitoTokensCookie extends ICookie {

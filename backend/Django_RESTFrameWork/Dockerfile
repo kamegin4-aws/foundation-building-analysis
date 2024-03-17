@@ -8,6 +8,7 @@ COPY ./Foundation_Building/Foundation_Building ./Foundation_Building
 COPY ./Foundation_Building/library ./library
 COPY ./Foundation_Building/mini_aws ./mini_aws
 COPY ./Foundation_Building/manage.py .
+COPY ./Foundation_Building/global-bundle.pem .
 
 RUN pip install --no-cache-dir -r requirements.txt
 RUN poetry install
