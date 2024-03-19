@@ -2,36 +2,51 @@
 
 import { createContext, useEffect, useState } from "react";
 import { GlobalAuthentication } from "@/library/authentication/global/authentication";
-import { AmazonCognitoIdentityWrapper } from "@/library/authentication/infrastructure/cognito_identity_client";
+import { UserInfoCookie } from "@/library/cookies/cognito/user_info";
+import { usePathname, useRouter } from "next/navigation";
+import Loading from "@/app/loading";
 
 export const CognitoContext = createContext();
 
 export default function CognitoProvider(props) {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const matcher = /^(?!.*(login|signup)).+$/;
+  const regex = new RegExp(matcher);
+  const matchResult = regex.test(pathname);
+
   //Cognito
-  const [tokens, setTokens] = useState();
   const [userAttributes, setUserAttributes] = useState();
 
   useEffect(() => {
-    const authentication = new GlobalAuthentication(
-      new AmazonCognitoIdentityWrapper()
-    );
+    if (matchResult) {
+      const authentication = new GlobalAuthentication();
 
-    const session = authentication.getSession();
-    console.log("session", session);
-
-    if (session) {
-      setTokens(session);
-      const user = authentication.getUser();
-      console.log("user", user);
-
-      if (user) setUserAttributes(user);
+      authentication.checkSession().then((session) => {
+        if (session) {
+          const userInfoCookie = new UserInfoCookie();
+          userInfoCookie
+            .get()
+            .then((userInfo) => {
+              console.log("userInfo", userInfo);
+              setUserAttributes(userInfo);
+            })
+            .catch((e) => {
+              router.push(
+                "/login?type=error&message=ユーザーの取得に失敗しました。"
+              );
+            });
+        } else router.push("/login?type=info&message=セッションが切れました");
+      });
     }
   }, []);
+
+  if (matchResult && !userAttributes) return <Loading />;
 
   return (
     <CognitoContext.Provider
       value={{
-        tokens,
         userAttributes,
       }}
     >

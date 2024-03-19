@@ -1,39 +1,51 @@
 import { IGlobalAuthentication } from "@/library/authentication/interface/authentication";
+import { CognitoTokensCookie } from "@/library/cookies/cognito/login";
+import { TokenRefresh } from "@/library/api/cognito/token_refresh";
+import { GetUserInfo } from "@/library/api/cognito/get_user_info";
 
 export class GlobalAuthentication extends IGlobalAuthentication {
-  #authenticationInstance;
-
-  constructor(authenticationInstance) {
+  constructor() {
     super();
-    this.#authenticationInstance = authenticationInstance;
   }
-
-  checkSession() {
+  async checkSession() {
     try {
-      const session = this.#authenticationInstance.getSession();
-      if (!session) {
-        const refreshSession = this.#authenticationInstance.refreshSession();
-        if (!refreshSession) return false;
-        else return refreshSession;
+      const cognitoTokens = new CognitoTokensCookie();
+      const tokens = await cognitoTokens.get();
+
+      const date = new Date();
+      const dateString = date.toLocaleString("ja-JP", {
+        timeZone: "Asia/Tokyo",
+      });
+
+      if (new Date(dateString) < new Date(tokens.ExpiresIn)) return true;
+      else {
+        const refreshToken = new TokenRefresh();
+        const responseRefreshToken = await refreshToken.execute();
+        if (responseRefreshToken.ok) {
+          const responseRefreshTokenObject = await responseRefreshToken.json();
+
+          const getUserInfo = new GetUserInfo();
+          const formDataGetUserInfo = new FormData();
+          formDataGetUserInfo.append(
+            "access_token",
+            responseRefreshTokenObject.AccessToken
+          );
+
+          const responseGetUserInfo =
+            await getUserInfo.execute(formDataGetUserInfo);
+          if (!responseGetUserInfo.ok) {
+            throw new Error("Get User Info Error");
+          }
+          return true;
+        }
+
+        return false;
       }
-      return session;
     } catch (e) {
       if (e instanceof Error) {
         throw new Error(e.message);
       } else {
         throw new Error("checkSession Error");
-      }
-    }
-  }
-
-  getUser() {
-    try {
-      return this.#authenticationInstance.getUserAttributes();
-    } catch (e) {
-      if (e instanceof Error) {
-        throw new Error(e.message);
-      } else {
-        throw new Error("getUser Error");
       }
     }
   }

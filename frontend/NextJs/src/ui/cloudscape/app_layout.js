@@ -20,7 +20,7 @@ export default function AppLayoutWrapper(props) {
         toolsOpen={props.toolsOpen ? props.toolsOpen : false}
         tools={props.helpPanel ? props.helpPanel : undefined}
         content={
-          <SpaceBetween size="l">
+          <SpaceBetween direction="vertical" size="l">
             {props.content ? props.content : <></>}
           </SpaceBetween>
         }

@@ -7,7 +7,7 @@ export default function LinkWrapper(props) {
       external={props.external ? props.external : false}
       target={props.target ? "_blank" : ""}
     >
-      {props.alt ? props.alt : "LinkUndefined"}
+      {props.alt ? props.alt : ""}
     </Link>
   );
 }

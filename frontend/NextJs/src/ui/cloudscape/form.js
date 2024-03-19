@@ -16,7 +16,7 @@ export default function FormWrapper(props) {
         }
       >
         {props.container ? (
-          <SpaceBetween direction="vertical" size="l">
+          <SpaceBetween direction="vertical" size="s">
             {props.container}
           </SpaceBetween>
         ) : (

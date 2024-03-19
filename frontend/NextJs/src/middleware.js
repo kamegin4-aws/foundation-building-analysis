@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server";
-import { CognitoTokensCookie } from "@/library/cookies/cognito/login";
-import { UserInfoCookie } from "@/library/cookies/cognito/user_info";
+
+export function middleware(request, event) {
+  const url = request.nextUrl.pathname;
+
+  if (url == "/") {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  //console.log("middleware", request.nextUrl);
+
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [
@@ -11,27 +21,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    "/((?!api|sam|signup|_next/static|_next/image|favicon.ico).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|sam|login|signup|.*svg).*)",
   ],
 };
-
-export function middleware(request, event) {
-  const url = request.nextUrl.clone();
-  const matcher = /\.svg$/;
-  const regex = new RegExp(matcher);
-
-  const cognitoTokensCookie = new CognitoTokensCookie();
-  const serInfoCookie = new UserInfoCookie();
-
-  console.log("pathname:", url.pathname);
-  if (url.pathname != "/" && !regex.test(url)) {
-    if (
-      event.waitUntil(cognitoTokensCookie.get()) == false ||
-      event.waitUntil(serInfoCookie.get()) == false
-    ) {
-      return NextResponse.rewrite(new URL("/login", request.url));
-    }
-  }
-
-  return NextResponse.next();
-}

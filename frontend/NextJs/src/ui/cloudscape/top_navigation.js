@@ -1,5 +1,4 @@
 import TopNavigation from "@cloudscape-design/components/top-navigation";
-import Input from "@cloudscape-design/components/input";
 import {
   LOGO_SRC,
   SETTINGS_ITEMS,

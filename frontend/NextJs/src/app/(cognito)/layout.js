@@ -6,6 +6,7 @@ import AppLayoutWrapper from "@/ui/cloudscape/app_layout";
 import BreadcrumbGroupWrapper from "@/ui/cloudscape/breadcrumb_group";
 import FlashBarWrapper from "@/ui/cloudscape/flashbar";
 import { createContext, useState } from "react";
+import CognitoProvider from "@/ui/components/provider/cognito_provider";
 
 export const CognitoLayoutContext = createContext();
 
@@ -51,7 +52,7 @@ export default function CognitoLayout({ children, params }) {
         helpPanel={helpPanel}
         splitPanel={splitPanel}
         notifications={<FlashBarWrapper items={flashBarItems} />}
-        content={children}
+        content={<CognitoProvider>{children}</CognitoProvider>}
       />
     </CognitoLayoutContext.Provider>
   );

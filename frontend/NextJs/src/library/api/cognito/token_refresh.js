@@ -2,8 +2,8 @@ import { CognitoTokensCookie } from "@/library/cookies/cognito/login";
 import { UserInfoCookie } from "@/library/cookies/cognito/user_info";
 import { IApi } from "@/library/api/interface/api";
 
-export class SignOut extends IApi {
-  #url = "/sam/cognito/logout";
+export class TokenRefresh extends IApi {
+  #url = "/sam/cognito/token/refresh";
   #options = {
     method: "POST", // *GET, POST, PUT, DELETE, etc.
     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
@@ -19,20 +19,28 @@ export class SignOut extends IApi {
       const userInfoCookie = new UserInfoCookie();
 
       const tokens = await cognitoTokensCookie.get();
-      if (!tokens) {
-        throw new Error("Not Cognito Tokens");
+      const user = await userInfoCookie.get();
+      if (!tokens || !user) {
+        throw new Error("Not Cognito Cookies");
       }
 
       const formData = new FormData();
-      formData.append("access_token", tokens.AccessToken);
-      console.log("access_token", tokens.AccessToken);
+      formData.append("refresh_token", tokens.RefreshToken);
+      formData.append("user_name", user.userName);
+
       this.#options.body = formData;
 
-      //cookieの削除
-      userInfoCookie.delete();
-      cognitoTokensCookie.delete();
-
       const response = fetch(this.#url, this.#options);
+
+      //リフレッシュトークン
+      const refresh = (await response).clone();
+
+      if (refresh.ok) {
+        const refreshObject = await refresh.json();
+        cognitoTokensCookie.set(refreshObject);
+      } else {
+        throw new Error("refresh Error");
+      }
 
       return response;
     } catch (e) {

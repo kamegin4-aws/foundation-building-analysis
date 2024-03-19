@@ -15,10 +15,9 @@ import ColumnLayoutWrapper from "@/ui/cloudscape/column_layout";
 import ContainerWrapper from "@/ui/cloudscape/container";
 import Image from "next/image";
 
-import { UserInfoCookie } from "@/library/cookies/cognito/user_info";
 import { SignOut } from "@/library/api/cognito/sign_out";
 
-import CognitoProvider from "@/ui/components/provider/cognito_provider";
+import { CognitoContext } from "@/ui/components/provider/cognito_provider";
 
 export default function UserInfoPage() {
   const router = useRouter();
@@ -26,6 +25,9 @@ export default function UserInfoPage() {
   //CognitoLayoutContext
   const { setBreadcrumbItems, setMenuDropdownItems } =
     useContext(CognitoLayoutContext);
+
+  //CognitoContext
+  const { userAttributes } = useContext(CognitoContext);
 
   //Alert
   const [alertDisplay, setAlertDisplay] = useState(false);
@@ -82,58 +84,40 @@ export default function UserInfoPage() {
       { text: "UserInfo", href: "/user" },
     ]);
 
-    const userInfoCookie = new UserInfoCookie();
-    userInfoCookie
-      .get()
-      .then((userInfo) => {
-        console.log("userInfo", userInfo);
-        setUserName(userInfo.userName);
-        setEmail(userInfo.email);
+    console.log("userAttributes", userAttributes);
 
-        const topMenu = [
-          {
-            type: "menu-dropdown",
-            text: userInfo.userName,
-            description: "ユーザーメニュー",
-            iconName: "user-profile-active",
-            items: [
-              {
-                id: "userInfo",
-                text: "ユーザー情報",
-                href: "/user",
-              },
-            ],
-          },
-          {
-            type: "button",
-            variant: "primary-button",
-            iconName: "user-profile",
-            text: "サインアウト",
-            ariaLabel: "サインアウト",
-            onClick: signOutOnClick,
-          },
-        ];
+    setUserName(userAttributes.userName);
+    setEmail(userAttributes.email);
 
-        setMenuDropdownItems(topMenu);
-      })
-      .catch((e) => {
-        if (e instanceof Error) {
-          console.log(e.message);
-          setAlertDisplay(true);
-          setAlertType("error");
-          setAlertHeader("エラーが発生しました。");
-          setAlertMessage(e.message);
-        } else {
-          setAlertDisplay(true);
-          setAlertType("error");
-          setAlertHeader("エラーが発生しました。");
-          setAlertMessage("Client Error");
-        }
-      });
+    const topMenu = [
+      {
+        type: "menu-dropdown",
+        text: userAttributes.userName,
+        description: "ユーザーメニュー",
+        iconName: "user-profile-active",
+        items: [
+          {
+            id: "userInfo",
+            text: "ユーザー情報",
+            href: "/user",
+          },
+        ],
+      },
+      {
+        type: "button",
+        variant: "primary-button",
+        iconName: "user-profile",
+        text: "サインアウト",
+        ariaLabel: "サインアウト",
+        onClick: signOutOnClick,
+      },
+    ];
+
+    setMenuDropdownItems(topMenu);
   }, []);
 
   return (
-    <CognitoProvider>
+    <>
       <ContentLayoutWrapper
         disableOverlap={true}
         header={
@@ -170,67 +154,65 @@ export default function UserInfoPage() {
           />
         }
         content={
-          <>
-            <ContainerWrapper
-              variant={"embedded"}
-              media={{
-                content: (
-                  <Image
-                    src="/cognito.svg"
-                    alt="cognito"
-                    width={500}
-                    height={500}
-                  />
-                ),
-                position: "side",
-                width: "25%",
-              }}
-              content={
-                <ColumnLayoutWrapper
-                  columnNumber={2}
-                  borders={"vertical"}
-                  content={
-                    <>
-                      <BoxWrapper
-                        variant={"div"}
-                        content={
-                          <SpaceBetweenWrapper
-                            size={"xs"}
-                            direction={"horizontal"}
-                            contents={
-                              <>
-                                ユーザー名
-                                <IconWrapper name={"user-profile"} />
-                              </>
-                            }
-                          />
-                        }
-                      />
-                      <BoxWrapper variant={"div"} content={userName} />
-                      <BoxWrapper
-                        variant={"div"}
-                        content={
-                          <SpaceBetweenWrapper
-                            size={"xs"}
-                            direction={"horizontal"}
-                            contents={
-                              <>
-                                Eメール
-                                <IconWrapper name={"envelope"} />
-                              </>
-                            }
-                          />
-                        }
-                      />
-                      <BoxWrapper variant={"div"} content={email} />
-                    </>
-                  }
+          <ContainerWrapper
+            variant={"embedded"}
+            media={{
+              content: (
+                <Image
+                  src="/cognito.svg"
+                  alt="cognito"
+                  width={500}
+                  height={500}
                 />
-              }
-            />
-          </>
+              ),
+              position: "side",
+              width: "25%",
+            }}
+            content={
+              <ColumnLayoutWrapper
+                columnNumber={2}
+                borders={"vertical"}
+                content={
+                  <>
+                    <BoxWrapper
+                      variant={"div"}
+                      content={
+                        <SpaceBetweenWrapper
+                          size={"xs"}
+                          direction={"horizontal"}
+                          contents={
+                            <>
+                              ユーザー名
+                              <IconWrapper name={"user-profile"} />
+                            </>
+                          }
+                        />
+                      }
+                    />
+                    <BoxWrapper variant={"div"} content={userName} />
+                    <BoxWrapper
+                      variant={"div"}
+                      content={
+                        <SpaceBetweenWrapper
+                          size={"xs"}
+                          direction={"horizontal"}
+                          contents={
+                            <>
+                              Eメール
+                              <IconWrapper name={"envelope"} />
+                            </>
+                          }
+                        />
+                      }
+                    />
+                    <BoxWrapper variant={"div"} content={email} />
+                  </>
+                }
+              />
+            }
+          />
         }
       />
-    </CognitoProvider>
+    </>
   );
 }

@@ -23,7 +23,9 @@ export default function ModalWrapper(props) {
       header={props.header ? props.header : undefined}
     >
       {props.content ? (
-        <SpaceBetween size="l">{props.content}</SpaceBetween>
+        <SpaceBetween direction="vertical" size="s">
+          {props.content}
+        </SpaceBetween>
       ) : (
         <></>
       )}

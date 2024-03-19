@@ -9,7 +9,7 @@ export default function ContainerWrapper(props) {
       footer={props.footer ? props.footer : undefined}
       media={props.media ? props.media : undefined}
     >
-      <SpaceBetween size="l">
+      <SpaceBetween direction="vertical" size="s">
         {props.content ? props.content : <></>}
       </SpaceBetween>
     </Container>

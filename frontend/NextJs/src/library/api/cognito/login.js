@@ -34,6 +34,7 @@ export class UserNameLogin extends IApi {
 
       if (login.ok) {
         let responseObjectLogin = await login.json();
+        console.log("responseObjectLogin", responseObjectLogin);
         cognitoTokensCookie.set(responseObjectLogin);
 
         //グループ内のユーザーを取得

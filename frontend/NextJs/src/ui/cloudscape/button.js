@@ -14,7 +14,7 @@ export default function ButtonWrapper(props) {
       target={props.target ? props.target : undefined}
       href={props.href ? props.href : undefined}
     >
-      {props.name ? props.name : "ButtonUndefined"}
+      {props.name ? props.name : ""}
     </Button>
   );
 }
