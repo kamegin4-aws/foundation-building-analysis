@@ -22,10 +22,6 @@ class ElastiCache(models.Model):
         auto_now=True,
         blank=True,
         null=True)
-    owner = models.ForeignKey(
-        'auth.User',
-        related_name='elasticache',
-        on_delete=models.CASCADE)
 
     def getID(self):
         return self.id
@@ -41,9 +37,6 @@ class ElastiCache(models.Model):
 
     def getUpdated_at(self):
         return self.updated_at
-
-    def getOwner(self):
-        return self.owner
 
     class Meta:
         ordering = ['key', 'updated_at', 'create_at']

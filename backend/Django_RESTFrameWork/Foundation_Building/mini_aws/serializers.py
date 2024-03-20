@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 
 class ElastiCacheSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(read_only=True)
-    owner = serializers.ReadOnlyField(source='owner.username')
 
     class Meta:
         model = ElastiCache
@@ -14,8 +13,7 @@ class ElastiCacheSerializer(serializers.ModelSerializer):
             'key',
             'value',
             'create_at',
-            'updated_at',
-            'owner']
+            'updated_at',]
 
 
 class ResultLogSerializer(serializers.ModelSerializer):
@@ -34,9 +32,7 @@ class ResultLogSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    elasticache = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=ElastiCache.objects.all())
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'elasticache']
+        fields = ['id', 'username']

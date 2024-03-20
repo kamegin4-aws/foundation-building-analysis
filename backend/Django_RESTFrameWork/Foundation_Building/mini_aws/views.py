@@ -3,11 +3,22 @@
 # from library.cache.infrastructure.pymemcache_client import PymemcacheWrapper
 from mini_aws.models import ElastiCache, ResultLog
 from mini_aws.serializers import ElastiCacheSerializer, ResultLogSerializer
-from rest_framework import generics, permissions, response, status, parsers, filters
+from rest_framework import generics, response, status, parsers, filters
 from django.contrib.auth.models import User
 from mini_aws.serializers import UserSerializer
-from mini_aws.permissions import IsOwnerOrReadOnly
+# from mini_aws.permissions import IsOwnerOrReadOnly
 import django_filters.rest_framework
+
+from library.token.infrastructure.pyjwt_client import PyJWTWrapper
+from library.token.cognito.tutorial import Cognito
+import environ
+from pathlib import Path
+import os
+env = environ.Env()
+# reading .env file
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 
 class APIRoot(generics.ListAPIView):
@@ -35,8 +46,8 @@ class APIRoot(generics.ListAPIView):
 class ElastiCacheList(generics.ListCreateAPIView):
     queryset = ElastiCache.objects.all()
     serializer_class = ElastiCacheSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
-                          IsOwnerOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+    #                      IsOwnerOrReadOnly]
     parser_classes = [parsers.JSONParser, parsers.MultiPartParser]
     filter_backends = [
         django_filters.rest_framework.DjangoFilterBackend,
@@ -52,6 +63,16 @@ class ElastiCacheList(generics.ListCreateAPIView):
         Optionally restricts the returned purchases to a given user,
         by filtering against a `username` query parameter in the URL.
         """
+
+        id_token = request.META.get('HTTP_AUTHORIZATION').split()[1]
+        issuer = env('ISSUER')
+        cognito = Cognito(instance=PyJWTWrapper(issuer=issuer))
+        token_validation = cognito.id_token_validation(id_token=id_token)
+        if token_validation is not True:
+            return response.Response(
+                token_validation,
+                status=status.HTTP_401_UNAUTHORIZED)
+
         kwargs = {}
         key = self.request.query_params.get('key')
         order_by = self.request.query_params.get('order_by')
@@ -89,15 +110,12 @@ class ElastiCacheList(generics.ListCreateAPIView):
         return response.Response(
             serializer.data, status=status.HTTP_201_CREATED)
 
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
-
 
 class ElastiCacheDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = ElastiCache.objects.all()
     serializer_class = ElastiCacheSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
-                          IsOwnerOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+    #                      IsOwnerOrReadOnly]
     parser_classes = [parsers.JSONParser, parsers.MultiPartParser]
     lookup_fields = ['pk']
 
@@ -110,7 +128,7 @@ class ElastiCacheDetail(generics.RetrieveUpdateDestroyAPIView):
                 filter[field] = self.kwargs[field]
 
         obj = generics.get_object_or_404(queryset, **filter)
-        self.check_object_permissions(self.request, obj)
+        # self.check_object_permissions(self.request, obj)
         serializer = self.get_serializer(obj)
         return response.Response(
             serializer.data,
@@ -138,7 +156,7 @@ class ElastiCacheDetail(generics.RetrieveUpdateDestroyAPIView):
                 filter[field] = self.kwargs[field]
 
         obj = generics.get_object_or_404(queryset, **filter)
-        self.check_object_permissions(self.request, obj)
+        # self.check_object_permissions(self.request, obj)
 
         return obj
 
