@@ -17,9 +17,7 @@ export default function CognitoLayout({ children, params }) {
   const [splitPanelOpen, setSplitPanelOpen] = useState(false);
 
   //OptionComponents
-  const [breadcrumbItems, setBreadcrumbItems] = useState([
-    { text: "Home", href: "#" },
-  ]);
+  const [breadcrumbItems, setBreadcrumbItems] = useState([]);
   const [sideNavigationItems, setSideNavigationItems] = useState(
     <SideNavigationWrapper />
   );
@@ -31,6 +29,7 @@ export default function CognitoLayout({ children, params }) {
   return (
     <CognitoLayoutContext.Provider
       value={{
+        flashBarItems,
         setBreadcrumbItems,
         setSideNavigationItems,
         setHelpPanel,

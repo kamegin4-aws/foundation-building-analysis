@@ -7,7 +7,6 @@ import ButtonWrapper from "@/ui/cloudscape/button";
 import { useEffect, useState, useContext } from "react";
 import { useRouter } from "next/navigation";
 
-import { CognitoLayoutContext } from "@/app/(cognito)/layout";
 import BoxWrapper from "@/ui/cloudscape/box";
 import SpaceBetweenWrapper from "@/ui/cloudscape/space_between";
 import IconWrapper from "@/ui/cloudscape/icon";
@@ -15,16 +14,14 @@ import ColumnLayoutWrapper from "@/ui/cloudscape/column_layout";
 import ContainerWrapper from "@/ui/cloudscape/container";
 import Image from "next/image";
 
-import { SignOut } from "@/library/api/cognito/sign_out";
-
 import { CognitoContext } from "@/ui/components/provider/cognito_provider";
+import TopNavigationProvider from "@/ui/components/provider/top_menu";
+import Loading from "@/app/loading";
+import BreadcrumbProvider from "@/ui/components/provider/bread_crumb";
+import FlashBarProvider from "@/ui/components/provider/flash_bar";
 
 export default function UserInfoPage() {
   const router = useRouter();
-
-  //CognitoLayoutContext
-  const { setBreadcrumbItems, setMenuDropdownItems } =
-    useContext(CognitoLayoutContext);
 
   //CognitoContext
   const { userAttributes } = useContext(CognitoContext);
@@ -43,81 +40,20 @@ export default function UserInfoPage() {
     event.preventDefault();
   };
 
-  const signOutOnClick = async (event) => {
-    event.preventDefault();
-    try {
-      setSignOutButtonLoading(true);
-      setSignOutButtonLoadingText("サインアウト中...");
-
-      const signOut = new SignOut();
-      const response = await signOut.execute();
-
-      if (response.ok) {
-        router.push("/");
-      } else {
-        setAlertDisplay(true);
-        setAlertType("error");
-        setAlertHeader("ログアウトに失敗しました。");
-        setAlertMessage(await response.json());
-      }
-    } catch (e) {
-      if (e instanceof Error) {
-        console.log(e.message);
-        setAlertDisplay(true);
-        setAlertType("error");
-        setAlertHeader("エラーが発生しました。");
-        setAlertMessage(e.message);
-      } else {
-        setAlertDisplay(true);
-        setAlertType("error");
-        setAlertHeader("エラーが発生しました。");
-        setAlertMessage("Client Error");
-      }
-    } finally {
-      setSignOutButtonLoading(false);
-    }
-  };
-
   useEffect(() => {
-    setBreadcrumbItems([
-      { text: "Home", href: "/" },
-      { text: "UserInfo", href: "/user" },
-    ]);
-
     console.log("userAttributes", userAttributes);
 
     setUserName(userAttributes.userName);
     setEmail(userAttributes.email);
-
-    const topMenu = [
-      {
-        type: "menu-dropdown",
-        text: userAttributes.userName,
-        description: "ユーザーメニュー",
-        iconName: "user-profile-active",
-        items: [
-          {
-            id: "userInfo",
-            text: "ユーザー情報",
-            href: "/user",
-          },
-        ],
-      },
-      {
-        type: "button",
-        variant: "primary-button",
-        iconName: "user-profile",
-        text: "サインアウト",
-        ariaLabel: "サインアウト",
-        onClick: signOutOnClick,
-      },
-    ];
-
-    setMenuDropdownItems(topMenu);
   }, []);
+
+  if (!userAttributes) return <Loading />;
 
   return (
     <>
+      <FlashBarProvider />
+      <BreadcrumbProvider />
+      <TopNavigationProvider />
       <ContentLayoutWrapper
         disableOverlap={true}
         header={

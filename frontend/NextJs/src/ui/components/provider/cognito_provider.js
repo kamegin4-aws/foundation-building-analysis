@@ -23,22 +23,27 @@ export default function CognitoProvider(props) {
     if (matchResult) {
       const authentication = new GlobalAuthentication();
 
-      authentication.checkSession().then((session) => {
-        if (session) {
-          const userInfoCookie = new UserInfoCookie();
-          userInfoCookie
-            .get()
-            .then((userInfo) => {
-              console.log("userInfo", userInfo);
-              setUserAttributes(userInfo);
-            })
-            .catch((e) => {
-              router.push(
-                "/login?type=error&message=ユーザーの取得に失敗しました。"
-              );
-            });
-        } else router.push("/login?type=info&message=セッションが切れました");
-      });
+      authentication
+        .checkSession()
+        .then((session) => {
+          if (session) {
+            const userInfoCookie = new UserInfoCookie();
+            userInfoCookie
+              .get()
+              .then((userInfo) => {
+                console.log("userInfo", userInfo);
+                setUserAttributes(userInfo);
+              })
+              .catch((e) => {
+                router.push(
+                  "/login?type=error&message=ユーザーの取得に失敗しました。"
+                );
+              });
+          } else router.push("/login?type=info&message=セッションが切れました");
+        })
+        .catch((e) => {
+          router.push("/login?type=info&message=ログインしてください。");
+        });
     }
   }, []);
 

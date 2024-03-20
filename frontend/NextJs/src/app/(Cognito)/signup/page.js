@@ -19,8 +19,9 @@ import { Signup } from "@/library/api/cognito/signup";
 import ModalWrapper from "@/ui/cloudscape/modal";
 import { ConfirmSignupValidation } from "@/library/validation/cognito/confirm_signup";
 import { ConfirmSignup } from "@/library/api/cognito/confirm_signup";
-import { CognitoLayoutContext } from "@/app/(cognito)/layout";
+import { CognitoLayoutContext } from "@/app/(Cognito)/layout";
 import TextContentWrapper from "@/ui/cloudscape/text_content";
+import BreadcrumbProvider from "@/ui/components/provider/bread_crumb";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -231,15 +232,11 @@ export default function SignupPage() {
     }
   };
 
-  useEffect(() => {
-    setBreadcrumbItems([
-      { text: "Home", href: "/" },
-      { text: "Signup", href: "/signup" },
-    ]);
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <>
+      <BreadcrumbProvider />
       <ContentLayoutWrapper
         header={<HeaderWrapper title={"Signup"} />}
         content={

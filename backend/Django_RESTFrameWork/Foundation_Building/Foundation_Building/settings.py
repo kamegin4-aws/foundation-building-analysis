@@ -11,7 +11,10 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-import os
+import environ
+env = environ.Env()
+# reading .env file
+environ.Env.read_env()
 
 
 def str_to_bool(s):
@@ -26,16 +29,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = str_to_bool(os.environ.get('DJANGO_DEBUG'))
+DEBUG = str_to_bool(env('DJANGO_DEBUG'))
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://foundation-building.kamegin.com',
-]
+if DEBUG is not True:
+    CSRF_TRUSTED_ORIGINS = [
+        'https://foundation-building.kamegin.com',
+    ]
 
 
 # Application definition
@@ -61,6 +65,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 ROOT_URLCONF = 'Foundation_Building.urls'
 
@@ -98,9 +103,9 @@ else:
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'foundation_building',
-            'USER': os.environ.get('RDS_USER'),
-            'PASSWORD': os.environ.get('RDS_PASSWORD'),
-            'HOST': os.environ.get('RDS_HOST'),
+            'USER': env('RDS_USER'),
+            'PASSWORD': env('RDS_PASSWORD'),
+            'HOST': env('RDS_HOST'),
             'PORT': '3306',
             'OPTIONS': {
                 'sslmode': 'require',
@@ -112,7 +117,7 @@ else:
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-            'LOCATION': os.environ.get('ELASTICACHE_ENDPOINT'),
+            'LOCATION': env('ELASTICACHE_ENDPOINT'),
         }
     }
 

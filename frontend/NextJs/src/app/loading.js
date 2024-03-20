@@ -1,7 +1,8 @@
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
+"use client";
+
+import SpinnerWrapper from "@/ui/cloudscape/spinner";
 
 export default function Loading() {
   // You can add any UI inside Loading, including a Skeleton.
-  return <Skeleton />;
+  return <SpinnerWrapper size={"large"} />;
 }
