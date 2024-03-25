@@ -1,4 +1,5 @@
 import ColumnLayout from "@cloudscape-design/components/column-layout";
+import React from "react";
 
 export default function ColumnLayoutWrapper(props) {
   return (

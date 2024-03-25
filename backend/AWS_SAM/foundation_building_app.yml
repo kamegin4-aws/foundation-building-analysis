@@ -243,12 +243,6 @@ Resources:
             - ContainerPort: 8080
               HostPort: 8080
               Protocol: tcp
-            - ContainerPort: 80
-              HostPort: 80
-              Protocol: tcp
-            - ContainerPort: 443
-              HostPort: 443
-              Protocol: tcp
           RepositoryCredentials:
             CredentialsParameter: !Ref DockerHubSecret
           LogConfiguration:
@@ -860,12 +854,6 @@ Resources:
             - ContainerPort: 8081
               HostPort: 8081
               Protocol: tcp
-            - ContainerPort: 80
-              HostPort: 80
-              Protocol: tcp
-            - ContainerPort: 443
-              HostPort: 443
-              Protocol: tcp
           RepositoryCredentials:
             CredentialsParameter: !Ref DockerHubSecret
           LogConfiguration:
@@ -990,6 +978,8 @@ Parameters:
     Type: String
   globalIP:
     Type: String
+  vpcId:
+    Type: String
   elbTargetGroupArn:
     Type: String
   elbAppTargetGroupArn:
@@ -1005,6 +995,8 @@ Parameters:
   rdsPassword:
     Type: String
   publicSubnet1Id:
+    Type: String
+  publicSubnet2Id:
     Type: String
   privateSubnet1Id:
     Type: String

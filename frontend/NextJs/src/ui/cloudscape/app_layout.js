@@ -2,6 +2,7 @@ import { AppLayout } from "@cloudscape-design/components";
 import { I18nProvider } from "@cloudscape-design/components/i18n";
 import messages from "@cloudscape-design/components/i18n/messages/all.en";
 import SpaceBetween from "@cloudscape-design/components/space-between";
+import React from "react";
 
 const LOCALE = "jp";
 
@@ -27,17 +28,14 @@ export default function AppLayoutWrapper(props) {
         splitPanelOpen={props.splitPanelOpen ? props.splitPanelOpen : false}
         splitPanel={props.splitPanel ? props.splitPanel : undefined}
         onNavigationChange={(event) => {
-          event.preventDefault();
           //console.log(event.detail.open);
           props.parentSetNavigationOpen(event.detail.open);
         }}
         onSplitPanelToggle={(event) => {
-          event.preventDefault();
           //console.log(event.detail.open);
           props.parentSetSplitPanelOpen(event.detail.open);
         }}
         onToolsChange={(event) => {
-          event.preventDefault();
           //console.log(event.detail.open);
           props.parentSetToolsOpen(event.detail.open);
         }}

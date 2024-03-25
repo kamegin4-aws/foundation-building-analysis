@@ -1,4 +1,5 @@
 import Flashbar from "@cloudscape-design/components/flashbar";
+import React from "react";
 
 export default function FlashBarWrapper(props) {
   /*

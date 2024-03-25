@@ -1,15 +1,16 @@
 "use client";
 
 import Loading from "@/app/loading";
-import { CognitoLayoutContext } from "@/app/(Cognito)/layout";
+import { LayoutContext } from "@/ui/components/provider/layout_provider";
 import { CognitoContext } from "@/ui/components/provider/cognito_provider";
 import { useContext, useEffect } from "react";
 import { SignOut } from "@/library/api/cognito/sign_out";
 import { useRouter } from "next/navigation";
+import React from "react";
 
 export default function TopNavigationProvider(props) {
-  //CognitoLayoutContext
-  const { setMenuDropdownItems } = useContext(CognitoLayoutContext);
+  //LayoutContext
+  const { setMenuDropdownItems } = useContext(LayoutContext);
 
   //CognitoContext
   const { userAttributes } = useContext(CognitoContext);

@@ -4,6 +4,7 @@ import {
   SETTINGS_ITEMS,
   USER_PROFILE_ITEMS,
 } from "@/ui/cloudscape/constant/constant_top_navigation";
+import React from "react";
 
 export default function TopNavigationWrapper(props) {
   return (

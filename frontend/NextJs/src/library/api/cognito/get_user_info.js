@@ -13,7 +13,7 @@ export class GetUserInfo extends IApi {
     super();
   }
 
-  async execute(formData) {
+  async execute(formData, query) {
     try {
       const cognitoTokensCookie = new CognitoTokensCookie();
       const userInfoCookie = new UserInfoCookie();
@@ -27,6 +27,7 @@ export class GetUserInfo extends IApi {
       };
       this.#options.body = formData;
 
+      // @ts-ignore
       const response = fetch(this.#url, this.#options);
 
       //ユーザー情報の取得

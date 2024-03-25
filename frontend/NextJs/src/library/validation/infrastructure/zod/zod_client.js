@@ -76,4 +76,40 @@ export class ZodWrapper extends IValidationInstance {
       }
     }
   }
+
+  keyValidation(key) {
+    try {
+      const result = z.string().min(1).max(5120).safeParse(key);
+
+      if (result.success) {
+        return true;
+      } else {
+        return JSON.stringify(result.error.format());
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(e.message);
+      } else {
+        throw new Error("Zod Error");
+      }
+    }
+  }
+
+  valueValidation(value) {
+    try {
+      const result = z.string().max(51200).optional().safeParse(value);
+
+      if (result.success) {
+        return true;
+      } else {
+        return JSON.stringify(result.error.format());
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(e.message);
+      } else {
+        throw new Error("Zod Error");
+      }
+    }
+  }
 }

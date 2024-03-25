@@ -19,19 +19,20 @@ import { UserNameLogin } from "@/library/api/cognito/login";
 import TextContentWrapper from "@/ui/cloudscape/text_content";
 import BreadcrumbProvider from "@/ui/components/provider/bread_crumb";
 import FlashBarProvider from "@/ui/components/provider/flash_bar";
+import React from "react";
 
 export default function LoginPage() {
   //Alert
   const [alertDisplay, setAlertDisplay] = useState(false);
-  const [alertType, setAlertType] = useState();
-  const [alertHeader, setAlertHeader] = useState();
-  const [alertMessage, setAlertMessage] = useState();
+  const [alertType, setAlertType] = useState("");
+  const [alertHeader, setAlertHeader] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
 
   //Form
   const [userNameInputValue, setUserNameInputValue] = useState("");
-  const [userNameErrorText, setUserNameErrorText] = useState();
+  const [userNameErrorText, setUserNameErrorText] = useState("");
   const [passwordInputValue, setPasswordInputValue] = useState("");
-  const [passwordErrorText, setPasswordErrorText] = useState();
+  const [passwordErrorText, setPasswordErrorText] = useState("");
   const [loginButtonLoading, setLoginButtonLoading] = useState(false);
   const [loginButtonLoadingText, setLoginButtonLoadingText] = useState("");
 
@@ -49,8 +50,8 @@ export default function LoginPage() {
       formData.append("password", passwordInputValue);
 
       const validationResult = loginValidation.execute(formData);
-      setUserNameErrorText();
-      setPasswordErrorText();
+      setUserNameErrorText("");
+      setPasswordErrorText("");
       setAlertDisplay(false);
 
       if (validationResult == true) {
@@ -63,6 +64,7 @@ export default function LoginPage() {
           setAlertDisplay(true);
           setAlertType("success");
           setAlertHeader("ログインしました。");
+          setAlertMessage("");
           //setCognitoTokens(apiResponseObject);
           //setAlertMessage(JSON.stringify(apiResponseObject));
         } else {
@@ -106,8 +108,8 @@ export default function LoginPage() {
     console.log(event.detail);
     setUserNameInputValue("");
     setPasswordInputValue("");
-    setUserNameErrorText();
-    setPasswordErrorText();
+    setUserNameErrorText("");
+    setPasswordErrorText("");
   };
 
   useEffect(() => {}, []);
@@ -139,7 +141,7 @@ export default function LoginPage() {
             media={{
               content: (
                 <Image
-                  src="/cognito.svg"
+                  src={`/cognito.svg`}
                   alt="cognito"
                   width={500}
                   height={500}

@@ -6,6 +6,14 @@ const nextConfig = {
   ],
   output: "standalone",
   experimental: { serverActions: true },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN,
+      },
+    ],
+  },
   async rewrites() {
     return [
       {
@@ -47,6 +55,10 @@ const nextConfig = {
         source: "/sam/cognito/user/info",
         destination:
           "https://mzildfvx2b.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/user/info",
+      },
+      {
+        source: "/drf/elasticache",
+        destination: `${process.env.NEXT_PUBLIC_PROTOCOL}://${process.env.NEXT_PUBLIC_HOST_DOMAIN}/drf/elasticache`,
       },
     ];
   },

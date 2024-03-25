@@ -5,8 +5,9 @@ import { GlobalAuthentication } from "@/library/authentication/global/authentica
 import { UserInfoCookie } from "@/library/cookies/cognito/user_info";
 import { usePathname, useRouter } from "next/navigation";
 import Loading from "@/app/loading";
+import React from "react";
 
-export const CognitoContext = createContext();
+export const CognitoContext = createContext(null);
 
 export default function CognitoProvider(props) {
   const router = useRouter();
@@ -17,7 +18,7 @@ export default function CognitoProvider(props) {
   const matchResult = regex.test(pathname);
 
   //Cognito
-  const [userAttributes, setUserAttributes] = useState();
+  const [userAttributes, setUserAttributes] = useState(null);
 
   useEffect(() => {
     if (matchResult) {

@@ -16,10 +16,24 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+import environ
+import os
+from Foundation_Building.settings import BASE_DIR, str_to_bool
+env = environ.Env()
+# reading .env file
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 
-urlpatterns = [
-    path('admin', admin.site.urls),
-    path('api-auth', include('rest_framework.urls')),
-    path('', include('mini_aws.urls')),
-]
+DEBUG = str_to_bool(env('DJANGO_DEBUG'))
+
+if DEBUG:
+    urlpatterns = [
+        path('admin', admin.site.urls),
+        path('api-auth', include('rest_framework.urls')),
+        path('', include('mini_aws.urls')),
+    ]
+else:
+    urlpatterns = [
+        path('api-auth', include('rest_framework.urls')),
+        path('', include('mini_aws.urls')),
+    ]

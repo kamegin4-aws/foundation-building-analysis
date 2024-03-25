@@ -4,6 +4,7 @@ import {
   HEADER,
   ITEMS,
 } from "@/ui/cloudscape/constant/constant_side_navigation";
+import React from "react";
 
 export default function SideNavigationWrapper(props) {
   //const [activeHref, setActiveHref] = React.useState(props.initialActiveHref);
@@ -18,6 +19,7 @@ export default function SideNavigationWrapper(props) {
           props.parentSetActiveHref(event.detail.href);
         }
       }}
+      // @ts-ignore
       items={ITEMS}
     />
   );

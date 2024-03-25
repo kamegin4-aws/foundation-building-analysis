@@ -1,4 +1,4 @@
-export const LOGO_SRC = "/app.svg";
+export const LOGO_SRC = `/app.svg`;
 
 export const SETTINGS_ITEMS = [
   {

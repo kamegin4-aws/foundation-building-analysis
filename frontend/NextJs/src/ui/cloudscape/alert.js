@@ -1,5 +1,6 @@
 import Alert from "@cloudscape-design/components/alert";
 import SpaceBetween from "@cloudscape-design/components/space-between";
+import React from "react";
 
 export default function AlertWrapper(props) {
   return (
@@ -8,7 +9,6 @@ export default function AlertWrapper(props) {
       type={props.type ? props.type : "info"}
       header={props.header ? props.header : "AlertUndefined"}
       onDismiss={(event) => {
-        event.preventDefault();
         //console.log(event.detail);
         props.parentAlertDisplay(false);
       }}

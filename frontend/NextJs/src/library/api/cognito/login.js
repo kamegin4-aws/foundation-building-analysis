@@ -17,10 +17,11 @@ export class UserNameLogin extends IApi {
     super();
   }
 
-  async execute(formData) {
+  async execute(formData, query) {
     try {
       this.#options.body = formData;
 
+      // @ts-ignore
       const response = fetch(this.#url, this.#options);
 
       const cognitoTokensCookie = new CognitoTokensCookie();
@@ -69,6 +70,11 @@ export class UserNameLogin extends IApi {
           if (!(await userInfoCookie.get())) {
             const formDataGetUserInfo = new FormData();
             const cognitoTokens = await cognitoTokensCookie.get();
+
+            if (!cognitoTokens) {
+              throw new Error("Not Access Token");
+            }
+
             formDataGetUserInfo.append(
               "access_token",
               cognitoTokens.AccessToken

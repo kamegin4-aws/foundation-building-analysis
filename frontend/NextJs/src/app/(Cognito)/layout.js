@@ -5,10 +5,12 @@ import SideNavigationWrapper from "@/ui/cloudscape/side_navigation";
 import AppLayoutWrapper from "@/ui/cloudscape/app_layout";
 import BreadcrumbGroupWrapper from "@/ui/cloudscape/breadcrumb_group";
 import FlashBarWrapper from "@/ui/cloudscape/flashbar";
-import { createContext, useState } from "react";
+import { useState, useContext } from "react";
 import CognitoProvider from "@/ui/components/provider/cognito_provider";
-
-export const CognitoLayoutContext = createContext();
+import AppLayoutProvider, {
+  LayoutContext,
+} from "@/ui/components/provider/layout_provider";
+import React from "react";
 
 export default function CognitoLayout({ children, params }) {
   //OpenState
@@ -16,32 +18,22 @@ export default function CognitoLayout({ children, params }) {
   const [toolsOpen, setToolsOpen] = useState(false);
   const [splitPanelOpen, setSplitPanelOpen] = useState(false);
 
-  //OptionComponents
-  const [breadcrumbItems, setBreadcrumbItems] = useState([]);
-  const [sideNavigationItems, setSideNavigationItems] = useState(
-    <SideNavigationWrapper />
-  );
-  const [helpPanel, setHelpPanel] = useState();
-  const [splitPanel, setSplitPanel] = useState();
-  const [flashBarItems, setFlashBarItems] = useState([]);
-  const [menuDropdownItems, setMenuDropdownItems] = useState([]);
+  //LayoutContext
+  const {
+    breadcrumbItems,
+    sideNavigationItems,
+    helpPanel,
+    splitPanel,
+    flashBarItems,
+    menuDropdownItems,
+  } = useContext(LayoutContext);
 
   return (
-    <CognitoLayoutContext.Provider
-      value={{
-        flashBarItems,
-        setBreadcrumbItems,
-        setSideNavigationItems,
-        setHelpPanel,
-        setSplitPanel,
-        setFlashBarItems,
-        setMenuDropdownItems,
-      }}
-    >
+    <>
       {<TopNavigationWrapper menuDropdown={menuDropdownItems} />}
       <AppLayoutWrapper
         breadCrumbGroup={<BreadcrumbGroupWrapper items={breadcrumbItems} />}
-        sideNavigation={sideNavigationItems}
+        sideNavigation={<SideNavigationWrapper />}
         navigationOpen={navigationOpen}
         toolsOpen={toolsOpen}
         splitPanelOpen={splitPanelOpen}
@@ -53,6 +45,6 @@ export default function CognitoLayout({ children, params }) {
         notifications={<FlashBarWrapper items={flashBarItems} />}
         content={<CognitoProvider>{children}</CognitoProvider>}
       />
-    </CognitoLayoutContext.Provider>
+    </>
   );
 }

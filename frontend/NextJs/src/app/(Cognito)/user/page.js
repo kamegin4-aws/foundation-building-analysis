@@ -19,6 +19,7 @@ import TopNavigationProvider from "@/ui/components/provider/top_menu";
 import Loading from "@/app/loading";
 import BreadcrumbProvider from "@/ui/components/provider/bread_crumb";
 import FlashBarProvider from "@/ui/components/provider/flash_bar";
+import React from "react";
 
 export default function UserInfoPage() {
   const router = useRouter();
@@ -95,7 +96,7 @@ export default function UserInfoPage() {
             media={{
               content: (
                 <Image
-                  src="/cognito.svg"
+                  src={`/cognito.svg`}
                   alt="cognito"
                   width={500}
                   height={500}

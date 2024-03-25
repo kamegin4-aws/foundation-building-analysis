@@ -1,8 +1,8 @@
 import { CognitoTokensCookie } from "@/library/cookies/cognito/login";
 import { IApi } from "@/library/api/interface/api";
 
-export class Create extends IApi {
-  #url = "/drf/elasticache-rds/create";
+export class RelationalDataCreate extends IApi {
+  #url = "/drf/elasticache";
   #options = {
     method: "POST", // *GET, POST, PUT, DELETE, etc.
     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
@@ -12,22 +12,21 @@ export class Create extends IApi {
     super();
   }
 
-  async execute(formData) {
+  async execute(formData, query) {
     try {
       const cognitoTokensCookie = new CognitoTokensCookie();
       const cognitoTokens = await cognitoTokensCookie.get();
-      if (!tokens) {
+      if (!cognitoTokens) {
         throw new Error("Not Cognito Tokens");
       }
 
       this.#options.headers = {
-        Authorization: `${tokens.TokenType} ${tokens.IdToken}`,
+        Authorization: `${cognitoTokens.TokenType} ${cognitoTokens.IdToken}`,
       };
 
-      const formDataGetUserInfo = new FormData();
-      formDataGetUserInfo.append("access_token", cognitoTokens.AccessToken);
-      this.#options.body = formDataGetUserInfo;
+      this.#options.body = formData;
 
+      // @ts-ignore
       const response = fetch(this.#url, this.#options);
 
       return response;

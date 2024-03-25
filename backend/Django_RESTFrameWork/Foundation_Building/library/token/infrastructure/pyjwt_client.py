@@ -2,13 +2,12 @@ from library.token.infrastructure.interface.token import ITokenInstance
 import jwt
 import traceback
 import environ
-from pathlib import Path
 import os
 import datetime
+from Foundation_Building.settings import BASE_DIR
+
 env = environ.Env()
 # reading .env file
-
-BASE_DIR = Path(__file__).resolve().parent.parent
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 

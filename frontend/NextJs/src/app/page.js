@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState } from "react";
 import Header from "@cloudscape-design/components/header";
@@ -6,6 +6,7 @@ import Container from "@cloudscape-design/components/container";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import Input from "@cloudscape-design/components/input";
 import Button from "@cloudscape-design/components/button";
+import React from "react";
 
 export default function App() {
   const [value, setValue] = useState("");

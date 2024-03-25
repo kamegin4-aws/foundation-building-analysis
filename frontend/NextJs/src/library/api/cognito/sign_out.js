@@ -13,7 +13,7 @@ export class SignOut extends IApi {
     super();
   }
 
-  async execute(formData) {
+  async execute(formData, query) {
     try {
       const cognitoTokensCookie = new CognitoTokensCookie();
       const userInfoCookie = new UserInfoCookie();
@@ -32,6 +32,7 @@ export class SignOut extends IApi {
       userInfoCookie.delete();
       cognitoTokensCookie.delete();
 
+      // @ts-ignore
       const response = fetch(this.#url, this.#options);
 
       return response;

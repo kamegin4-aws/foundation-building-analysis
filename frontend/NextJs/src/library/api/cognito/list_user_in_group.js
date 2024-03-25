@@ -12,7 +12,7 @@ export class ListUserInGroup extends IApi {
     super();
   }
 
-  async execute(formData) {
+  async execute(formData, query) {
     try {
       const cognitoTokensCookie = new CognitoTokensCookie();
       const tokens = await cognitoTokensCookie.get();
@@ -25,6 +25,7 @@ export class ListUserInGroup extends IApi {
       };
       this.#options.body = formData;
 
+      // @ts-ignore
       const response = fetch(this.#url, this.#options);
 
       return response;

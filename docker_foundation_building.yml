@@ -1,5 +1,30 @@
 version: '3.8'
 services:
+  web:
+    build:
+      context: ./infra/Nginx
+      dockerfile: Dockerfile
+      args:
+        - HOST_DOMAIN=${HOST_DOMAIN}
+    image: kamegin4/foundation-building:nginx
+    container_name: nginx
+    restart: always
+    tty: true
+    #privileged: true
+    depends_on:
+      - presentation
+      - application
+    #environment:
+    #  - NGINX_HOST=foobar.com
+    #  - NGINX_PORT=80
+    expose:
+      - 80
+    ports:
+      - '80:80'
+    #extra_hosts:
+    #  - local_dev:${HOST_IP}
+    #volumes:
+    #command:
   presentation:
     build:
       context: ./frontend/NextJs
@@ -8,6 +33,7 @@ services:
     container_name: next_js
     restart: always
     tty: true
+    #privileged: true
     expose:
       - 8080
     ports:
@@ -27,6 +53,7 @@ services:
     container_name: django_rf
     restart: always
     tty: true
+    privileged: true
     #environment:
     expose:
       - 8081
@@ -34,6 +61,6 @@ services:
       - '8081:8081'
     #extra_hosts:
     #  - local_dev:${HOST_IP}
-    #volumes:
-    #  - ./backend/Django_RESTFrameWork/Foundation_Building/db.sqlite3:/usr/src/app/db.sqlite3
+    volumes:
+      - ./backend/Django_RESTFrameWork/Foundation_Building/db.sqlite3:/usr/src/app/db.sqlite3
     #command:

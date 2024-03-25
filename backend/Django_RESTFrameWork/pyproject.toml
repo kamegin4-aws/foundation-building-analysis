@@ -6,7 +6,8 @@ build-backend = "poetry.core.masonry.api"
 name = "Foundation_Building"
 version = "0.1.0"
 packages = [
-    { include = "Foundation_Building/library" }
+    { include = "Foundation_Building/library" },
+    { include = "Foundation_Building/Foundation_Building" }
 ]
 authors = ["kamegin4-aws <kamegin4@outlook.jp>"]
 description = "Backend App of Foundation_Building"

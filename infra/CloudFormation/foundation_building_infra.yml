@@ -573,10 +573,6 @@ Resources:
                   - ExternalELBTargetGroup
                   - TargetGroupArn
                 Weight: 1
-              - TargetGroupArn: !GetAtt 
-                  - ExternalELBAppTargetGroup
-                  - TargetGroupArn
-                Weight: 1
             TargetGroupStickinessConfig:
               DurationSeconds: 3600
               Enabled: true
@@ -597,10 +593,6 @@ Resources:
             TargetGroups:
               - TargetGroupArn: !GetAtt 
                   - ExternalELBTargetGroup
-                  - TargetGroupArn
-                Weight: 1
-              - TargetGroupArn: !GetAtt 
-                  - ExternalELBAppTargetGroup
                   - TargetGroupArn
                 Weight: 1
             TargetGroupStickinessConfig:

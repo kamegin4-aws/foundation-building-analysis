@@ -1,4 +1,5 @@
 import Spinner from "@cloudscape-design/components/spinner";
+import React from "react";
 
 export default function SpinnerWrapper(props) {
   return (

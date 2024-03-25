@@ -1,12 +1,13 @@
 "use client";
 
-import { CognitoLayoutContext } from "@/app/(Cognito)/layout";
+import { LayoutContext } from "@/ui/components/provider/layout_provider";
 import { usePathname } from "next/navigation";
+import React from "react";
 import { useContext, useEffect } from "react";
 
 export default function BreadcrumbProvider() {
-  //CognitoLayoutContext
-  const { setBreadcrumbItems } = useContext(CognitoLayoutContext);
+  //LayoutContext
+  const { setBreadcrumbItems } = useContext(LayoutContext);
 
   const pathname = usePathname();
   const pathArray = pathname.split("/").slice(1);

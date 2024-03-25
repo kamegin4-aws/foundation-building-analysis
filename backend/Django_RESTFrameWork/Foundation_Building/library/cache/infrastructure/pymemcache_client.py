@@ -3,12 +3,17 @@ from pymemcache.client.base import Client
 from pymemcache import serde
 import traceback
 from library.cache.infrastructure.interface.cache import ICacheInstance
+import environ
 import os
+from Foundation_Building.settings import BASE_DIR
+env = environ.Env()
+# reading .env file
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 
 class PymemcacheWrapper(ICacheInstance):
     def __init__(self, *, endpoint=None, tls_context=None, sered_cache=None):
-        self.endpoint = endpoint if endpoint is not None else os.environ.get(
+        self.endpoint = endpoint if endpoint is not None else env(
             'ELASTICACHE_ENDPOINT')
         self.tls_context = tls_context if tls_context is not None else ssl.create_default_context()
         self.sered_cache = sered_cache if sered_cache is not None else serde.pickle_serde

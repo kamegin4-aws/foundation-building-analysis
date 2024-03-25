@@ -11,9 +11,10 @@ export class ConfirmSignup extends IApi {
     super();
   }
 
-  async execute(formData) {
+  async execute(formData, query) {
     try {
       this.#options.body = formData;
+      // @ts-ignore
       const response = fetch(this.#url, this.#options);
 
       return response;

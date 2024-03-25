@@ -19,37 +19,35 @@ import { Signup } from "@/library/api/cognito/signup";
 import ModalWrapper from "@/ui/cloudscape/modal";
 import { ConfirmSignupValidation } from "@/library/validation/cognito/confirm_signup";
 import { ConfirmSignup } from "@/library/api/cognito/confirm_signup";
-import { CognitoLayoutContext } from "@/app/(Cognito)/layout";
 import TextContentWrapper from "@/ui/cloudscape/text_content";
 import BreadcrumbProvider from "@/ui/components/provider/bread_crumb";
+import FlashBarProvider from "@/ui/components/provider/flash_bar";
+import React from "react";
 
 export default function SignupPage() {
   const router = useRouter();
 
-  //CognitoLayoutContext
-  const { setBreadcrumbItems } = useContext(CognitoLayoutContext);
-
   //Alert
   const [alertDisplay, setAlertDisplay] = useState(false);
-  const [alertType, setAlertType] = useState();
-  const [alertHeader, setAlertHeader] = useState();
-  const [alertMessage, setAlertMessage] = useState();
-  const [alertAction, setAlertAction] = useState();
+  const [alertType, setAlertType] = useState("");
+  const [alertHeader, setAlertHeader] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertAction, setAlertAction] = useState(<></>);
 
   //Form
   const [userNameInputValue, setUserNameInputValue] = useState("");
-  const [userNameErrorText, setUserNameErrorText] = useState();
+  const [userNameErrorText, setUserNameErrorText] = useState("");
   const [emailInputValue, setEmailInputValue] = useState("");
-  const [emailErrorText, setEmailErrorText] = useState();
+  const [emailErrorText, setEmailErrorText] = useState("");
   const [passwordInputValue, setPasswordInputValue] = useState("");
-  const [passwordErrorText, setPasswordErrorText] = useState();
+  const [passwordErrorText, setPasswordErrorText] = useState("");
   const [signupButtonLoading, setSignupButtonLoading] = useState(false);
   const [signupButtonLoadingText, setSignupButtonLoadingText] = useState("");
 
   //Modal
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [confirmCodeInputValue, setConfirmCodeInputValue] = useState("");
-  const [confirmCodeErrorText, setConfirmCodeErrorText] = useState();
+  const [confirmCodeErrorText, setConfirmCodeErrorText] = useState("");
   const [confirmCodeButtonLoading, setConfirmCodeButtonLoading] =
     useState(false);
   const [confirmCodeButtonLoadingText, setConfirmCodeButtonLoadingText] =
@@ -70,9 +68,9 @@ export default function SignupPage() {
       formData.append("password", passwordInputValue);
 
       const validationResult = signupValidation.execute(formData);
-      setUserNameErrorText();
-      setEmailErrorText();
-      setPasswordErrorText();
+      setUserNameErrorText("");
+      setEmailErrorText("");
+      setPasswordErrorText("");
       setAlertDisplay(false);
 
       if (validationResult == true) {
@@ -142,9 +140,9 @@ export default function SignupPage() {
     setUserNameInputValue("");
     setPasswordInputValue("");
     setEmailInputValue("");
-    setUserNameErrorText();
-    setEmailErrorText();
-    setPasswordErrorText();
+    setUserNameErrorText("");
+    setEmailErrorText("");
+    setPasswordErrorText("");
   };
 
   const openConfirmCodeModal = (event) => {
@@ -157,8 +155,8 @@ export default function SignupPage() {
     event.preventDefault();
     console.log(event.detail);
     setConfirmModalVisible(false);
-    setUserNameErrorText();
-    setConfirmCodeErrorText();
+    setUserNameErrorText("");
+    setConfirmCodeErrorText("");
   };
 
   const confirmCodeSubmitOnClick = async (event) => {
@@ -178,8 +176,8 @@ export default function SignupPage() {
       formData.append("code", confirmCodeInputValue);
 
       const validationResult = confirmSignupValidation.execute(formData);
-      setUserNameErrorText();
-      setConfirmCodeErrorText();
+      setUserNameErrorText("");
+      setConfirmCodeErrorText("");
       setAlertDisplay(false);
 
       if (validationResult == true) {
@@ -236,6 +234,7 @@ export default function SignupPage() {
 
   return (
     <>
+      <FlashBarProvider />
       <BreadcrumbProvider />
       <ContentLayoutWrapper
         header={<HeaderWrapper title={"Signup"} />}
@@ -261,7 +260,7 @@ export default function SignupPage() {
             media={{
               content: (
                 <Image
-                  src="/cognito.svg"
+                  src={`/cognito.svg`}
                   alt="cognito"
                   width={500}
                   height={500}

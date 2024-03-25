@@ -12,17 +12,16 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import environ
+import os
 env = environ.Env()
 # reading .env file
-environ.Env.read_env()
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 
 def str_to_bool(s):
     return s.lower() in ["true", "t", "yes", "1"]
-
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -38,8 +37,12 @@ ALLOWED_HOSTS = ['*']
 
 if DEBUG is not True:
     CSRF_TRUSTED_ORIGINS = [
-        'https://foundation-building.kamegin.com',
+        'https://*.kamegin.com',
+        'http://*.kamegin.com:8080',
     ]
+    # SECURE_SSL_REDIRECT = True
+    # SESSION_COOKIE_SECURE = True
+    # CSRF_COOKIE_SECURE = True
 
 
 # Application definition

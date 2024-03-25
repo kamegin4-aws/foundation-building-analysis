@@ -1,12 +1,13 @@
 "use client";
 
-import { CognitoLayoutContext } from "@/app/(Cognito)/layout";
+import { LayoutContext } from "@/ui/components/provider/layout_provider";
 import { useSearchParams } from "next/navigation";
+import React from "react";
 import { useContext, useEffect } from "react";
 
 export default function FlashBarProvider(props) {
-  //CognitoLayoutContext
-  const { flashBarItems, setFlashBarItems } = useContext(CognitoLayoutContext);
+  //LayoutContext
+  const { flashBarItems, setFlashBarItems } = useContext(LayoutContext);
 
   const searchParams = useSearchParams();
   const searchType = searchParams.get("type");

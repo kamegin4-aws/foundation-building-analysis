@@ -1,4 +1,5 @@
 import Icon from "@cloudscape-design/components/icon";
+import React from "react";
 
 export default function IconWrapper(props) {
   return (

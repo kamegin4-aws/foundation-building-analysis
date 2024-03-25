@@ -37,4 +37,22 @@ export class IValidationInstance {
   codeValidation(code) {
     throw new Error("Not implemented");
   }
+
+  /**
+   * キーバリデーション
+   * @param {string} key キー
+   * @returns {boolean | string} 成功時:true, 失敗時:エラーメッセージ
+   */
+  keyValidation(key) {
+    throw new Error("Not implemented");
+  }
+
+  /**
+   * バリューバリデーション
+   * @param {string} value バリュー
+   * @returns {boolean | string} 成功時:true, 失敗時:エラーメッセージ
+   */
+  valueValidation(value) {
+    throw new Error("Not implemented");
+  }
 }

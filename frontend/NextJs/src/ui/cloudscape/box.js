@@ -1,4 +1,5 @@
 import Box from "@cloudscape-design/components/box";
+import React from "react";
 
 export default function BoxWrapper(props) {
   return (

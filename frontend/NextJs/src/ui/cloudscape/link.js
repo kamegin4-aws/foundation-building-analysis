@@ -1,4 +1,5 @@
 import Link from "@cloudscape-design/components/link";
+import React from "react";
 
 export default function LinkWrapper(props) {
   return (

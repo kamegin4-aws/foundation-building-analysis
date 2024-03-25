@@ -12,12 +12,10 @@ import django_filters.rest_framework
 from library.token.infrastructure.pyjwt_client import PyJWTWrapper
 from library.token.cognito.tutorial import Cognito
 import environ
-from pathlib import Path
 import os
+from Foundation_Building.settings import BASE_DIR
 env = environ.Env()
 # reading .env file
-
-BASE_DIR = Path(__file__).resolve().parent.parent
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 
@@ -63,7 +61,8 @@ class ElastiCacheList(generics.ListCreateAPIView):
         Optionally restricts the returned purchases to a given user,
         by filtering against a `username` query parameter in the URL.
         """
-
+        """
+        # トークン検証
         id_token = request.META.get('HTTP_AUTHORIZATION').split()[1]
         issuer = env('ISSUER')
         cognito = Cognito(instance=PyJWTWrapper(issuer=issuer))
@@ -72,6 +71,7 @@ class ElastiCacheList(generics.ListCreateAPIView):
             return response.Response(
                 token_validation,
                 status=status.HTTP_401_UNAUTHORIZED)
+        """
 
         kwargs = {}
         key = self.request.query_params.get('key')
@@ -102,6 +102,16 @@ class ElastiCacheList(generics.ListCreateAPIView):
             status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
+        # トークン検証
+        id_token = request.META.get('HTTP_AUTHORIZATION').split()[1]
+        issuer = env('ISSUER')
+        cognito = Cognito(instance=PyJWTWrapper(issuer=issuer))
+        token_validation = cognito.id_token_validation(id_token=id_token)
+        if token_validation is not True:
+            return response.Response(
+                token_validation,
+                status=status.HTTP_401_UNAUTHORIZED)
+
         # リクエストデータをシリアライズして新しいデータを作成
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -120,6 +130,16 @@ class ElastiCacheDetail(generics.RetrieveUpdateDestroyAPIView):
     lookup_fields = ['pk']
 
     def get(self, request, *args, **kwargs):
+        # トークン検証
+        id_token = request.META.get('HTTP_AUTHORIZATION').split()[1]
+        issuer = env('ISSUER')
+        cognito = Cognito(instance=PyJWTWrapper(issuer=issuer))
+        token_validation = cognito.id_token_validation(id_token=id_token)
+        if token_validation is not True:
+            return response.Response(
+                token_validation,
+                status=status.HTTP_401_UNAUTHORIZED)
+
         queryset = self.get_queryset()
 
         filter = {}
@@ -135,6 +155,16 @@ class ElastiCacheDetail(generics.RetrieveUpdateDestroyAPIView):
             status=status.HTTP_200_OK)
 
     def put(self, request, *args, **kwargs):
+        # トークン検証
+        id_token = request.META.get('HTTP_AUTHORIZATION').split()[1]
+        issuer = env('ISSUER')
+        cognito = Cognito(instance=PyJWTWrapper(issuer=issuer))
+        token_validation = cognito.id_token_validation(id_token=id_token)
+        if token_validation is not True:
+            return response.Response(
+                token_validation,
+                status=status.HTTP_401_UNAUTHORIZED)
+
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -144,6 +174,16 @@ class ElastiCacheDetail(generics.RetrieveUpdateDestroyAPIView):
             status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
+        # トークン検証
+        id_token = request.META.get('HTTP_AUTHORIZATION').split()[1]
+        issuer = env('ISSUER')
+        cognito = Cognito(instance=PyJWTWrapper(issuer=issuer))
+        token_validation = cognito.id_token_validation(id_token=id_token)
+        if token_validation is not True:
+            return response.Response(
+                token_validation,
+                status=status.HTTP_401_UNAUTHORIZED)
+
         instance = self.get_object()
         self.perform_destroy(instance)
         return response.Response(status=status.HTTP_204_NO_CONTENT)
@@ -159,9 +199,6 @@ class ElastiCacheDetail(generics.RetrieveUpdateDestroyAPIView):
         # self.check_object_permissions(self.request, obj)
 
         return obj
-
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
 
 
 class ResultLogList(generics.ListCreateAPIView):
