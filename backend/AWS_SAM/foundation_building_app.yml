@@ -223,56 +223,6 @@ Resources:
       CapacityProviders:
         - FARGATE
         - FARGATE_SPOT
-  NextJsTaskDefinition:
-    Type: AWS::ECS::TaskDefinition
-    Properties:
-      Family: NextJsTaskDefinition
-      ExecutionRoleArn: !GetAtt ExecECSTaskRole.Arn
-      NetworkMode: awsvpc
-      RequiresCompatibilities:
-        - FARGATE
-      Cpu: '256'
-      Memory: '512'
-      EphemeralStorage:
-        SizeInGiB: 21
-      ContainerDefinitions:
-        - Name: next_js
-          Image: kamegin4/foundation-building:next_js
-          Essential: true
-          PortMappings:
-            - ContainerPort: 8080
-              HostPort: 8080
-              Protocol: tcp
-          RepositoryCredentials:
-            CredentialsParameter: !Ref DockerHubSecret
-          LogConfiguration:
-            LogDriver: awslogs
-            Options:
-              awslogs-group: /ecs/NextJsTaskDefinition
-              awslogs-region: !Ref AWS::Region
-              awslogs-stream-prefix: ecs
-              awslogs-create-group: 'true'
-  NextJSService:
-    Type: AWS::ECS::Service
-    Properties:
-      Cluster: !GetAtt Cluster.Arn
-      TaskDefinition: !Ref NextJsTaskDefinition
-      DesiredCount: 0
-      DeploymentConfiguration:
-        MaximumPercent: 200
-        MinimumHealthyPercent: 50
-      LoadBalancers:
-        - ContainerName: next_js
-          ContainerPort: 8080
-          TargetGroupArn: !Ref elbTargetGroupArn
-      LaunchType: FARGATE
-      NetworkConfiguration:
-        AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
-          SecurityGroups:
-            - !Ref publicSecurityGroupId
-          Subnets:
-            - !Ref publicSubnet1Id
   ExecECSTaskRole:
     Type: AWS::IAM::Role
     Properties:
@@ -834,56 +784,6 @@ Resources:
       DBInstanceClass: db.t3.medium
       Engine: aurora-postgresql
       DBClusterIdentifier: !Ref DBCluster
-  DjangoRFTaskDefinition:
-    Type: AWS::ECS::TaskDefinition
-    Properties:
-      Family: DjangoRFTaskDefinition
-      ExecutionRoleArn: !GetAtt ExecECSTaskRole.Arn
-      NetworkMode: awsvpc
-      RequiresCompatibilities:
-        - FARGATE
-      Cpu: '256'
-      Memory: '512'
-      EphemeralStorage:
-        SizeInGiB: 21
-      ContainerDefinitions:
-        - Name: django_rf
-          Image: kamegin4/foundation-building:django_rf
-          Essential: true
-          PortMappings:
-            - ContainerPort: 8081
-              HostPort: 8081
-              Protocol: tcp
-          RepositoryCredentials:
-            CredentialsParameter: !Ref DockerHubSecret
-          LogConfiguration:
-            LogDriver: awslogs
-            Options:
-              awslogs-group: /ecs/DjangoRFTaskDefinition
-              awslogs-region: !Ref AWS::Region
-              awslogs-stream-prefix: ecs
-              awslogs-create-group: 'true'
-  DjangoRFService:
-    Type: AWS::ECS::Service
-    Properties:
-      Cluster: !GetAtt Cluster.Arn
-      TaskDefinition: !Ref DjangoRFTaskDefinition
-      DesiredCount: 0
-      DeploymentConfiguration:
-        MaximumPercent: 200
-        MinimumHealthyPercent: 50
-      LoadBalancers:
-        - ContainerName: django_rf
-          ContainerPort: 8081
-          TargetGroupArn: !Ref elbAppTargetGroupArn
-      LaunchType: FARGATE
-      NetworkConfiguration:
-        AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
-          SecurityGroups:
-            - !Ref publicAppSecurityGroupId
-          Subnets:
-            - !Ref publicSubnet1Id
   ObjectStorage:
     Type: AWS::S3::Bucket
     Properties:
@@ -972,6 +872,102 @@ Resources:
             QueryStringBehavior: none
         DefaultTTL: 86400
         Name: CloudfrontCachePolicy
+  FoundationBuildingService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !GetAtt Cluster.Arn
+      TaskDefinition: !Ref FoundationBuildingTaskDefinition
+      DesiredCount: 0
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 50
+      LoadBalancers:
+        - ContainerName: nginx
+          ContainerPort: 80
+          TargetGroupArn: !Ref elbWebTargetGroupArn
+        - ContainerName: next_js
+          ContainerPort: 8080
+          TargetGroupArn: !Ref elbPresentationTargetGroupArn
+        - ContainerName: django_rf
+          ContainerPort: 8081
+          TargetGroupArn: !Ref elbApplicationTargetGroupArn
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !Ref publicSecurityGroupId
+          Subnets:
+            - !Ref publicSubnet1Id
+  FoundationBuildingTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: FoundationBuildingTaskDefinition
+      ExecutionRoleArn: !GetAtt ExecECSTaskRole.Arn
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: '256'
+      Memory: '512'
+      EphemeralStorage:
+        SizeInGiB: 21
+      ContainerDefinitions:
+        - Name: nginx
+          Image: kamegin4/foundation-building:nginx
+          Essential: true
+          PortMappings:
+            - ContainerPort: 80
+              HostPort: 80
+              Protocol: tcp
+            - ContainerPort: 443
+              HostPort: 443
+              Protocol: tcp
+          RepositoryCredentials:
+            CredentialsParameter: !Ref DockerHubSecret
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/NginxTaskDefinition
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+              awslogs-create-group: 'true'
+          DependsOn:
+            - Condition: START
+              ContainerName: next_js
+            - Condition: START
+              ContainerName: django_rf
+        - Name: next_js
+          Image: kamegin4/foundation-building:next_js
+          Essential: true
+          PortMappings:
+            - ContainerPort: 8080
+              HostPort: 8080
+              Protocol: tcp
+          RepositoryCredentials:
+            CredentialsParameter: !Ref DockerHubSecret
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/NextJsTaskDefinition
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+              awslogs-create-group: 'true'
+        - Name: django_rf
+          Image: kamegin4/foundation-building:django_rf
+          Essential: true
+          PortMappings:
+            - ContainerPort: 8081
+              HostPort: 8081
+              Protocol: tcp
+          RepositoryCredentials:
+            CredentialsParameter: !Ref DockerHubSecret
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/DjangoRFTaskDefinition
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+              awslogs-create-group: 'true'
 Transform: AWS::Serverless-2016-10-31
 Parameters:
   clientSecret:
@@ -980,9 +976,11 @@ Parameters:
     Type: String
   vpcId:
     Type: String
-  elbTargetGroupArn:
+  elbWebTargetGroupArn:
     Type: String
-  elbAppTargetGroupArn:
+  elbPresentationTargetGroupArn:
+    Type: String
+  elbApplicationTargetGroupArn:
     Type: String
   dockerCredentialsParameter:
     Type: String
@@ -1003,8 +1001,6 @@ Parameters:
   privateSubnet2Id:
     Type: String
   publicSecurityGroupId:
-    Type: String
-  publicAppSecurityGroupId:
     Type: String
   elastiCacheSecurityGroupId:
     Type: String

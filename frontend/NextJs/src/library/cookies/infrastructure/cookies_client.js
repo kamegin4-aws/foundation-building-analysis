@@ -9,7 +9,11 @@ export async function setCookie({ key: key, value: value }) {
     name: key,
     value: value,
     httpOnly: true,
-    //path: "/",
+    path: "/",
+    domain:
+      process.env.NEXT_PUBLIC_PROTOCOL == "http"
+        ? "localhost"
+        : process.env.NEXT_PUBLIC_HOST_DOMAIN,
   });
 }
 

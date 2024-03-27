@@ -4,8 +4,7 @@
 export class ICookie {
   /**
    * クッキーの保存
-   * @typedef { Record<string,string>} Data
-   * @param {Data} data インプット
+   * @param {Record<string,string>} data インプット
    */
   set(data) {
     throw new Error("Not implemented");
@@ -13,8 +12,7 @@ export class ICookie {
 
   /**
    * クッキーの取得
-   * @typedef { Record<string,string>} Data
-   * @returns {Data|boolean} data アウトプット
+   * @returns {Promise<Record<string,string>|boolean>} data アウトプット
    */
   async get() {
     throw new Error("Not implemented");

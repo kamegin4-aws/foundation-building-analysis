@@ -21,21 +21,21 @@ Metadata:
         - 3d63d8d7-768c-4598-a3f7-3dffdbc00411
         - 9384b3df-130b-4b04-8107-2ea01180adfb
         - ac9c17dc-48e6-4001-abf5-767138f4c670
-        - 6b1ccd3f-eeae-4762-bfd8-9f1d9322a2b2
         - c9b4d4ee-cfb4-4913-a8b1-6b079f2de24a
         - c7875a33-6903-4ddb-b14c-970ff5ef58f5
         - ed43b443-0134-463d-92fa-97721a39eb33
         - 67c2bab4-f28f-462a-a9ab-ca985467d3d4
     e616c472-8719-4b09-ade8-958721f4dbfa:
       size:
-        width: 430
-        height: 170
+        width: 420
+        height: 260
       position:
         x: 310
         'y': 220
       z: 1
       parent: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
       embeds:
+        - 5a43d249-4eb3-4135-88e1-a6cd6265ee48
         - 999c3473-1ef3-4fbf-a45f-b678fe148865
         - 55bf8504-814b-4f73-b648-3cf6fb8e6bc2
         - 4703e375-3d3c-4cc5-b7ff-fd132e5bc879
@@ -175,7 +175,7 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 490
+        x: 560
         'y': 230
       z: 2
       parent: e616c472-8719-4b09-ade8-958721f4dbfa
@@ -185,8 +185,8 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 480
-        'y': 310
+        x: 640
+        'y': 230
       z: 2
       parent: e616c472-8719-4b09-ade8-958721f4dbfa
       embeds: []
@@ -207,8 +207,8 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 570
-        'y': 230
+        x: 560
+        'y': 300
       z: 2
       parent: e616c472-8719-4b09-ade8-958721f4dbfa
       embeds: []
@@ -217,8 +217,8 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 570
-        'y': 310
+        x: 640
+        'y': 300
       z: 2
       parent: e616c472-8719-4b09-ade8-958721f4dbfa
       embeds: []
@@ -287,20 +287,10 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 658.2711783059334
-        'y': 295.376241489209
+        x: 330
+        'y': 400
       z: 2
       parent: e616c472-8719-4b09-ade8-958721f4dbfa
-      embeds: []
-    6b1ccd3f-eeae-4762-bfd8-9f1d9322a2b2:
-      size:
-        width: 60
-        height: 60
-      position:
-        x: 1125.4019306833297
-        'y': 309.7999252295353
-      z: 1
-      parent: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
       embeds: []
     bd476613-5374-4df3-a7c5-06e03a5e509a:
       size:
@@ -319,6 +309,16 @@ Metadata:
         x: 110
         'y': 170
       z: 0
+      embeds: []
+    5a43d249-4eb3-4135-88e1-a6cd6265ee48:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 440
+        'y': 370
+      z: 2
+      parent: e616c472-8719-4b09-ade8-958721f4dbfa
       embeds: []
 Resources:
   VPC:
@@ -426,10 +426,6 @@ Resources:
         - IpProtocol: '-1'
           FromPort: -1
           ToPort: -1
-          SourceSecurityGroupId: !Ref PublicAppSecurityGroup
-        - IpProtocol: '-1'
-          FromPort: -1
-          ToPort: -1
           CidrIp: !GetAtt 
             - VPC
             - CidrBlock
@@ -534,34 +530,6 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 4703e375-3d3c-4cc5-b7ff-fd132e5bc879
-  ExternalELBTargetGroup:
-    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
-    Properties:
-      HealthCheckEnabled: true
-      HealthCheckIntervalSeconds: 35
-      HealthCheckPath: /
-      HealthCheckPort: '8080'
-      HealthCheckProtocol: HTTP
-      HealthCheckTimeoutSeconds: 30
-      HealthyThresholdCount: 5
-      Name: ExternalELBTargetGroup
-      Port: 8080
-      Protocol: HTTP
-      TargetType: ip
-      UnhealthyThresholdCount: 2
-      VpcId: !Ref VPC
-      TargetGroupAttributes:
-        - Key: stickiness.enabled
-          Value: 'true'
-        - Key: stickiness.type
-          Value: lb_cookie
-        - Key: stickiness.lb_cookie.duration_seconds
-          Value: '3600'
-        - Key: deregistration_delay.timeout_seconds
-          Value: '300'
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 55bf8504-814b-4f73-b648-3cf6fb8e6bc2
   ExternalELBHTTPListener:
     Type: 'AWS::ElasticLoadBalancingV2::Listener'
     Properties:
@@ -570,7 +538,7 @@ Resources:
           ForwardConfig:
             TargetGroups:
               - TargetGroupArn: !GetAtt 
-                  - ExternalELBTargetGroup
+                  - WebTargetGroup
                   - TargetGroupArn
                 Weight: 1
             TargetGroupStickinessConfig:
@@ -592,7 +560,7 @@ Resources:
           ForwardConfig:
             TargetGroups:
               - TargetGroupArn: !GetAtt 
-                  - ExternalELBTargetGroup
+                  - WebTargetGroup
                   - TargetGroupArn
                 Weight: 1
             TargetGroupStickinessConfig:
@@ -626,7 +594,7 @@ Resources:
       DefaultActions:
         - Type: forward
           TargetGroupArn: !GetAtt 
-            - ExternalELBTargetGroup
+            - PresentationTargetGroup
             - TargetGroupArn
       LoadBalancerArn: !GetAtt 
         - ExternalLoadBalancer
@@ -642,7 +610,7 @@ Resources:
       DefaultActions:
         - Type: forward
           TargetGroupArn: !GetAtt 
-            - ExternalELBAppTargetGroup
+            - ApplicationTargetGroup
             - TargetGroupArn
       LoadBalancerArn: !GetAtt 
         - ExternalLoadBalancer
@@ -661,10 +629,6 @@ Resources:
           FromPort: 2049
           ToPort: 2049
           SourceSecurityGroupId: !Ref PublicSecurityGroup
-        - IpProtocol: tcp
-          FromPort: 2049
-          ToPort: 2049
-          SourceSecurityGroupId: !Ref PublicAppSecurityGroup
         - IpProtocol: tcp
           FromPort: 2049
           ToPort: 2049
@@ -793,10 +757,6 @@ Resources:
         - IpProtocol: tcp
           FromPort: 11211
           ToPort: 11211
-          SourceSecurityGroupId: !Ref PublicAppSecurityGroup
-        - IpProtocol: tcp
-          FromPort: 11211
-          ToPort: 11211
           SourceSecurityGroupId: !Ref PrivateSecurityGroup
       SecurityGroupEgress:
         - IpProtocol: '-1'
@@ -819,10 +779,6 @@ Resources:
         - IpProtocol: tcp
           FromPort: 3306
           ToPort: 3306
-          SourceSecurityGroupId: !Ref PublicAppSecurityGroup
-        - IpProtocol: tcp
-          FromPort: 3306
-          ToPort: 3306
           SourceSecurityGroupId: !Ref PrivateSecurityGroup
       SecurityGroupEgress:
         - IpProtocol: '-1'
@@ -833,60 +789,6 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: c7875a33-6903-4ddb-b14c-970ff5ef58f5
-  ExternalELBAppTargetGroup:
-    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
-    Properties:
-      HealthCheckEnabled: true
-      HealthCheckIntervalSeconds: 35
-      HealthCheckPath: /
-      HealthCheckPort: '8081'
-      HealthCheckProtocol: HTTP
-      HealthCheckTimeoutSeconds: 30
-      HealthyThresholdCount: 5
-      Name: ExternalELBAppTargetGroup
-      Port: 8081
-      Protocol: HTTP
-      TargetType: ip
-      UnhealthyThresholdCount: 2
-      VpcId: !Ref VPC
-      TargetGroupAttributes:
-        - Key: stickiness.enabled
-          Value: 'true'
-        - Key: stickiness.type
-          Value: lb_cookie
-        - Key: stickiness.lb_cookie.duration_seconds
-          Value: '3600'
-        - Key: deregistration_delay.timeout_seconds
-          Value: '300'
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 999c3473-1ef3-4fbf-a45f-b678fe148865
-  PublicAppSecurityGroup:
-    Type: 'AWS::EC2::SecurityGroup'
-    Properties:
-      GroupDescription: Allow access from public and SSH traffic
-      SecurityGroupIngress:
-        - IpProtocol: '-1'
-          FromPort: -1
-          ToPort: -1
-          SourceSecurityGroupId: !Ref PublicSecurityGroup
-        - IpProtocol: '-1'
-          FromPort: -1
-          ToPort: -1
-          SourceSecurityGroupId: !Ref ExternalLoadBalancerSecurityGroup
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: !Ref SSHLocation
-      SecurityGroupEgress:
-        - IpProtocol: '-1'
-          FromPort: -1
-          ToPort: -1
-          CidrIp: 0.0.0.0/0
-      VpcId: !Ref VPC
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 6b1ccd3f-eeae-4762-bfd8-9f1d9322a2b2
   GlobalWebACL:
     Type: 'AWS::WAFv2::WebACL'
     Properties:
@@ -945,6 +847,90 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 9675c918-4365-4b04-a9ef-1090d3f06346
+  PresentationTargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: 35
+      HealthCheckPath: /
+      HealthCheckPort: '8080'
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 30
+      HealthyThresholdCount: 5
+      Name: PresentationTargetGroup
+      Port: 8080
+      Protocol: HTTP
+      TargetType: ip
+      UnhealthyThresholdCount: 2
+      VpcId: !Ref VPC
+      TargetGroupAttributes:
+        - Key: stickiness.enabled
+          Value: 'true'
+        - Key: stickiness.type
+          Value: lb_cookie
+        - Key: stickiness.lb_cookie.duration_seconds
+          Value: '3600'
+        - Key: deregistration_delay.timeout_seconds
+          Value: '300'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 55bf8504-814b-4f73-b648-3cf6fb8e6bc2
+  ApplicationTargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: 35
+      HealthCheckPath: /
+      HealthCheckPort: '8081'
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 30
+      HealthyThresholdCount: 5
+      Name: ApplicationTargetGroup
+      Port: 8081
+      Protocol: HTTP
+      TargetType: ip
+      UnhealthyThresholdCount: 2
+      VpcId: !Ref VPC
+      TargetGroupAttributes:
+        - Key: stickiness.enabled
+          Value: 'true'
+        - Key: stickiness.type
+          Value: lb_cookie
+        - Key: stickiness.lb_cookie.duration_seconds
+          Value: '3600'
+        - Key: deregistration_delay.timeout_seconds
+          Value: '300'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 999c3473-1ef3-4fbf-a45f-b678fe148865
+  WebTargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: 35
+      HealthCheckPath: /
+      HealthCheckPort: '80'
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 30
+      HealthyThresholdCount: 5
+      Name: WebTargetGroup
+      Port: 80
+      Protocol: HTTP
+      TargetType: ip
+      UnhealthyThresholdCount: 2
+      VpcId: !Ref VPC
+      TargetGroupAttributes:
+        - Key: stickiness.enabled
+          Value: 'true'
+        - Key: stickiness.type
+          Value: lb_cookie
+        - Key: stickiness.lb_cookie.duration_seconds
+          Value: '3600'
+        - Key: deregistration_delay.timeout_seconds
+          Value: '300'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 5a43d249-4eb3-4135-88e1-a6cd6265ee48
 Parameters:
   SSHLocation:
     Description: ' The IP address range that can be used to access the web server using SSH.'

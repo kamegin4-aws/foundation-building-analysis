@@ -9,6 +9,7 @@ export class ZodWrapper extends IValidationInstance {
       if (result.success) {
         return true;
       } else {
+        // @ts-ignore
         return JSON.stringify(result.error.format());
       }
     } catch (e) {
@@ -29,6 +30,7 @@ export class ZodWrapper extends IValidationInstance {
       if (result.success) {
         return true;
       } else {
+        // @ts-ignore
         return JSON.stringify(result.error.format());
       }
     } catch (e) {
@@ -47,6 +49,7 @@ export class ZodWrapper extends IValidationInstance {
       if (result.success) {
         return true;
       } else {
+        // @ts-ignore
         return JSON.stringify(result.error.format());
       }
     } catch (e) {
@@ -66,6 +69,7 @@ export class ZodWrapper extends IValidationInstance {
       if (result.success) {
         return true;
       } else {
+        // @ts-ignore
         return JSON.stringify(result.error.format());
       }
     } catch (e) {
@@ -84,6 +88,7 @@ export class ZodWrapper extends IValidationInstance {
       if (result.success) {
         return true;
       } else {
+        // @ts-ignore
         return JSON.stringify(result.error.format());
       }
     } catch (e) {
@@ -102,6 +107,7 @@ export class ZodWrapper extends IValidationInstance {
       if (result.success) {
         return true;
       } else {
+        // @ts-ignore
         return JSON.stringify(result.error.format());
       }
     } catch (e) {
