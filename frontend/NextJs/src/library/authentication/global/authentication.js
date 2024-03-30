@@ -12,6 +12,8 @@ export class GlobalAuthentication extends IGlobalAuthentication {
       const cognitoTokens = new CognitoTokensCookie();
       const tokens = await cognitoTokens.get();
 
+      if (!tokens) return false;
+
       const date = new Date();
       const dateString = date.toLocaleString("ja-JP", {
         timeZone: "Asia/Tokyo",

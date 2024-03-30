@@ -4,9 +4,9 @@
 export class IGlobalAuthentication {
   /**
    * セッションの確認
-   * @returns {boolean} 成功時:true 失敗時:false
+   * @returns {Promise<boolean>} 成功時:true 失敗時:false
    */
-  checkSession() {
+  async checkSession() {
     throw new Error("Not implemented");
   }
 }

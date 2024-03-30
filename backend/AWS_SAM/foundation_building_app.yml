@@ -13,7 +13,11 @@ Resources:
   IdentityPool:
     Type: AWS::Cognito::IdentityPool
     Properties:
-      AllowUnauthenticatedIdentities: false
+      AllowUnauthenticatedIdentities: true
+      CognitoIdentityProviders:
+        - ClientId: !GetAtt UserPoolClient.ClientId
+          ProviderName: !Sub cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}
+      IdentityPoolName: CognitoIdentityPool
   Login:
     Type: AWS::Serverless::Function
     Properties:

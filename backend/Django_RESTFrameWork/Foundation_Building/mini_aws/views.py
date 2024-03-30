@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from mini_aws.serializers import UserSerializer
 # from mini_aws.permissions import IsOwnerOrReadOnly
 import django_filters.rest_framework
+from mini_aws.filters import ElastiCacheFilter
 
 from library.token.infrastructure.pyjwt_client import PyJWTWrapper
 from library.token.cognito.tutorial import Cognito
@@ -17,6 +18,14 @@ from Foundation_Building.settings import BASE_DIR
 env = environ.Env()
 # reading .env file
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+
+def token_validation(request):
+    # トークン検証
+    id_token = request.META.get('HTTP_AUTHORIZATION').split()[1]
+    issuer = env('ISSUER')
+    cognito = Cognito(instance=PyJWTWrapper(issuer=issuer))
+    return cognito.id_token_validation(id_token=id_token)
 
 
 class APIRoot(generics.ListAPIView):
@@ -49,67 +58,38 @@ class ElastiCacheList(generics.ListCreateAPIView):
     parser_classes = [parsers.JSONParser, parsers.MultiPartParser]
     filter_backends = [
         django_filters.rest_framework.DjangoFilterBackend,
-        filters.SearchFilter,
         filters.OrderingFilter]
-    filter_fields = ['key']
-    search_fields = ['key']
-    ordering_fields = ['key', 'updated_at']
-    ordering = ['key', 'updated_at']
+    filterset_class = ElastiCacheFilter
 
     def get(self, request, *args, **kwargs):
         """
         Optionally restricts the returned purchases to a given user,
         by filtering against a `username` query parameter in the URL.
         """
-        """
+
         # トークン検証
-        id_token = request.META.get('HTTP_AUTHORIZATION').split()[1]
-        issuer = env('ISSUER')
-        cognito = Cognito(instance=PyJWTWrapper(issuer=issuer))
-        token_validation = cognito.id_token_validation(id_token=id_token)
-        if token_validation is not True:
+        token_validation_result = token_validation(request)
+        if token_validation_result is not True:
             return response.Response(
-                token_validation,
+                token_validation_result,
                 status=status.HTTP_401_UNAUTHORIZED)
-        """
 
-        kwargs = {}
-        key = self.request.query_params.get('key')
-        order_by = self.request.query_params.get('order_by')
-        limit = self.request.query_params.get('limit')
-        offset = self.request.query_params.get('offset')
-        if key is not None:
-            kwargs['key__contains'] = key
+        # フィルタリングされたクエリセットを取得
+        filtered_qs = self.filter_queryset(self.get_queryset())
 
-        queryset = ElastiCache.objects.filter(**kwargs)
-
-        if limit is not None or offset is not None:
-            if limit is not None and offset is not None:
-                queryset = queryset[int(offset):int(limit)]
-            elif limit is not None:
-                queryset = queryset[:int(limit)]
-            elif offset is not None:
-                queryset = queryset[int(offset):]
-            queryset = queryset[:int(limit)]
-
-        if order_by is not None:
-            queryset = queryset.order_by(order_by)
-
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(filtered_qs, many=True)
 
         return response.Response(
             serializer.data,
             status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
+
         # トークン検証
-        id_token = request.META.get('HTTP_AUTHORIZATION').split()[1]
-        issuer = env('ISSUER')
-        cognito = Cognito(instance=PyJWTWrapper(issuer=issuer))
-        token_validation = cognito.id_token_validation(id_token=id_token)
-        if token_validation is not True:
+        token_validation_result = token_validation(request)
+        if token_validation_result is not True:
             return response.Response(
-                token_validation,
+                token_validation_result,
                 status=status.HTTP_401_UNAUTHORIZED)
 
         # リクエストデータをシリアライズして新しいデータを作成
@@ -119,6 +99,18 @@ class ElastiCacheList(generics.ListCreateAPIView):
         self.perform_create(serializer)
         return response.Response(
             serializer.data, status=status.HTTP_201_CREATED)
+
+    def get_serializer(self, *args, **kwargs):
+        """
+        このビューで使用されるシリアライザーのインスタンスを返す
+        """
+        fields = self.request.query_params.get('fields')
+        if fields:
+            # リスト化してシリアライザに渡す
+            fields = fields.split(',')
+            kwargs['fields'] = fields
+
+        return super(ElastiCacheList, self).get_serializer(*args, **kwargs)
 
 
 class ElastiCacheDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -131,13 +123,10 @@ class ElastiCacheDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get(self, request, *args, **kwargs):
         # トークン検証
-        id_token = request.META.get('HTTP_AUTHORIZATION').split()[1]
-        issuer = env('ISSUER')
-        cognito = Cognito(instance=PyJWTWrapper(issuer=issuer))
-        token_validation = cognito.id_token_validation(id_token=id_token)
-        if token_validation is not True:
+        token_validation_result = token_validation(request)
+        if token_validation_result is not True:
             return response.Response(
-                token_validation,
+                token_validation_result,
                 status=status.HTTP_401_UNAUTHORIZED)
 
         queryset = self.get_queryset()
@@ -156,13 +145,10 @@ class ElastiCacheDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def put(self, request, *args, **kwargs):
         # トークン検証
-        id_token = request.META.get('HTTP_AUTHORIZATION').split()[1]
-        issuer = env('ISSUER')
-        cognito = Cognito(instance=PyJWTWrapper(issuer=issuer))
-        token_validation = cognito.id_token_validation(id_token=id_token)
-        if token_validation is not True:
+        token_validation_result = token_validation(request)
+        if token_validation_result is not True:
             return response.Response(
-                token_validation,
+                token_validation_result,
                 status=status.HTTP_401_UNAUTHORIZED)
 
         instance = self.get_object()
@@ -175,13 +161,10 @@ class ElastiCacheDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         # トークン検証
-        id_token = request.META.get('HTTP_AUTHORIZATION').split()[1]
-        issuer = env('ISSUER')
-        cognito = Cognito(instance=PyJWTWrapper(issuer=issuer))
-        token_validation = cognito.id_token_validation(id_token=id_token)
-        if token_validation is not True:
+        token_validation_result = token_validation(request)
+        if token_validation_result is not True:
             return response.Response(
-                token_validation,
+                token_validation_result,
                 status=status.HTTP_401_UNAUTHORIZED)
 
         instance = self.get_object()
@@ -199,6 +182,18 @@ class ElastiCacheDetail(generics.RetrieveUpdateDestroyAPIView):
         # self.check_object_permissions(self.request, obj)
 
         return obj
+
+    def get_serializer(self, *args, **kwargs):
+        """
+        このビューで使用されるシリアライザーのインスタンスを返す
+        """
+        fields = self.request.query_params.get('fields')
+        if fields:
+            # リスト化してシリアライザに渡す
+            fields = fields.split(',')
+            kwargs['fields'] = fields
+
+        return super(ElastiCacheList, self).get_serializer(*args, **kwargs)
 
 
 class ResultLogList(generics.ListCreateAPIView):
