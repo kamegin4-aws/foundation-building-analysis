@@ -41,6 +41,7 @@ export class S3Wrapper {
     await this.s3Client.deleteObject(params);
   }
 
+
   async getFile(fileKey) {
     const params = {};
   }

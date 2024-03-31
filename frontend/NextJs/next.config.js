@@ -7,7 +7,7 @@ const nextConfig = {
   output: "standalone",
   experimental: {
     serverActions: {
-      allowedOrigins: ["localhost", "*.kamegin.com"],
+      allowedOrigins: [process.env.NEXT_PUBLIC_HOST_DOMAIN, "*.kamegin.com"],
     },
   },
   images: {
@@ -23,42 +23,42 @@ const nextConfig = {
       {
         source: "/sam/cognito/login",
         destination:
-          "https://clfxnxiooc.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/login",
+          "https://nsx2iwuzd7.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/login",
       },
       {
         source: "/sam/cognito/logout",
         destination:
-          "https://clfxnxiooc.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/logout",
+          "https://nsx2iwuzd7.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/logout",
       },
       {
         source: "/sam/cognito/signup",
         destination:
-          "https://clfxnxiooc.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/signup",
+          "https://nsx2iwuzd7.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/signup",
       },
       {
         source: "/sam/cognito/token/refresh",
         destination:
-          "https://clfxnxiooc.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/token/refresh",
+          "https://nsx2iwuzd7.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/token/refresh",
       },
       {
         source: "/sam/cognito/signup/confirm",
         destination:
-          "https://clfxnxiooc.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/signup/confirm",
+          "https://nsx2iwuzd7.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/signup/confirm",
       },
       {
         source: "/sam/cognito/group/user/list",
         destination:
-          "https://v34fkvw7ib.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/group/user/list",
+          "https://jahojnl1jj.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/group/user/list",
       },
       {
         source: "/sam/cognito/group/user/add",
         destination:
-          "https://v34fkvw7ib.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/group/user/add",
+          "https://jahojnl1jj.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/group/user/add",
       },
       {
         source: "/sam/cognito/user/info",
         destination:
-          "https://v34fkvw7ib.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/user/info",
+          "https://jahojnl1jj.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/user/info",
       },
       {
         source: "/drf/elasticache",

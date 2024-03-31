@@ -10,10 +10,7 @@ export async function setCookie({ key: key, value: value }) {
     value: value,
     httpOnly: true,
     path: "/",
-    domain:
-      process.env.NEXT_PUBLIC_PROTOCOL == "http"
-        ? "localhost"
-        : process.env.NEXT_PUBLIC_HOST_DOMAIN,
+    domain: process.env.NEXT_PUBLIC_HOST_DOMAIN,
   });
 }
 

@@ -12,7 +12,7 @@ export class RelationalDataCreate extends IApi {
     super();
   }
 
-  async execute(formData, query) {
+  async execute(formData = undefined, query = undefined) {
     try {
       const cognitoTokensCookie = new CognitoTokensCookie();
       const cognitoTokens = await cognitoTokensCookie.get();

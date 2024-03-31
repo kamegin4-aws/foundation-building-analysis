@@ -12,7 +12,7 @@ export class AddUserToGroup extends IApi {
     super();
   }
 
-  async execute(formData, query) {
+  async execute(formData = undefined, query = undefined) {
     try {
       const cognitoTokensCookie = new CognitoTokensCookie();
       const tokens = await cognitoTokensCookie.get();

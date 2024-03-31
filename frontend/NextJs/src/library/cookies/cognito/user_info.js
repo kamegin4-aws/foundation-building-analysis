@@ -34,8 +34,7 @@ export class UserInfoCookie extends ICookie {
 
   async get() {
     try {
-      const cookies = await getCookies();
-      if (!cookies || !(await getCookie("Username"))) {
+      if (!(await getCookie("Username"))) {
         return false;
       }
 

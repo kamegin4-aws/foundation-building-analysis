@@ -11,7 +11,7 @@ export class ConfirmSignup extends IApi {
     super();
   }
 
-  async execute(formData, query) {
+  async execute(formData = undefined, query = undefined) {
     try {
       this.#options.body = formData;
       // @ts-ignore

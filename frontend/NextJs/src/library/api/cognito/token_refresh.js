@@ -13,7 +13,7 @@ export class TokenRefresh extends IApi {
     super();
   }
 
-  async execute(formData, query) {
+  async execute(formData = undefined, query = undefined) {
     try {
       const cognitoTokensCookie = new CognitoTokensCookie();
       const userInfoCookie = new UserInfoCookie();

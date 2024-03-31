@@ -1,11 +1,10 @@
 import { CognitoTokensCookie } from "@/library/cookies/cognito/login";
-import { UserInfoCookie } from "@/library/cookies/cognito/user_info";
 import { IApi } from "@/library/api/interface/api";
 
-export class SignOut extends IApi {
-  #url = "/sam/cognito/logout";
+export class RelationalDataList extends IApi {
+  #url = "/drf/elasticache";
   #options = {
-    method: "POST", // *GET, POST, PUT, DELETE, etc.
+    method: "GET", // *GET, POST, PUT, DELETE, etc.
     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
     mode: "cors",
   };
@@ -16,21 +15,19 @@ export class SignOut extends IApi {
   async execute(formData = undefined, query = undefined) {
     try {
       const cognitoTokensCookie = new CognitoTokensCookie();
-      const userInfoCookie = new UserInfoCookie();
-
-      const tokens = await cognitoTokensCookie.get();
-      if (!tokens) {
+      const cognitoTokens = await cognitoTokensCookie.get();
+      if (!cognitoTokens) {
         throw new Error("Not Cognito Tokens");
       }
 
-      const formData = new FormData();
-      formData.append("access_token", tokens.AccessToken);
-      console.log("access_token", tokens.AccessToken);
-      this.#options.body = formData;
+      this.#options.headers = {
+        Authorization: `${cognitoTokens.TokenType} ${cognitoTokens.IdToken}`,
+      };
 
-      //cookieの削除
-      userInfoCookie.delete();
-      cognitoTokensCookie.delete();
+      if (query) {
+        const queryParams = new URLSearchParams(query);
+        this.#url = `${this.#url}?${queryParams}`;
+      }
 
       // @ts-ignore
       const response = fetch(this.#url, this.#options);

@@ -49,8 +49,7 @@ export class CognitoTokensCookie extends ICookie {
 
   async get() {
     try {
-      const cookies = await getCookies();
-      if (!cookies || !(await getCookie("AccessToken"))) {
+      if (!(await getCookie("AccessToken"))) {
         return false;
       }
 
