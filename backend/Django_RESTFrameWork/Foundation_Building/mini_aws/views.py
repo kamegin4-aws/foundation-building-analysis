@@ -9,6 +9,7 @@ from mini_aws.serializers import UserSerializer
 # from mini_aws.permissions import IsOwnerOrReadOnly
 import django_filters.rest_framework
 from mini_aws.filters import ElastiCacheFilter
+from mini_aws.paginates import ElastiCachePagination
 
 from library.token.infrastructure.pyjwt_client import PyJWTWrapper
 from library.token.cognito.tutorial import Cognito
@@ -60,6 +61,7 @@ class ElastiCacheList(generics.ListCreateAPIView):
         django_filters.rest_framework.DjangoFilterBackend,
         filters.OrderingFilter]
     filterset_class = ElastiCacheFilter
+    pagination_class = ElastiCachePagination
 
     def get(self, request, *args, **kwargs):
         """
@@ -76,8 +78,9 @@ class ElastiCacheList(generics.ListCreateAPIView):
 
         # フィルタリングされたクエリセットを取得
         filtered_qs = self.filter_queryset(self.get_queryset())
+        paginate_qs = self.paginate_queryset(filtered_qs)
 
-        serializer = self.get_serializer(filtered_qs, many=True)
+        serializer = self.get_serializer(paginate_qs, many=True)
 
         return response.Response(
             serializer.data,
