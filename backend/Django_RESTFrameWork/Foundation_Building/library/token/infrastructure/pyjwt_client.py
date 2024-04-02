@@ -38,6 +38,8 @@ class PyJWTWrapper(ITokenInstance):
                 issuer=self.issuer
             )
 
+            # print(f'decode_token: {decode_token}')
+
             dt_now_jst_aware = datetime.datetime.now(
                 datetime.timezone(datetime.timedelta(hours=9))
             )
@@ -45,6 +47,28 @@ class PyJWTWrapper(ITokenInstance):
                 int(decode_token['exp']), datetime.timezone(datetime.timedelta(hours=9)))
 
             if decode_token['token_use'] != 'id' or decode_token['iss'] != self.issuer or dt_jst_aware_token < dt_now_jst_aware:
+                return False
+
+            return True
+        except Exception:
+            print(traceback.format_exc())
+            raise RuntimeError(traceback.format_exc())
+
+    def user_validation(self, *, jwt_token, user_name):
+        try:
+
+            token = jwt_token
+            signing_key = self.jwks_client.get_signing_key_from_jwt(
+                token)
+            decode_token = jwt.decode(
+                token,
+                signing_key.key,
+                algorithms=['RS256'],
+                audience=self.client_id,
+                issuer=self.issuer
+            )
+
+            if decode_token['cognito:username'] != user_name:
                 return False
 
             return True

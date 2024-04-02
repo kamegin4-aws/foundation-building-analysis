@@ -16,3 +16,15 @@ class IToken(metaclass=abc.ABCMeta):
             result (boolean): 検証合格:True。
         """
         raise NotImplementedError()
+
+    def id_token_user_validation(self, *, id_token, user_name):
+        """CognitoIDトークン内のユーザーとリクエストユーザーが一緒か確かめる
+
+        Args:
+            id_token (str): IDトークン
+            user_name (str): ユーザーネーム
+
+        Returns:
+            result (boolean): 検証合格:True。
+        """
+        raise NotImplementedError()

@@ -14,3 +14,13 @@ class Cognito(IToken):
         except Exception:
             print(traceback.format_exc())
             raise RuntimeError(traceback.format_exc())
+
+    def id_token_user_validation(self, *, id_token, user_name):
+        try:
+            result = self.instance.user_validation(
+                jwt_token=id_token, user_name=user_name)
+
+            return result
+        except Exception:
+            print(traceback.format_exc())
+            raise RuntimeError(traceback.format_exc())
