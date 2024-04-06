@@ -13,7 +13,10 @@ export class SignOut extends IApi {
     super();
   }
 
-  async execute(formData = undefined, query = undefined) {
+  async execute({
+    formData: formData = undefined,
+    query: query = undefined,
+  } = {}) {
     try {
       const cognitoTokensCookie = new CognitoTokensCookie();
       const userInfoCookie = new UserInfoCookie();
@@ -38,9 +41,9 @@ export class SignOut extends IApi {
       return response;
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(e.message);
+        throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("API Error");
+        throw new Error("client error: API");
       }
     }
   }

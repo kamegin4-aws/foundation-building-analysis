@@ -145,6 +145,6 @@ class CognitoIdentityProviderWrapper:
                 err.response['Error']['Message'],
             )
             raise RuntimeError(
-                "Couldn't confirm sign up for {}.".format(user_name)) from err
+                "cognito server error: Couldn't confirm sign up for {}.".format(user_name)) from err
 
         return auth_tokens

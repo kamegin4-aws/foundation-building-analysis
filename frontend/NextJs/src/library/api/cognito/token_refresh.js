@@ -13,7 +13,10 @@ export class TokenRefresh extends IApi {
     super();
   }
 
-  async execute(formData = undefined, query = undefined) {
+  async execute({
+    formData: formData = undefined,
+    query: query = undefined,
+  } = {}) {
     try {
       const cognitoTokensCookie = new CognitoTokensCookie();
       const userInfoCookie = new UserInfoCookie();
@@ -38,7 +41,7 @@ export class TokenRefresh extends IApi {
 
       if (refresh.ok) {
         const refreshObject = await refresh.json();
-        cognitoTokensCookie.set(refreshObject);
+        cognitoTokensCookie.set({ data: refreshObject });
       } else {
         throw new Error("refresh Error");
       }
@@ -46,9 +49,9 @@ export class TokenRefresh extends IApi {
       return response;
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(e.message);
+        throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("API Error");
+        throw new Error("client error: API");
       }
     }
   }

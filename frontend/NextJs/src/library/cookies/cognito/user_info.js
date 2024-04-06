@@ -11,7 +11,7 @@ export class UserInfoCookie extends ICookie {
     super();
   }
 
-  set(data) {
+  set({ data: data }) {
     try {
       setCookie({
         key: "Username",
@@ -25,43 +25,43 @@ export class UserInfoCookie extends ICookie {
       }
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(e.message);
+        throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("Set Cookie Error");
+        throw new Error("client error: Cookie");
       }
     }
   }
 
   async get() {
     try {
-      if (!(await getCookie("Username"))) {
+      if (!(await getCookie({ key: "Username" }))) {
         return false;
       }
 
       return {
-        userName: (await getCookie("Username")).value,
-        email: (await getCookie("email")).value,
-        userId: (await getCookie("sub")).value,
+        userName: (await getCookie({ key: "Username" })).value,
+        email: (await getCookie({ key: "email" })).value,
+        userId: (await getCookie({ key: "sub" })).value,
       };
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(e.message);
+        throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("Get Cookie Error");
+        throw new Error("client error: Cookie");
       }
     }
   }
 
   delete() {
     try {
-      deleteCookie("Username");
-      deleteCookie("email");
-      deleteCookie("sub");
+      deleteCookie({ key: "Username" });
+      deleteCookie({ key: "email" });
+      deleteCookie({ key: "sub" });
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(e.message);
+        throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("Delete Cookie Error");
+        throw new Error("client error: Cookie");
       }
     }
   }

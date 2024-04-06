@@ -4,11 +4,16 @@
 export class IApi {
   /**
    * API実行
-   * @param {FormData} [formData=undefined] formData フォームデータ
-   * @param {Record<string,string>} [query=undefined] query クエリパラメータ
+   * @typedef {Object} InputObject
+   * @property {FormData} [formData=undefined] フォームデータ
+   * @property {Record<string,string>} [query=undefined] クエリ
+   * @param {InputObject} input API実行インプット
    * @returns {Promise<Response>} API実行結果
    */
-  async execute(formData = undefined, query = undefined) {
+  async execute({
+    formData: formData = undefined,
+    query: query = undefined,
+  } = {}) {
     throw new Error("Not implemented");
   }
 }

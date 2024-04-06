@@ -136,6 +136,6 @@ class CognitoIdentityProviderWrapper:
 
         except Exception as err:
             raise RuntimeError(
-                "Couldn't confirm sign up for {}.".format(user_name)) from err
+                "cognito server error: Couldn't confirm sign up for {}.".format(user_name)) from err
 
         return True

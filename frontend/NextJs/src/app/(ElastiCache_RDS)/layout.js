@@ -30,7 +30,7 @@ export default function CognitoLayout({ children, params }) {
 
   return (
     <>
-      {<TopNavigationWrapper menuDropdown={menuDropdownItems} />}
+      <TopNavigationWrapper menuDropdown={menuDropdownItems} />
       <AppLayoutWrapper
         breadCrumbGroup={<BreadcrumbGroupWrapper items={breadcrumbItems} />}
         sideNavigation={<SideNavigationWrapper />}

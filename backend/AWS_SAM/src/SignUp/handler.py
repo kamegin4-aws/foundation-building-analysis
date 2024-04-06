@@ -155,7 +155,8 @@ class CognitoIdentityProviderWrapper:
 
                 error_massage = "Couldn't sign up {}. Here's why: {}: {}".format(
                     user_name, err.response['Error']['Code'], err.response['Error']['Message'])
-            raise RuntimeError(error_massage) from err
+            raise RuntimeError(
+                f'cognito server error: {error_massage}') from err
 
         return confirmed
 

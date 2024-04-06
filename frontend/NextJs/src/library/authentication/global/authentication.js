@@ -33,8 +33,9 @@ export class GlobalAuthentication extends IGlobalAuthentication {
             responseRefreshTokenObject.AccessToken
           );
 
-          const responseGetUserInfo =
-            await getUserInfo.execute(formDataGetUserInfo);
+          const responseGetUserInfo = await getUserInfo.execute({
+            formData: formDataGetUserInfo,
+          });
           if (!responseGetUserInfo.ok) {
             throw new Error("Get User Info Error");
           }
@@ -45,9 +46,9 @@ export class GlobalAuthentication extends IGlobalAuthentication {
       }
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(e.message);
+        throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("checkSession Error");
+        throw new Error("client error: Session");
       }
     }
   }

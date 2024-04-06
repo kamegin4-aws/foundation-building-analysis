@@ -12,7 +12,7 @@ from mini_aws.filters import ElastiCacheFilter
 from mini_aws.paginates import ElastiCachePagination
 
 from library.token.infrastructure.pyjwt_client import PyJWTWrapper
-from library.token.cognito.tutorial import Cognito
+from library.token.cognito.token import Cognito
 import environ
 import os
 from Foundation_Building.settings import BASE_DIR

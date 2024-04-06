@@ -42,21 +42,23 @@ export default function LoginPage() {
       setLoginButtonLoading(true);
       setLoginButtonLoadingText("ログイン中...");
 
-      const loginValidation = new LoginValidation(new ZodWrapper());
+      const loginValidation = new LoginValidation({
+        validationInstance: new ZodWrapper(),
+      });
       const userNameLogin = new UserNameLogin();
 
       const formData = new FormData();
       formData.append("user_name", userNameInputValue);
       formData.append("password", passwordInputValue);
 
-      const validationResult = loginValidation.execute(formData);
+      const validationResult = loginValidation.execute({ formData: formData });
       setUserNameErrorText("");
       setPasswordErrorText("");
       setAlertDisplay(false);
 
       if (validationResult == true) {
         console.log("loginValidation: true");
-        const apiResponse = await userNameLogin.execute(formData);
+        const apiResponse = await userNameLogin.execute({ formData: formData });
 
         if (apiResponse.ok) {
           const apiResponseObject = await apiResponse.json();

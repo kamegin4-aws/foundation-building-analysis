@@ -59,7 +59,9 @@ export default function SignupPage() {
       setSignupButtonLoading(true);
       setSignupButtonLoadingText("サインアップ中...");
 
-      const signupValidation = new SignupValidation(new ZodWrapper());
+      const signupValidation = new SignupValidation({
+        validationInstance: new ZodWrapper(),
+      });
       const signup = new Signup();
 
       const formData = new FormData();
@@ -67,7 +69,7 @@ export default function SignupPage() {
       formData.append("user_email", emailInputValue);
       formData.append("password", passwordInputValue);
 
-      const validationResult = signupValidation.execute(formData);
+      const validationResult = signupValidation.execute({ formData: formData });
       setUserNameErrorText("");
       setEmailErrorText("");
       setPasswordErrorText("");
@@ -75,7 +77,7 @@ export default function SignupPage() {
 
       if (validationResult == true) {
         console.log("signupValidation: true");
-        const apiResponse = await signup.execute(formData);
+        const apiResponse = await signup.execute({ formData: formData });
 
         if (apiResponse.ok) {
           const apiResponseObject = await apiResponse.json();
@@ -166,23 +168,25 @@ export default function SignupPage() {
       setConfirmCodeButtonLoading(true);
       setConfirmCodeButtonLoadingText("確認中...");
 
-      const confirmSignupValidation = new ConfirmSignupValidation(
-        new ZodWrapper()
-      );
+      const confirmSignupValidation = new ConfirmSignupValidation({
+        validationInstance: new ZodWrapper(),
+      });
       const confirmSignup = new ConfirmSignup();
 
       const formData = new FormData();
       formData.append("user_name", userNameInputValue);
       formData.append("code", confirmCodeInputValue);
 
-      const validationResult = confirmSignupValidation.execute(formData);
+      const validationResult = confirmSignupValidation.execute({
+        formData: formData,
+      });
       setUserNameErrorText("");
       setConfirmCodeErrorText("");
       setAlertDisplay(false);
 
       if (validationResult == true) {
         console.log("confirmSignupValidation: true");
-        const apiResponse = await confirmSignup.execute(formData);
+        const apiResponse = await confirmSignup.execute({ formData: formData });
 
         if (apiResponse.ok) {
           const apiResponseObject = await apiResponse.json();

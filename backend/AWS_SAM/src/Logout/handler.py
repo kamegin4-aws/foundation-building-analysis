@@ -111,4 +111,5 @@ class CognitoIdentityProviderWrapper:
             return True
 
         except Exception as err:
-            raise RuntimeError("Couldn't sign out") from err
+            raise RuntimeError(
+                "cognito server error: Couldn't sign out") from err

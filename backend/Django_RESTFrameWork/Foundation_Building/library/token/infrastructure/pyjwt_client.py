@@ -52,7 +52,7 @@ class PyJWTWrapper(ITokenInstance):
             return True
         except Exception:
             print(traceback.format_exc())
-            raise RuntimeError(traceback.format_exc())
+            raise RuntimeError(f'jwt server error: {traceback.format_exc()}')
 
     def user_validation(self, *, jwt_token, user_name):
         try:
@@ -74,4 +74,4 @@ class PyJWTWrapper(ITokenInstance):
             return True
         except Exception:
             print(traceback.format_exc())
-            raise RuntimeError(traceback.format_exc())
+            raise RuntimeError(f'jwt server error: {traceback.format_exc()}')

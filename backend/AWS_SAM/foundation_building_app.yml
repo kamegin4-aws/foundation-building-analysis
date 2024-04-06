@@ -13,7 +13,7 @@ Resources:
   IdentityPool:
     Type: AWS::Cognito::IdentityPool
     Properties:
-      AllowUnauthenticatedIdentities: true
+      AllowUnauthenticatedIdentities: false
       CognitoIdentityProviders:
         - ClientId: !GetAtt UserPoolClient.ClientId
           ProviderName: !Sub cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}
@@ -133,8 +133,8 @@ Resources:
       TracingEnabled: true
       Auth:
         ResourcePolicy:
-          IpRangeWhitelist:
-            - !Ref globalIP
+          SourceVpcWhitelist:
+            - !Ref vpcId
           CustomStatements:
             - Effect: Allow
               Principal: '*'
@@ -276,16 +276,6 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess
         - arn:aws:iam::aws:policy/AmazonS3FullAccess
       MaxSessionDuration: 3600
-      Policies:
-        - PolicyName: DenyS3Delete
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              Action:
-                - s3:DeleteObject
-              Resource:
-                - '*'
-              Effect: Deny
       AssumeRolePolicyDocument:
         Version: '2008-10-17'
         Statement:
@@ -299,6 +289,78 @@ Resources:
             Principal:
               Service: s3.amazonaws.com
             Sid: ''
+  AuthRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+      MaxSessionDuration: 3600
+      Policies:
+        - PolicyName: CognitoDefault
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              Action:
+                - mobileanalytics:PutEvents,
+                - cognito-sync:*,
+                - cognito-identity:*
+              Resource:
+                - '*'
+              Effect: Allow
+      AssumeRolePolicyDocument:
+        Version: '2008-10-17'
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Sid: ''
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+            Sid: ''
+          - Action: sts:AssumeRoleWithWebIdentity
+            Effect: Allow
+            Principal:
+              Federated: cognito-identity.amazonaws.com
+            Condition:
+              StringEquals:
+                cognito-identity.amazonaws.com:aud: !Ref IdentityPool
+              ForAnyValue:StringLike:
+                cognito-identity.amazonaws.com:amr: authenticated
+  UnAuthRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/job-function/ViewOnlyAccess
+      MaxSessionDuration: 3600
+      Policies:
+        - PolicyName: CognitoDefault
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              Action:
+                - mobileanalytics:PutEvents,
+                - cognito-sync:*,
+              Resource:
+                - '*'
+              Effect: Allow
+      AssumeRolePolicyDocument:
+        Version: '2008-10-17'
+        Statement:
+          - Action: sts:AssumeRoleWithWebIdentity
+            Effect: Allow
+            Principal:
+              Federated: cognito-identity.amazonaws.com
+            Condition:
+              StringEquals:
+                cognito-identity.amazonaws.com:aud: !Ref IdentityPool
+              ForAnyValue:StringLike:
+                cognito-identity.amazonaws.com:amr: unauthenticated
   StageDevCognito:
     Type: AWS::ApiGateway::Stage
     Properties:
@@ -804,6 +866,23 @@ Resources:
         BlockPublicPolicy: true
       VersioningConfiguration:
         Status: Enabled
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - '*'
+            AllowedMethods:
+              - HEAD
+              - GET
+              - PUT
+              - POST
+              - DELETE
+            AllowedOrigins:
+              - !Sub https://${domain}
+            ExposedHeaders:
+              - ETag
+              - "x-amz-meta-custom-header"
+            Id: myCORSRuleId1
+            MaxAge: 3600
   ObjectStorageBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -972,11 +1051,20 @@ Resources:
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: ecs
               awslogs-create-group: 'true'
+  IdentityPoolRoleAttachment:
+    Type: AWS::Cognito::IdentityPoolRoleAttachment
+    Properties:
+      IdentityPoolId: !Ref IdentityPool
+      Roles:
+        authenticated: !GetAtt AuthRole.Arn
+        unauthenticated: !GetAtt UnAuthRole.Arn
 Transform: AWS::Serverless-2016-10-31
 Parameters:
   clientSecret:
     Type: String
   globalIP:
+    Type: String
+  domain:
     Type: String
   vpcId:
     Type: String

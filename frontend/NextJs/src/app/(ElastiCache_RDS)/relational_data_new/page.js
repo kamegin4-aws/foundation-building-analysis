@@ -40,23 +40,27 @@ export default function NewPage() {
       setCreateButtonLoading(true);
       setCreateButtonLoadingText("保存中...");
 
-      const createValidation = new RelationalDataCreateValidation(
-        new ZodWrapper()
-      );
+      const createValidation = new RelationalDataCreateValidation({
+        validationInstance: new ZodWrapper(),
+      });
       const relationalDataCreate = new RelationalDataCreate();
 
       const formData = new FormData();
       formData.append("key", keyInputValue);
       formData.append("value", valueInputValue);
 
-      const createValidationResult = createValidation.execute(formData);
+      const createValidationResult = createValidation.execute({
+        formData: formData,
+      });
       setKeyErrorText("");
       setValueErrorText("");
       setAlertDisplay(false);
 
       if (createValidationResult == true) {
         console.log("Validation: true");
-        const apiResponse = await relationalDataCreate.execute(formData);
+        const apiResponse = await relationalDataCreate.execute({
+          formData: formData,
+        });
 
         if (apiResponse.ok) {
           const apiResponseObject = await apiResponse.json();

@@ -11,7 +11,7 @@ export class CognitoTokensCookie extends ICookie {
     super();
   }
 
-  set(data) {
+  set({ data: data }) {
     try {
       setCookie({
         key: "AccessToken",
@@ -40,47 +40,47 @@ export class CognitoTokensCookie extends ICookie {
       });
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(e.message);
+        throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("Set Cookie Error");
+        throw new Error("client error: Cookie");
       }
     }
   }
 
   async get() {
     try {
-      if (!(await getCookie("AccessToken"))) {
+      if (!(await getCookie({ key: "AccessToken" }))) {
         return false;
       }
 
       return {
-        AccessToken: (await getCookie("AccessToken")).value,
-        ExpiresIn: (await getCookie("ExpiresIn")).value,
-        IdToken: (await getCookie("IdToken")).value,
-        RefreshToken: (await getCookie("RefreshToken")).value,
-        TokenType: (await getCookie("TokenType")).value,
+        AccessToken: (await getCookie({ key: "AccessToken" })).value,
+        ExpiresIn: (await getCookie({ key: "ExpiresIn" })).value,
+        IdToken: (await getCookie({ key: "IdToken" })).value,
+        RefreshToken: (await getCookie({ key: "RefreshToken" })).value,
+        TokenType: (await getCookie({ key: "TokenType" })).value,
       };
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(e.message);
+        throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("Get Cookie Error");
+        throw new Error("client error: Cookie");
       }
     }
   }
 
   delete() {
     try {
-      deleteCookie("AccessToken");
-      deleteCookie("ExpiresIn");
-      deleteCookie("IdToken");
-      deleteCookie("RefreshToken");
-      deleteCookie("TokenType");
+      deleteCookie({ key: "AccessToken" });
+      deleteCookie({ key: "ExpiresIn" });
+      deleteCookie({ key: "IdToken" });
+      deleteCookie({ key: "RefreshToken" });
+      deleteCookie({ key: "TokenType" });
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(e.message);
+        throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("Delete Cookie Error");
+        throw new Error("client error: Cookie");
       }
     }
   }

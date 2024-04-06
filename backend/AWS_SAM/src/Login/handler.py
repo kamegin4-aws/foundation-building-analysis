@@ -116,4 +116,5 @@ class AWSSRPWrapper:
             return tokens['AuthenticationResult']
 
         except Exception:
-            raise RuntimeError('Cognito(pycognito.aws_srp) Error')
+            raise RuntimeError(
+                'cognito server error: Cognito(pycognito.aws_srp) Error')

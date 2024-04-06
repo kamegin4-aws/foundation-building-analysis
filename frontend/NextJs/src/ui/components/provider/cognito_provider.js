@@ -56,7 +56,7 @@ export default function CognitoProvider(props) {
         userAttributes,
       }}
     >
-      <>{props.children}</>
+      {props.children}
     </CognitoContext.Provider>
   );
 }

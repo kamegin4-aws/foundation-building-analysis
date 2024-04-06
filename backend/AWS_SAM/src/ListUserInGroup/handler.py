@@ -149,7 +149,8 @@ class CognitoIdentityProviderWrapper:
             return response
 
         except Exception as err:
-            raise RuntimeError("Couldn't list user in group") from err
+            raise RuntimeError(
+                "cognito server error: Couldn't list user in group") from err
 
 
 def check_list_users_in_group(list_user):

@@ -11,6 +11,7 @@ import AppLayoutProvider, {
   LayoutContext,
 } from "@/ui/components/provider/layout_provider";
 import React from "react";
+import S3Provider from "@/ui/components/provider/s3_provider";
 
 export default function CognitoLayout({ children, params }) {
   //OpenState
@@ -43,7 +44,11 @@ export default function CognitoLayout({ children, params }) {
         helpPanel={helpPanel}
         splitPanel={splitPanel}
         notifications={<FlashBarWrapper items={flashBarItems} />}
-        content={<CognitoProvider>{children}</CognitoProvider>}
+        content={
+          <CognitoProvider>
+            <S3Provider>{children}</S3Provider>
+          </CognitoProvider>
+        }
       />
     </>
   );

@@ -4,9 +4,11 @@
 export class ICookie {
   /**
    * クッキーの保存
-   * @param {Record<string,string>} data インプット
+   * @typedef {Object} InputObject
+   * @property {Record<string,string>} data インプット
+   * @param {InputObject} input インプット
    */
-  set(data) {
+  set({ data: data }) {
     throw new Error("Not implemented");
   }
 

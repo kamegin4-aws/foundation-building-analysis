@@ -7,6 +7,8 @@ FROM nginx:1.24.0-alpine-slim
 
 ENV NJS_VERSION   0.8.0
 
+ENV TZ "Asia/Tokyo"
+
 ARG HOST_DOMAIN
 ENV HOST_DOMAIN=${HOST_DOMAIN}
 

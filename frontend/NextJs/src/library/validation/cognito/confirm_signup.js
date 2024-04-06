@@ -6,25 +6,25 @@ export class ConfirmSignupValidation extends IValidation {
   #errorMessageList = [];
   #index = ["userName", "code"];
 
-  constructor(validationInstance) {
+  constructor({ validationInstance: validationInstance }) {
     super();
     this.#validationInstance = validationInstance;
   }
 
-  execute(formData) {
+  execute({ formData: formData }) {
     try {
       console.log("formData");
       for (let value of formData.entries()) {
         console.log(value);
       }
 
-      const userName = this.#validationInstance.userNameValidation(
-        formData.get("user_name")
-      );
+      const userName = this.#validationInstance.userNameValidation({
+        userName: formData.get("user_name"),
+      });
       this.#validationList.push(userName);
-      const code = this.#validationInstance.codeValidation(
-        formData.get("code")
-      );
+      const code = this.#validationInstance.codeValidation({
+        code: formData.get("code"),
+      });
       this.#validationList.push(code);
 
       for (let i = 0; i < this.#validationList.length; i++) {
@@ -40,9 +40,9 @@ export class ConfirmSignupValidation extends IValidation {
       else return this.#errorMessageList;
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(e.message);
+        throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("Input Validation Error");
+        throw new Error("client error: Validation");
       }
     }
   }

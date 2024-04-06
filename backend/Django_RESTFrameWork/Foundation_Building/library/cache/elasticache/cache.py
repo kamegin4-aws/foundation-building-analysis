@@ -22,7 +22,7 @@ class ElastiCache(ICache):
             return result
         except Exception:
             print(traceback.format_exc())
-            raise RuntimeError(traceback.format_exc())
+            raise RuntimeError(f'client error: {traceback.format_exc()}')
 
     def cache_info(self, *, key):
         try:
@@ -34,7 +34,7 @@ class ElastiCache(ICache):
             return result if result else False
         except Exception:
             print(traceback.format_exc())
-            raise RuntimeError(traceback.format_exc())
+            raise RuntimeError(f'client error: {traceback.format_exc()}')
 
     def cache_create_update(self, *, key, value, expire=86400):
         try:
@@ -44,11 +44,11 @@ class ElastiCache(ICache):
             return True
         except Exception:
             print(traceback.format_exc())
-            raise RuntimeError(traceback.format_exc())
+            raise RuntimeError(f'client error: {traceback.format_exc()}')
 
     def cache_remove(self, *, key):
         try:
             return self.instance.delete_cache(key)
         except Exception:
             print(traceback.format_exc())
-            raise RuntimeError(traceback.format_exc())
+            raise RuntimeError(f'client error: {traceback.format_exc()}')

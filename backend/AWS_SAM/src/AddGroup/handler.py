@@ -115,4 +115,5 @@ class CognitoIdentityProviderWrapper:
             return True
 
         except Exception as err:
-            raise RuntimeError("Couldn't add user to group") from err
+            raise RuntimeError(
+                "cognito server error: Couldn't add user to group") from err

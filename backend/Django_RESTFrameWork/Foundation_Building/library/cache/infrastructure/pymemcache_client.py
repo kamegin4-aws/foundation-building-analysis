@@ -29,7 +29,8 @@ class PymemcacheWrapper(ICacheInstance):
             return result if result else False
         except Exception:
             print(traceback.format_exc())
-            raise RuntimeError(traceback.format_exc())
+            raise RuntimeError(
+                f'pymemcache server error: {traceback.format_exc()}')
 
     def set_cache(self, *, key, value, expire=86400):
         try:
@@ -38,18 +39,21 @@ class PymemcacheWrapper(ICacheInstance):
             return True
         except Exception:
             print(traceback.format_exc())
-            raise RuntimeError(traceback.format_exc())
+            raise RuntimeError(
+                f'pymemcache server error: {traceback.format_exc()}')
 
     def delete_cache(self, *, key):
         try:
             return self.client.delete(key, noreply=False)
         except Exception:
             print(traceback.format_exc())
-            raise RuntimeError(traceback.format_exc())
+            raise RuntimeError(
+                f'pymemcache server error: {traceback.format_exc()}')
 
     def flush_cache(self):
         try:
             return self.client.flush_all(noreply=False)
         except Exception:
             print(traceback.format_exc())
-            raise RuntimeError(traceback.format_exc())
+            raise RuntimeError(
+                f'pymemcache server error: {traceback.format_exc()}')

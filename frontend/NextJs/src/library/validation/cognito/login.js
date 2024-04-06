@@ -6,25 +6,25 @@ export class LoginValidation extends IValidation {
   #errorMessageList = [];
   #index = ["userName", "password"];
 
-  constructor(validationInstance) {
+  constructor({ validationInstance: validationInstance }) {
     super();
     this.#validationInstance = validationInstance;
   }
 
-  execute(formData) {
+  execute({ formData: formData }) {
     try {
       console.log("formData");
       for (let value of formData.entries()) {
         console.log(value);
       }
 
-      const userName = this.#validationInstance.userNameValidation(
-        formData.get("user_name")
-      );
+      const userName = this.#validationInstance.userNameValidation({
+        userName: formData.get("user_name"),
+      });
       this.#validationList.push(userName);
-      const password = this.#validationInstance.passwordValidation(
-        formData.get("password")
-      );
+      const password = this.#validationInstance.passwordValidation({
+        password: formData.get("password"),
+      });
       this.#validationList.push(password);
 
       for (let i = 0; i < this.#validationList.length; i++) {
@@ -40,9 +40,9 @@ export class LoginValidation extends IValidation {
       else return this.#errorMessageList;
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(e.message);
+        throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("Input Validation Error");
+        throw new Error("client error: Validation");
       }
     }
   }

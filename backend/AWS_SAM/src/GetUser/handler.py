@@ -111,4 +111,5 @@ class CognitoIdentityProviderWrapper:
             return response
 
         except Exception as err:
-            raise RuntimeError("Couldn't get user") from err
+            raise RuntimeError(
+                "cognito server error: Couldn't get user") from err

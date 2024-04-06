@@ -17,7 +17,10 @@ export class UserNameLogin extends IApi {
     super();
   }
 
-  async execute(formData = undefined, query = undefined) {
+  async execute({
+    formData: formData = undefined,
+    query: query = undefined,
+  } = {}) {
     try {
       this.#options.body = formData;
 
@@ -36,13 +39,14 @@ export class UserNameLogin extends IApi {
       if (login.ok) {
         let responseObjectLogin = await login.json();
         console.log("responseObjectLogin", responseObjectLogin);
-        cognitoTokensCookie.set(responseObjectLogin);
+        cognitoTokensCookie.set({ data: responseObjectLogin });
 
         //グループ内のユーザーを取得
         const formDataListUser = new FormData();
         formDataListUser.append("group_name", FREE_USER_GROUP);
-        const responseListUser =
-          await listUserInGroup.execute(formDataListUser);
+        const responseListUser = await listUserInGroup.execute({
+          formData: formDataListUser,
+        });
         if (responseListUser.ok) {
           const responseObjectListUser = await responseListUser.json();
           console.log(responseObjectListUser);
@@ -58,8 +62,9 @@ export class UserNameLogin extends IApi {
             const formDataAddGroup = new FormData();
             formDataAddGroup.append("user_name", user_name);
             formDataAddGroup.append("group_name", FREE_USER_GROUP);
-            const responseAddGroup =
-              await addUserToGroup.execute(formDataAddGroup);
+            const responseAddGroup = await addUserToGroup.execute({
+              formData: formDataAddGroup,
+            });
 
             if (!responseAddGroup.ok) {
               throw new Error("Add User To Group Error");
@@ -79,8 +84,9 @@ export class UserNameLogin extends IApi {
               "access_token",
               cognitoTokens.AccessToken
             );
-            const responseGetUserInfo =
-              await getUserInfo.execute(formDataGetUserInfo);
+            const responseGetUserInfo = await getUserInfo.execute({
+              formData: formDataGetUserInfo,
+            });
             if (!responseGetUserInfo.ok) {
               throw new Error("Get User Info Error");
             }
@@ -95,9 +101,9 @@ export class UserNameLogin extends IApi {
       return response;
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(e.message);
+        throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("API Error");
+        throw new Error("client error: API");
       }
     }
   }

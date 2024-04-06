@@ -4,14 +4,15 @@
 export class IValidation {
   /**
    * バリデーションチェック
-   * @param {FormData} formData フォームデータ
-   * @typedef {Record<string,string>} FunctionReturn
+   * @typedef {Object} InputObjectExecute
+   * @property {FormData} formData フォームデータ
+   * @param {InputObjectExecute} input インプット
+   * @typedef {Object} FunctionReturnExecute
    * @property {string} index エラーインデックス
    * @property {string} message エラーメッセージ
-   * @typedef {Array<FunctionReturn>} FunctionReturnArray
-   * @returns {FunctionReturnArray | boolean} 返り値
+   * @returns {FunctionReturnExecute[] | boolean} 返り値
    */
-  execute(formData) {
+  execute({ formData: formData }) {
     throw new Error("Not implemented");
   }
 }
