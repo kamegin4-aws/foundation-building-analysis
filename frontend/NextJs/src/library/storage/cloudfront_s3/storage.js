@@ -51,9 +51,20 @@ export class ContentsOperation extends IStorage {
         maxKeys: maxKeys,
         startAfter: startAfter,
       });
-      console.log("result: ", result);
 
-      return result;
+      let toString = Object.prototype.toString;
+
+      for (let i = 0; i < result.Contents.length; i++) {
+        if ("LastModified" in result.Contents[i]) {
+          let flg = toString.call(result.Contents[i].LastModified).slice(8, -1);
+          if (flg == "Date") {
+            result.Contents[i].LastModified =
+              result.Contents[i].LastModified.toLocaleString("ja-JP");
+          }
+        }
+      }
+
+      return result.Contents;
     } catch (e) {
       if (e instanceof Error) {
         throw new Error(`client error: ${e.message}`);
@@ -142,6 +153,27 @@ export class ContentsOperation extends IStorage {
       console.log("result: ", result);
 
       return result;
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(`client error: ${e.message}`);
+      } else {
+        throw new Error("client error: Storage");
+      }
+    }
+  }
+
+  async infoTag({
+    userName: userName,
+    fileName: fileName,
+    versionId: versionId = undefined,
+  }) {
+    try {
+      const result = await this.#contentsInstance.infoObjectTag({
+        key: `${userName}/${fileName}`,
+        versionId: versionId,
+      });
+
+      return result.TagSet;
     } catch (e) {
       if (e instanceof Error) {
         throw new Error(`client error: ${e.message}`);

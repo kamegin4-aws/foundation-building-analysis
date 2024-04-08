@@ -47,7 +47,7 @@ export default function ListPage() {
           setAlertDisplay(true);
           setAlertType("error");
           setAlertHeader("データの取得に失敗しました。");
-          setAlertMessage("Server Error");
+          setAlertMessage("CLient Error");
         }
       })
       .finally(() => {

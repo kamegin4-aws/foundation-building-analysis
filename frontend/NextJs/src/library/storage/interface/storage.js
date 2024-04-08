@@ -31,7 +31,7 @@ export class IStorage {
    * @property {number} [maxKeys=1000] 応答で返されるキーの最大数を設定します。
    * @property {string} [startAfter=undefined] この指定されたキーの後にリストを開始します。
    * @param {InputObjectList} input インプット
-   * @return {Promise<import("@aws-sdk/client-s3").ListObjectsV2CommandOutput>} 結果
+   * @return {Promise<Record<string,string>[]>} 結果
    * @typedef {Object} OutputObjectList
    */
   async list({
@@ -106,6 +106,24 @@ export class IStorage {
    * @return {Promise<boolean>} 成功時:True
    */
   async delete({
+    userName: userName,
+    fileName: fileName,
+    versionId: versionId = undefined,
+  }) {
+    throw new Error("Not implemented");
+  }
+
+  /**
+   * オブジェクトのタグ情報
+   * @typedef {Object} InputObjectInfoObjectTag
+   * @property {string} userName ユーザー名
+   * @property {string} fileName ファイル名
+   * @property {string} [versionId=undefined] オブジェクトの特定のバージョンを参照するために使用されるバージョン ID
+   * @param {InputObjectInfoObjectTag} input インプット
+   * @return {Promise<import("@aws-sdk/client-s3").GetObjectTaggingCommandOutput>} 結果
+   * @see https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/command/GetObjectTaggingCommand/
+   */
+  async infoTag({
     userName: userName,
     fileName: fileName,
     versionId: versionId = undefined,

@@ -42,11 +42,13 @@ export default function UserInfoPage() {
   };
 
   useEffect(() => {
-    console.log("userAttributes", userAttributes);
+    if (userAttributes) {
+      console.log("userAttributes", userAttributes);
 
-    setUserName(userAttributes.userName);
-    setEmail(userAttributes.email);
-  }, []);
+      setUserName(userAttributes.userName);
+      setEmail(userAttributes.email);
+    }
+  }, [userAttributes]);
 
   if (!userAttributes) return <Loading />;
 

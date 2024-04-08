@@ -94,4 +94,17 @@ export class IStorageInstance {
   async deleteObject({ key: key = "", versionId: versionId = undefined }) {
     throw new Error("Not implemented");
   }
+
+  /**
+   * オブジェクトのタグ情報
+   * @typedef {Object} InputObjectInfoObjectTag
+   * @property {string} key オブジェクトキー
+   * @property {string} [versionId=undefined] オブジェクトの特定のバージョンを参照するために使用されるバージョン ID
+   * @param {InputObjectInfoObjectTag} input インプット
+   * @return {Promise<import("@aws-sdk/client-s3").GetObjectTaggingCommandOutput>} 結果
+   * @see https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/command/GetObjectTaggingCommand/
+   */
+  async infoObjectTag({ key: key = "", versionId: versionId = undefined }) {
+    throw new Error("Not implemented");
+  }
 }

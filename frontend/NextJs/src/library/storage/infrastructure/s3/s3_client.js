@@ -2,6 +2,7 @@ import {
   DeleteObjectCommand,
   GetObjectAttributesCommand,
   GetObjectCommand,
+  GetObjectTaggingCommand,
   ListObjectsV2Command,
   ListObjectVersionsCommand,
   PutObjectCommand,
@@ -156,6 +157,25 @@ export class S3Wrapper extends IStorageInstance {
       const command = new DeleteObjectCommand(input);
       await this.#s3Client.send(command);
       return true;
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(`s3 server error: ${e.message}`);
+      } else {
+        throw new Error("server error: S3");
+      }
+    }
+  }
+
+  async infoObjectTag({ key: key = "", versionId: versionId = undefined }) {
+    try {
+      const input = {
+        Bucket: process.env.NEXT_PUBLIC_BUCKET,
+        Key: key,
+        VersionId: versionId,
+      };
+      const command = new GetObjectTaggingCommand(input);
+      const result = await this.#s3Client.send(command);
+      return result;
     } catch (e) {
       if (e instanceof Error) {
         throw new Error(`s3 server error: ${e.message}`);

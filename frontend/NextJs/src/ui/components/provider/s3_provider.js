@@ -20,13 +20,17 @@ export default function S3Provider(props) {
     cognitoTokensCookie
       .get()
       .then((tokens) => {
-        if (!tokens) throw new Error("Not Cognito Tokens");
+        if (!tokens)
+          router.push(
+            "/login?type=error&message=セッションを取得できませんでした。"
+          );
+        else {
+          const contentsOperation = new ContentsOperation({
+            contentsInstance: new S3Wrapper({ idToken: tokens.IdToken }),
+          });
 
-        const contentsOperation = new ContentsOperation({
-          contentsInstance: new S3Wrapper({ idToken: tokens.IdToken }),
-        });
-
-        setContentsClient(contentsOperation);
+          setContentsClient(contentsOperation);
+        }
       })
       .catch((error) => {
         router.push("/login?type=info&message=ログインしてください。");

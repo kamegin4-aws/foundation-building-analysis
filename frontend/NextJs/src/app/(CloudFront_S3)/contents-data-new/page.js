@@ -79,6 +79,7 @@ export default function NewPage() {
               body: await file.arrayBuffer(),
               userName: userAttributes.userName,
               fileName: file.name,
+              keyValueArray: [{ key: "mimeType", value: file.type }],
             })
           );
         }
