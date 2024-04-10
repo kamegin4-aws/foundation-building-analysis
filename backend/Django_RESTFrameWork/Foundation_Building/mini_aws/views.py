@@ -1,15 +1,14 @@
 # from django.shortcuts import render
 # from library.cache.elasticache.tutorial import ElastiCache as ElastiCacheWrapper
 # from library.cache.infrastructure.pymemcache_client import PymemcacheWrapper
-from mini_aws.models import ElastiCache, ResultLog
-from mini_aws.serializers import ElastiCacheSerializer, ResultLogSerializer
+from mini_aws.models import ElastiCache, UserResults
+from mini_aws.serializers import ElastiCacheSerializer, UserResultsSerializer, UserSerializer
 from rest_framework import generics, response, status, parsers, filters
 from django.contrib.auth.models import User
-from mini_aws.serializers import UserSerializer
 # from mini_aws.permissions import IsOwnerOrReadOnly
 import django_filters.rest_framework
-from mini_aws.filters import ElastiCacheFilter
-from mini_aws.paginates import ElastiCachePagination
+from mini_aws.filters import ElastiCacheFilter, UserResultsFilter
+from mini_aws.paginates import ElastiCachePagination, UserResultsPagination
 
 from library.token.infrastructure.pyjwt_client import PyJWTWrapper
 from library.token.cognito.token import Cognito
@@ -96,10 +95,12 @@ class ElastiCacheList(generics.ListCreateAPIView):
                 status=status.HTTP_401_UNAUTHORIZED)
 
         # リクエストデータをシリアライズして新しいデータを作成
+        # self.user_results = request.data.get('user_results')
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         self.perform_create(serializer)
+
         return response.Response(
             serializer.data, status=status.HTTP_201_CREATED)
 
@@ -199,83 +200,111 @@ class ElastiCacheDetail(generics.RetrieveUpdateDestroyAPIView):
         return super(ElastiCacheList, self).get_serializer(*args, **kwargs)
 
 
-class ResultLogList(generics.ListCreateAPIView):
-    queryset = ResultLog.objects.all()
-    serializer_class = ResultLogSerializer
+class UserResultsList(generics.ListCreateAPIView):
+    queryset = UserResults.objects.all()
+    serializer_class = UserResultsSerializer
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+    #                      IsOwnerOrReadOnly]
     parser_classes = [parsers.JSONParser, parsers.MultiPartParser]
     filter_backends = [
         django_filters.rest_framework.DjangoFilterBackend,
-        filters.SearchFilter,
         filters.OrderingFilter]
-    filter_fields = ['user_name']
-    search_fields = ['user_name']
-    ordering_fields = ['create_at', 'user_name']
-    ordering = ['create_at', 'user_name']
+    filterset_class = UserResultsFilter
+    pagination_class = UserResultsPagination
 
     def get(self, request, *args, **kwargs):
         """
         Optionally restricts the returned purchases to a given user,
         by filtering against a `username` query parameter in the URL.
         """
-        kwargs = {}
-        user_name = self.request.query_params.get('user_name')
-        order_by = self.request.query_params.get('order_by')
-        limit = self.request.query_params.get('limit')
-        offset = self.request.query_params.get('offset')
-        if user_name is not None:
-            kwargs['user_name__contains'] = user_name
 
-        queryset = ResultLog.objects.filter(**kwargs)
+        # トークン検証
+        token_validation_result = token_validation(request)
+        if token_validation_result is not True:
+            return response.Response(
+                token_validation_result,
+                status=status.HTTP_401_UNAUTHORIZED)
 
-        if limit is not None or offset is not None:
-            if limit is not None and offset is not None:
-                queryset = queryset[int(offset):int(limit)]
-            elif limit is not None:
-                queryset = queryset[:int(limit)]
-            elif offset is not None:
-                queryset = queryset[int(offset):]
-            queryset = queryset[:int(limit)]
+        # フィルタリングされたクエリセットを取得
+        filtered_qs = self.filter_queryset(self.get_queryset())
+        paginate_qs = self.paginate_queryset(filtered_qs)
 
-        if order_by is not None:
-            queryset = queryset.order_by(order_by)
-
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(paginate_qs, many=True)
 
         return response.Response(
             serializer.data,
             status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
+
+        # トークン検証
+        token_validation_result = token_validation(request)
+        if token_validation_result is not True:
+            return response.Response(
+                token_validation_result,
+                status=status.HTTP_401_UNAUTHORIZED)
+
         # リクエストデータをシリアライズして新しいデータを作成
+        # self.user_results = request.data.get('user_results')
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
         self.perform_create(serializer)
+
         return response.Response(
-            serializer.data,
-            status=status.HTTP_201_CREATED)
+            serializer.data, status=status.HTTP_201_CREATED)
+
+    def get_serializer(self, *args, **kwargs):
+        """
+        このビューで使用されるシリアライザーのインスタンスを返す
+        """
+        fields = self.request.query_params.get('fields')
+        if fields:
+            # リスト化してシリアライザに渡す
+            fields = fields.split(',')
+            kwargs['fields'] = fields
+
+        return super(UserResultsList, self).get_serializer(*args, **kwargs)
 
 
-class ResultLogDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = ResultLog.objects.all()
-    serializer_class = ResultLogSerializer
+class UserResultsDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = UserResults.objects.all()
+    serializer_class = UserResultsSerializer
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+    #                      IsOwnerOrReadOnly]
     parser_classes = [parsers.JSONParser, parsers.MultiPartParser]
     lookup_fields = ['pk']
 
     def get(self, request, *args, **kwargs):
+        # トークン検証
+        token_validation_result = token_validation(request)
+        if token_validation_result is not True:
+            return response.Response(
+                token_validation_result,
+                status=status.HTTP_401_UNAUTHORIZED)
+
         queryset = self.get_queryset()
+
         filter = {}
         for field in self.lookup_fields:
             if field in self.kwargs:
                 filter[field] = self.kwargs[field]
 
         obj = generics.get_object_or_404(queryset, **filter)
-        self.check_object_permissions(self.request, obj)
+        # self.check_object_permissions(self.request, obj)
         serializer = self.get_serializer(obj)
         return response.Response(
             serializer.data,
             status=status.HTTP_200_OK)
 
     def put(self, request, *args, **kwargs):
+        # トークン検証
+        token_validation_result = token_validation(request)
+        if token_validation_result is not True:
+            return response.Response(
+                token_validation_result,
+                status=status.HTTP_401_UNAUTHORIZED)
+
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -285,6 +314,13 @@ class ResultLogDetail(generics.RetrieveUpdateDestroyAPIView):
             status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
+        # トークン検証
+        token_validation_result = token_validation(request)
+        if token_validation_result is not True:
+            return response.Response(
+                token_validation_result,
+                status=status.HTTP_401_UNAUTHORIZED)
+
         instance = self.get_object()
         self.perform_destroy(instance)
         return response.Response(status=status.HTTP_204_NO_CONTENT)
@@ -297,9 +333,21 @@ class ResultLogDetail(generics.RetrieveUpdateDestroyAPIView):
                 filter[field] = self.kwargs[field]
 
         obj = generics.get_object_or_404(queryset, **filter)
-        self.check_object_permissions(self.request, obj)
+        # self.check_object_permissions(self.request, obj)
 
         return obj
+
+    def get_serializer(self, *args, **kwargs):
+        """
+        このビューで使用されるシリアライザーのインスタンスを返す
+        """
+        fields = self.request.query_params.get('fields')
+        if fields:
+            # リスト化してシリアライザに渡す
+            fields = fields.split(',')
+            kwargs['fields'] = fields
+
+        return super(ElastiCacheList, self).get_serializer(*args, **kwargs)
 
 
 class UserList(generics.ListAPIView):
