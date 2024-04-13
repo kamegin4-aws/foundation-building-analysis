@@ -13,21 +13,18 @@ export class SignupValidation extends IValidation {
 
   execute({ formData: formData }) {
     try {
-      console.log("formData");
-      for (let value of formData.entries()) {
-        console.log(value);
-      }
+      console.log("formData", formData);
 
       const userName = this.#validationInstance.userNameValidation({
-        userName: formData.get("user_name"),
+        userName: formData.user_name,
       });
       this.#validationList.push(userName);
       const email = this.#validationInstance.emailValidation({
-        email: formData.get("user_email"),
+        email: formData.user_email,
       });
       this.#validationList.push(email);
       const password = this.#validationInstance.passwordValidation({
-        password: formData.get("password"),
+        password: formData.password,
       });
       this.#validationList.push(password);
 

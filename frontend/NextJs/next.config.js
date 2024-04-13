@@ -61,8 +61,8 @@ const nextConfig = {
           "https://jahojnl1jj.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/user/info",
       },
       {
-        source: "/drf/elasticache",
-        destination: `${process.env.NEXT_PUBLIC_PROTOCOL}://${process.env.NEXT_PUBLIC_HOST_DOMAIN}/drf/elasticache`,
+        source: "/drf/user-contents",
+        destination: `${process.env.NEXT_PUBLIC_PROTOCOL}://${process.env.NEXT_PUBLIC_HOST_DOMAIN}/drf/user-contents`,
       },
     ];
   },

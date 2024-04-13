@@ -24,9 +24,10 @@ export class AddUserToGroup extends IApi {
       }
 
       this.#options.headers = {
+        "Content-Type": "application/json",
         Authorization: `${tokens.TokenType} ${tokens.IdToken}`,
       };
-      this.#options.body = formData;
+      this.#options.body = JSON.stringify(formData);
 
       // @ts-ignore
       const response = fetch(this.#url, this.#options);

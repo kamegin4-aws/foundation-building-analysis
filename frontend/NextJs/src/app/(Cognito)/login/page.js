@@ -47,18 +47,23 @@ export default function LoginPage() {
       });
       const userNameLogin = new UserNameLogin();
 
-      const formData = new FormData();
-      formData.append("user_name", userNameInputValue);
-      formData.append("password", passwordInputValue);
+      const formObject = {
+        user_name: userNameInputValue,
+        password: passwordInputValue,
+      };
 
-      const validationResult = loginValidation.execute({ formData: formData });
+      const validationResult = loginValidation.execute({
+        formData: formObject,
+      });
       setUserNameErrorText("");
       setPasswordErrorText("");
       setAlertDisplay(false);
 
       if (validationResult == true) {
         console.log("loginValidation: true");
-        const apiResponse = await userNameLogin.execute({ formData: formData });
+        const apiResponse = await userNameLogin.execute({
+          formData: formObject,
+        });
 
         if (apiResponse.ok) {
           const apiResponseObject = await apiResponse.json();

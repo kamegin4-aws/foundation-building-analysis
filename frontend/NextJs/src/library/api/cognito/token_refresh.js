@@ -27,11 +27,15 @@ export class TokenRefresh extends IApi {
         throw new Error("Not Cognito Cookies");
       }
 
-      const formData = new FormData();
-      formData.append("refresh_token", tokens.RefreshToken);
-      formData.append("user_name", user.userName);
+      const formObject = {
+        refresh_token: tokens.RefreshToken,
+        user_name: user.userName,
+      };
 
-      this.#options.body = formData;
+      this.#options.headers = {
+        "Content-Type": "application/json",
+      };
+      this.#options.body = JSON.stringify(formObject);
 
       // @ts-ignore
       const response = fetch(this.#url, this.#options);

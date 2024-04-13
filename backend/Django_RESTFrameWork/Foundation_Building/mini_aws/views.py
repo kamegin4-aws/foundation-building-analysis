@@ -1,14 +1,14 @@
 # from django.shortcuts import render
 # from library.cache.elasticache.tutorial import ElastiCache as ElastiCacheWrapper
 # from library.cache.infrastructure.pymemcache_client import PymemcacheWrapper
-from mini_aws.models import ElastiCache, UserResults
-from mini_aws.serializers import ElastiCacheSerializer, UserResultsSerializer, UserSerializer
+from mini_aws.models import ElastiCache, UserContents
+from mini_aws.serializers import ElastiCacheSerializer, UserContentsSerializer, UserSerializer
 from rest_framework import generics, response, status, parsers, filters
 from django.contrib.auth.models import User
 # from mini_aws.permissions import IsOwnerOrReadOnly
 import django_filters.rest_framework
-from mini_aws.filters import ElastiCacheFilter, UserResultsFilter
-from mini_aws.paginates import ElastiCachePagination, UserResultsPagination
+from mini_aws.filters import ElastiCacheFilter, UserContentsFilter
+from mini_aws.paginates import ElastiCachePagination, UserContentsPagination
 
 from library.token.infrastructure.pyjwt_client import PyJWTWrapper
 from library.token.cognito.token import Cognito
@@ -197,34 +197,30 @@ class ElastiCacheDetail(generics.RetrieveUpdateDestroyAPIView):
             fields = fields.split(',')
             kwargs['fields'] = fields
 
-        return super(ElastiCacheList, self).get_serializer(*args, **kwargs)
+        return super(ElastiCacheDetail, self).get_serializer(*args, **kwargs)
 
 
-class UserResultsList(generics.ListCreateAPIView):
-    queryset = UserResults.objects.all()
-    serializer_class = UserResultsSerializer
+class UserContentsList(generics.ListCreateAPIView):
+    queryset = UserContents.objects.all()
+    serializer_class = UserContentsSerializer
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly,
     #                      IsOwnerOrReadOnly]
     parser_classes = [parsers.JSONParser, parsers.MultiPartParser]
     filter_backends = [
         django_filters.rest_framework.DjangoFilterBackend,
         filters.OrderingFilter]
-    filterset_class = UserResultsFilter
-    pagination_class = UserResultsPagination
+    filterset_class = UserContentsFilter
+    pagination_class = UserContentsPagination
 
     def get(self, request, *args, **kwargs):
         """
-        Optionally restricts the returned purchases to a given user,
-        by filtering against a `username` query parameter in the URL.
-        """
-
         # トークン検証
         token_validation_result = token_validation(request)
         if token_validation_result is not True:
             return response.Response(
                 token_validation_result,
                 status=status.HTTP_401_UNAUTHORIZED)
-
+        """
         # フィルタリングされたクエリセットを取得
         filtered_qs = self.filter_queryset(self.get_queryset())
         paginate_qs = self.paginate_queryset(filtered_qs)
@@ -236,14 +232,14 @@ class UserResultsList(generics.ListCreateAPIView):
             status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-
+        """
         # トークン検証
         token_validation_result = token_validation(request)
         if token_validation_result is not True:
             return response.Response(
                 token_validation_result,
                 status=status.HTTP_401_UNAUTHORIZED)
-
+        """
         # リクエストデータをシリアライズして新しいデータを作成
         # self.user_results = request.data.get('user_results')
         serializer = self.get_serializer(data=request.data)
@@ -264,25 +260,26 @@ class UserResultsList(generics.ListCreateAPIView):
             fields = fields.split(',')
             kwargs['fields'] = fields
 
-        return super(UserResultsList, self).get_serializer(*args, **kwargs)
+        return super(UserContentsList, self).get_serializer(*args, **kwargs)
 
 
-class UserResultsDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = UserResults.objects.all()
-    serializer_class = UserResultsSerializer
+class UserContentsDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = UserContents.objects.all()
+    serializer_class = UserContentsSerializer
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly,
     #                      IsOwnerOrReadOnly]
     parser_classes = [parsers.JSONParser, parsers.MultiPartParser]
     lookup_fields = ['pk']
 
     def get(self, request, *args, **kwargs):
+        """
         # トークン検証
         token_validation_result = token_validation(request)
         if token_validation_result is not True:
             return response.Response(
                 token_validation_result,
                 status=status.HTTP_401_UNAUTHORIZED)
-
+        """
         queryset = self.get_queryset()
 
         filter = {}
@@ -298,13 +295,14 @@ class UserResultsDetail(generics.RetrieveUpdateDestroyAPIView):
             status=status.HTTP_200_OK)
 
     def put(self, request, *args, **kwargs):
+        """
         # トークン検証
         token_validation_result = token_validation(request)
         if token_validation_result is not True:
             return response.Response(
                 token_validation_result,
                 status=status.HTTP_401_UNAUTHORIZED)
-
+        """
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -314,13 +312,14 @@ class UserResultsDetail(generics.RetrieveUpdateDestroyAPIView):
             status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
+        """
         # トークン検証
         token_validation_result = token_validation(request)
         if token_validation_result is not True:
             return response.Response(
                 token_validation_result,
                 status=status.HTTP_401_UNAUTHORIZED)
-
+        """
         instance = self.get_object()
         self.perform_destroy(instance)
         return response.Response(status=status.HTTP_204_NO_CONTENT)
@@ -347,7 +346,7 @@ class UserResultsDetail(generics.RetrieveUpdateDestroyAPIView):
             fields = fields.split(',')
             kwargs['fields'] = fields
 
-        return super(ElastiCacheList, self).get_serializer(*args, **kwargs)
+        return super(UserContentsDetail, self).get_serializer(*args, **kwargs)
 
 
 class UserList(generics.ListAPIView):

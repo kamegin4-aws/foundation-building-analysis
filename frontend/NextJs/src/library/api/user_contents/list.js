@@ -1,10 +1,10 @@
 import { CognitoTokensCookie } from "@/library/cookies/cognito/login";
 import { IApi } from "@/library/api/interface/api";
 
-export class RelationalDataCreate extends IApi {
-  #url = "/drf/elasticache";
+export class UserContentsList extends IApi {
+  #url = "/drf/user-contents";
   #options = {
-    method: "POST", // *GET, POST, PUT, DELETE, etc.
+    method: "GET", // *GET, POST, PUT, DELETE, etc.
     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
     mode: "cors",
   };
@@ -24,10 +24,14 @@ export class RelationalDataCreate extends IApi {
       }
 
       this.#options.headers = {
+        "Content-Type": "application/json",
         Authorization: `${cognitoTokens.TokenType} ${cognitoTokens.IdToken}`,
       };
 
-      this.#options.body = formData;
+      if (query) {
+        const queryParams = new URLSearchParams(query);
+        this.#url = `${this.#url}?${queryParams}`;
+      }
 
       // @ts-ignore
       const response = fetch(this.#url, this.#options);

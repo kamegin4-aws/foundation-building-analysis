@@ -64,12 +64,15 @@ export default function SignupPage() {
       });
       const signup = new Signup();
 
-      const formData = new FormData();
-      formData.append("user_name", userNameInputValue);
-      formData.append("user_email", emailInputValue);
-      formData.append("password", passwordInputValue);
+      const formObject = {
+        user_name: userNameInputValue,
+        user_email: emailInputValue,
+        password: passwordInputValue,
+      };
 
-      const validationResult = signupValidation.execute({ formData: formData });
+      const validationResult = signupValidation.execute({
+        formData: formObject,
+      });
       setUserNameErrorText("");
       setEmailErrorText("");
       setPasswordErrorText("");
@@ -77,7 +80,7 @@ export default function SignupPage() {
 
       if (validationResult == true) {
         console.log("signupValidation: true");
-        const apiResponse = await signup.execute({ formData: formData });
+        const apiResponse = await signup.execute({ formData: formObject });
 
         if (apiResponse.ok) {
           const apiResponseObject = await apiResponse.json();
@@ -173,12 +176,13 @@ export default function SignupPage() {
       });
       const confirmSignup = new ConfirmSignup();
 
-      const formData = new FormData();
-      formData.append("user_name", userNameInputValue);
-      formData.append("code", confirmCodeInputValue);
+      const formObject = {
+        user_name: userNameInputValue,
+        code: confirmCodeInputValue,
+      };
 
       const validationResult = confirmSignupValidation.execute({
-        formData: formData,
+        formData: formObject,
       });
       setUserNameErrorText("");
       setConfirmCodeErrorText("");
@@ -186,7 +190,9 @@ export default function SignupPage() {
 
       if (validationResult == true) {
         console.log("confirmSignupValidation: true");
-        const apiResponse = await confirmSignup.execute({ formData: formData });
+        const apiResponse = await confirmSignup.execute({
+          formData: formObject,
+        });
 
         if (apiResponse.ok) {
           const apiResponseObject = await apiResponse.json();

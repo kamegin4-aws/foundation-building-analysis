@@ -59,11 +59,10 @@ export default function NewPage() {
         });
       }
 
-      const formData = new FormData();
-      formData.append("filesMeta", JSON.stringify(filesMeta));
+      const formObject = { filesMeta: filesMeta };
 
       const uploadValidationResult = uploadValidation.execute({
-        formData: formData,
+        formData: formObject,
       });
       setFileErrors([]);
       setErrorText("");

@@ -26,10 +26,13 @@ export class SignOut extends IApi {
         throw new Error("Not Cognito Tokens");
       }
 
-      const formData = new FormData();
-      formData.append("access_token", tokens.AccessToken);
-      console.log("access_token", tokens.AccessToken);
-      this.#options.body = formData;
+      const formObject = {
+        access_token: tokens.AccessToken,
+      };
+      this.#options.headers = {
+        "Content-Type": "application/json",
+      };
+      this.#options.body = JSON.stringify(formObject);
 
       //cookieの削除
       userInfoCookie.delete();

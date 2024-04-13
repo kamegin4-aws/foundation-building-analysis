@@ -1,5 +1,5 @@
 from django_filters import rest_framework as filters
-from mini_aws.models import ElastiCache, UserResults
+from mini_aws.models import ElastiCache, UserContents
 
 
 class ElastiCacheFilter(filters.FilterSet):
@@ -14,7 +14,7 @@ class ElastiCacheFilter(filters.FilterSet):
         fields = ['key', 'value', 'create_at', 'updated_at']
 
 
-class UserResultsFilter(filters.FilterSet):
+class UserContentsFilter(filters.FilterSet):
     user_name = filters.CharFilter(field_name='user_name', lookup_expr='exact')
     elasticache_key = filters.CharFilter(field_name='elasticache__key',
                                          method='filter_elasticache_key')
@@ -32,7 +32,7 @@ class UserResultsFilter(filters.FilterSet):
         return queryset.filter(elasticache__value__icontains=value)
 
     class Meta:
-        model = UserResults
+        model = UserContents
         # フィルタを列挙する
         fields = [
             'user_name',

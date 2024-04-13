@@ -1,10 +1,10 @@
 import { CognitoTokensCookie } from "@/library/cookies/cognito/login";
 import { IApi } from "@/library/api/interface/api";
 
-export class RelationalDataList extends IApi {
+export class UserContentsCreate extends IApi {
   #url = "/drf/user-contents";
   #options = {
-    method: "GET", // *GET, POST, PUT, DELETE, etc.
+    method: "POST", // *GET, POST, PUT, DELETE, etc.
     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
     mode: "cors",
   };
@@ -27,11 +27,7 @@ export class RelationalDataList extends IApi {
         "Content-Type": "application/json",
         Authorization: `${cognitoTokens.TokenType} ${cognitoTokens.IdToken}`,
       };
-
-      if (query) {
-        const queryParams = new URLSearchParams(query);
-        this.#url = `${this.#url}?${queryParams}`;
-      }
+      this.#options.body = JSON.stringify(formData);
 
       // @ts-ignore
       const response = fetch(this.#url, this.#options);

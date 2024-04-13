@@ -12,12 +12,9 @@ export class ContentsDataUploadValidation extends IValidation {
 
   execute({ formData: formData }) {
     try {
-      console.log("formData");
-      for (let value of formData.entries()) {
-        console.log(value);
-      }
+      console.log("formData:", formData);
 
-      const filesMeta = JSON.parse(formData.get("filesMeta"));
+      const filesMeta = formData.filesMeta;
       let sumSize = 0;
 
       const filesNumber = this.#validationInstance.filesNumberValidation({

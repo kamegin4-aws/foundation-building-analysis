@@ -9,15 +9,17 @@ import ButtonWrapper from "@/ui/cloudscape/button";
 import FormFieldWrapper from "@/ui/cloudscape/form_field";
 import InputWrapper from "@/ui/cloudscape/input";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { ZodWrapper } from "@/library/validation/infrastructure/zod/zod_client";
 import BreadcrumbProvider from "@/ui/components/provider/bread_crumb";
 import FlashBarProvider from "@/ui/components/provider/flash_bar";
 import { RelationalDataCreateValidation } from "@/library/validation/elasticache_rds/create";
-import { RelationalDataCreate } from "@/library/api/elasticache_rds/create";
 import TopNavigationProvider from "@/ui/components/provider/top_menu";
 import React from "react";
+import { CognitoContext } from "@/ui/components/provider/cognito_provider";
+import Loading from "@/app/loading";
+import { RelationalDataUpdate } from "@/library/api/elasticache_rds/update";
 
 export default function NewPage() {
   //Alert
@@ -34,6 +36,9 @@ export default function NewPage() {
   const [createButtonLoading, setCreateButtonLoading] = useState(false);
   const [createButtonLoadingText, setCreateButtonLoadingText] = useState("");
 
+  //CognitoContext
+  const { userAttributes } = useContext(CognitoContext);
+
   const onSubmit = async (event) => {
     event.preventDefault();
     try {
@@ -43,14 +48,22 @@ export default function NewPage() {
       const createValidation = new RelationalDataCreateValidation({
         validationInstance: new ZodWrapper(),
       });
-      const relationalDataCreate = new RelationalDataCreate();
+      const relationalDataUpdate = new RelationalDataUpdate({
+        userName: userAttributes.userName,
+      });
 
-      const formData = new FormData();
-      formData.append("key", keyInputValue);
-      formData.append("value", valueInputValue);
+      const formObject = {
+        user_name: userAttributes.userName,
+        elasticache: [
+          {
+            key: keyInputValue,
+            value: valueInputValue,
+          },
+        ],
+      };
 
       const createValidationResult = createValidation.execute({
-        formData: formData,
+        formData: formObject,
       });
       setKeyErrorText("");
       setValueErrorText("");
@@ -58,8 +71,8 @@ export default function NewPage() {
 
       if (createValidationResult == true) {
         console.log("Validation: true");
-        const apiResponse = await relationalDataCreate.execute({
-          formData: formData,
+        const apiResponse = await relationalDataUpdate.execute({
+          formData: formObject,
         });
 
         if (apiResponse.ok) {
@@ -117,6 +130,8 @@ export default function NewPage() {
   };
 
   useEffect(() => {}, []);
+
+  if (!userAttributes) return <Loading />;
 
   return (
     <>

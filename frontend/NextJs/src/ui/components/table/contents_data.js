@@ -17,7 +17,13 @@ export default function ContentsTable(props) {
     {
       id: "fileName",
       header: "File Name",
-      cell: (item) => <Link href={`#${item.key}`}>{item.fileName}</Link>,
+      cell: (item) => (
+        <Link
+          href={`https://${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${item.key}`}
+        >
+          {item.fileName}
+        </Link>
+      ),
       sortingField: "fileName",
       isRowHeader: true,
     },

@@ -22,7 +22,10 @@ export class UserNameLogin extends IApi {
     query: query = undefined,
   } = {}) {
     try {
-      this.#options.body = formData;
+      this.#options.headers = {
+        "Content-Type": "application/json",
+      };
+      this.#options.body = JSON.stringify(formData);
 
       // @ts-ignore
       const response = fetch(this.#url, this.#options);
@@ -42,8 +45,7 @@ export class UserNameLogin extends IApi {
         cognitoTokensCookie.set({ data: responseObjectLogin });
 
         //グループ内のユーザーを取得
-        const formDataListUser = new FormData();
-        formDataListUser.append("group_name", FREE_USER_GROUP);
+        const formDataListUser = { group_name: FREE_USER_GROUP };
         const responseListUser = await listUserInGroup.execute({
           formData: formDataListUser,
         });
@@ -56,12 +58,13 @@ export class UserNameLogin extends IApi {
               index,
             ])
           );
-          const user_name = formData.get("user_name");
+          const user_name = formData.user_name;
           if (!userMap.has(user_name)) {
             //グループ内にユーザーがいなければ追加
-            const formDataAddGroup = new FormData();
-            formDataAddGroup.append("user_name", user_name);
-            formDataAddGroup.append("group_name", FREE_USER_GROUP);
+            const formDataAddGroup = {
+              user_name: user_name,
+              group_name: FREE_USER_GROUP,
+            };
             const responseAddGroup = await addUserToGroup.execute({
               formData: formDataAddGroup,
             });
@@ -73,17 +76,15 @@ export class UserNameLogin extends IApi {
 
           //クッキーにユーザー情報がなければ取得
           if (!(await userInfoCookie.get())) {
-            const formDataGetUserInfo = new FormData();
             const cognitoTokens = await cognitoTokensCookie.get();
 
             if (!cognitoTokens) {
               throw new Error("Not Access Token");
             }
 
-            formDataGetUserInfo.append(
-              "access_token",
-              cognitoTokens.AccessToken
-            );
+            const formDataGetUserInfo = {
+              access_token: cognitoTokens.AccessToken,
+            };
             const responseGetUserInfo = await getUserInfo.execute({
               formData: formDataGetUserInfo,
             });

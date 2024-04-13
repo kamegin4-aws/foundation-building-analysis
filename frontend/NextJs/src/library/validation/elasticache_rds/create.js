@@ -4,7 +4,7 @@ export class RelationalDataCreateValidation extends IValidation {
   #validationInstance;
   #validationList = [];
   #errorMessageList = [];
-  #index = ["key", "value"];
+  #index = ["key", "value", "userName"];
 
   constructor({ validationInstance: validationInstance }) {
     super();
@@ -13,19 +13,22 @@ export class RelationalDataCreateValidation extends IValidation {
 
   execute({ formData: formData }) {
     try {
-      console.log("formData");
-      for (let value of formData.entries()) {
-        console.log(value);
-      }
+      console.log("formData:", formData);
+
+      const formDataObjectArray = formData.elasticache;
 
       const key = this.#validationInstance.keyValidation({
-        key: formData.get("key"),
+        key: formDataObjectArray[0].key,
       });
       this.#validationList.push(key);
       const value = this.#validationInstance.valueValidation({
-        value: formData.get("value"),
+        value: formDataObjectArray[0].value,
       });
       this.#validationList.push(value);
+      const userName = this.#validationInstance.userNameValidation({
+        userName: formData.user_name,
+      });
+      this.#validationList.push(userName);
 
       for (let i = 0; i < this.#validationList.length; i++) {
         if (this.#validationList[i] !== true) {

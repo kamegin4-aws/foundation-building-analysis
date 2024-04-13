@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from mini_aws.models import ElastiCache, UserResults
+from mini_aws.models import ElastiCache, UserContents
 from django.contrib.auth.models import User
 from django.db import transaction
 
@@ -26,18 +26,18 @@ class ElastiCacheSerializer(DynamicFieldsSerializer):
         fields = ['id', 'key', 'value', 'create_at', 'updated_at']
 
 
-class UserResultsSerializer(DynamicFieldsSerializer):
+class UserContentsSerializer(DynamicFieldsSerializer):
     # user_name = serializers.CharField(read_only=True)
     elasticache = ElastiCacheSerializer(many=True, required=False)
 
     def create(self, validated_data):
         with transaction.atomic():
             elasticache_data = validated_data.pop('elasticache', [])
-            user_results = UserResults.objects.create(**validated_data)
+            user_contents = UserContents.objects.create(**validated_data)
             for _elasticache_data in elasticache_data:
                 ElastiCache.objects.create(
-                    user_results=user_results, **_elasticache_data)
-            return user_results
+                    user_contents=user_contents, **_elasticache_data)
+            return user_contents
 
     def update(self, instance, validated_data):
         with transaction.atomic():
@@ -54,17 +54,17 @@ class UserResultsSerializer(DynamicFieldsSerializer):
                 if key in existing_keys:
                     # 既存のオブジェクトを更新
                     ElastiCache.objects.filter(
-                        user_results=instance, key=key).update(
+                        user_contents=instance, key=key).update(
                         **elasticache_data)
                     existing_keys.remove(key)
                 else:
                     # 新しいオブジェクトを作成
                     ElastiCache.objects.create(
-                        user_results=instance, **elasticache_data)
+                        user_contents=instance, **elasticache_data)
 
             # リクエストになかった既存のElastiCacheオブジェクトを削除
             ElastiCache.objects.filter(
-                user_results=instance,
+                user_contents=instance,
                 key__in=existing_keys).delete()
 
             # UserResultsのその他のフィールドを更新
@@ -75,7 +75,7 @@ class UserResultsSerializer(DynamicFieldsSerializer):
         return instance
 
     class Meta:
-        model = UserResults
+        model = UserContents
         fields = ['user_name', 'elasticache', 'create_at', 'updated_at']
 
 

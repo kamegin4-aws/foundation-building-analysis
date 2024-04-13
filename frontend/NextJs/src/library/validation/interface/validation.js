@@ -5,7 +5,7 @@ export class IValidation {
   /**
    * バリデーションチェック
    * @typedef {Object} InputObjectExecute
-   * @property {FormData} formData フォームデータ
+   * @property {Record<string,string>} formData フォームオブジェクト
    * @param {InputObjectExecute} input インプット
    * @typedef {Object} FunctionReturnExecute
    * @property {string} index エラーインデックス

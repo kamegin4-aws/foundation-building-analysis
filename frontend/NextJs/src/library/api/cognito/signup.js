@@ -16,7 +16,10 @@ export class Signup extends IApi {
     query: query = undefined,
   } = {}) {
     try {
-      this.#options.body = formData;
+      this.#options.headers = {
+        "Content-Type": "application/json",
+      };
+      this.#options.body = JSON.stringify(formData);
 
       // @ts-ignore
       const response = fetch(this.#url, this.#options);

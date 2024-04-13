@@ -6,7 +6,7 @@ import ContentLayoutWrapper from "@/ui/cloudscape/content_layout";
 import HeaderWrapper from "@/ui/cloudscape/header";
 import ButtonWrapper from "@/ui/cloudscape/button";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import BreadcrumbProvider from "@/ui/components/provider/bread_crumb";
 import FlashBarProvider from "@/ui/components/provider/flash_bar";
@@ -14,6 +14,8 @@ import TopNavigationProvider from "@/ui/components/provider/top_menu";
 import React from "react";
 import RelationalTable from "@/ui/components/table/relationnal_data";
 import { RelationalDataList } from "@/library/api/elasticache_rds/list";
+import { CognitoContext } from "@/ui/components/provider/cognito_provider";
+import Loading from "@/app/loading";
 
 export default function ListPage() {
   //Alert
@@ -26,34 +28,46 @@ export default function ListPage() {
   const [relationalTableItems, setRelationalTableItems] = useState([]);
   const [relationalTableLoading, setRelationalTableLoading] = useState(false);
 
+  //CognitoContext
+  const { userAttributes } = useContext(CognitoContext);
+
   useEffect(() => {
-    const relationalData = new RelationalDataList();
-    setRelationalTableLoading(true);
-    relationalData
-      .execute()
-      .then((response) => {
-        response.json().then((object) => {
-          console.log(object);
-          setRelationalTableItems(object);
+    if (userAttributes) {
+      const relationalData = new RelationalDataList();
+      setRelationalTableLoading(true);
+      relationalData
+        .execute({
+          query: {
+            user_name: userAttributes.userName,
+            fields: "elasticache",
+          },
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          setRelationalTableItems(data[0].elasticache);
+        })
+
+        .catch((error) => {
+          if (error instanceof Error) {
+            setAlertDisplay(true);
+            setAlertType("error");
+            setAlertHeader("データの取得に失敗しました。");
+            setAlertMessage(error.message);
+          } else {
+            setAlertDisplay(true);
+            setAlertType("error");
+            setAlertHeader("データの取得に失敗しました。");
+            setAlertMessage("CLient Error");
+          }
+        })
+        .finally(() => {
+          setRelationalTableLoading(false);
         });
-      })
-      .catch((error) => {
-        if (error instanceof Error) {
-          setAlertDisplay(true);
-          setAlertType("error");
-          setAlertHeader("データの取得に失敗しました。");
-          setAlertMessage(error.message);
-        } else {
-          setAlertDisplay(true);
-          setAlertType("error");
-          setAlertHeader("データの取得に失敗しました。");
-          setAlertMessage("CLient Error");
-        }
-      })
-      .finally(() => {
-        setRelationalTableLoading(false);
-      });
-  }, []);
+    }
+  }, [userAttributes]);
+
+  if (!userAttributes) return <Loading />;
 
   return (
     <>

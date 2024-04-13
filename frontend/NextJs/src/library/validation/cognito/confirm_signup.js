@@ -13,17 +13,14 @@ export class ConfirmSignupValidation extends IValidation {
 
   execute({ formData: formData }) {
     try {
-      console.log("formData");
-      for (let value of formData.entries()) {
-        console.log(value);
-      }
+      console.log("formData:", formData);
 
       const userName = this.#validationInstance.userNameValidation({
-        userName: formData.get("user_name"),
+        userName: formData.user_name,
       });
       this.#validationList.push(userName);
       const code = this.#validationInstance.codeValidation({
-        code: formData.get("code"),
+        code: formData.code,
       });
       this.#validationList.push(code);
 
