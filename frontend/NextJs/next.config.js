@@ -23,42 +23,42 @@ const nextConfig = {
       {
         source: "/sam/cognito/login",
         destination:
-          "https://nsx2iwuzd7.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/login",
+          "https://hoe2vu7fdg.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/login",
       },
       {
         source: "/sam/cognito/logout",
         destination:
-          "https://nsx2iwuzd7.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/logout",
+          "https://hoe2vu7fdg.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/logout",
       },
       {
         source: "/sam/cognito/signup",
         destination:
-          "https://nsx2iwuzd7.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/signup",
+          "https://hoe2vu7fdg.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/signup",
       },
       {
         source: "/sam/cognito/token/refresh",
         destination:
-          "https://nsx2iwuzd7.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/token/refresh",
+          "https://hoe2vu7fdg.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/token/refresh",
       },
       {
         source: "/sam/cognito/signup/confirm",
         destination:
-          "https://nsx2iwuzd7.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/signup/confirm",
+          "https://hoe2vu7fdg.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/signup/confirm",
       },
       {
         source: "/sam/cognito/group/user/list",
         destination:
-          "https://jahojnl1jj.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/group/user/list",
+          "https://p8xcu8000m.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/group/user/list",
       },
       {
         source: "/sam/cognito/group/user/add",
         destination:
-          "https://jahojnl1jj.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/group/user/add",
+          "https://p8xcu8000m.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/group/user/add",
       },
       {
         source: "/sam/cognito/user/info",
         destination:
-          "https://jahojnl1jj.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/user/info",
+          "https://p8xcu8000m.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/user/info",
       },
       {
         source: "/drf/user-contents",

@@ -26,7 +26,7 @@ export class ContentsOperation extends IStorage {
 
       const result = await this.#contentsInstance.uploadObject({
         body: body,
-        key: `${userName}/${fileName}`,
+        key: `FoundationBuildingApp/${userName}/${fileName}`,
         tagging: tagging,
       });
 
@@ -47,7 +47,7 @@ export class ContentsOperation extends IStorage {
   }) {
     try {
       const result = await this.#contentsInstance.listObjects({
-        prefix: `${userName}/`,
+        prefix: `FoundationBuildingApp/${userName}/`,
         maxKeys: maxKeys,
         startAfter: startAfter,
       });
@@ -81,7 +81,7 @@ export class ContentsOperation extends IStorage {
   }) {
     try {
       const result = await this.#contentsInstance.listObjectVersions({
-        prefix: `${userName}/${fileName}`,
+        prefix: `FoundationBuildingApp/${userName}/${fileName}`,
         maxKeys: maxKeys,
       });
       console.log("result: ", result);
@@ -103,7 +103,7 @@ export class ContentsOperation extends IStorage {
   }) {
     try {
       const result = await this.#contentsInstance.infoObject({
-        key: `${userName}/${fileName}`,
+        key: `FoundationBuildingApp/${userName}/${fileName}`,
         versionId: versionId,
       });
       console.log("result: ", result);
@@ -125,7 +125,7 @@ export class ContentsOperation extends IStorage {
   }) {
     try {
       const result = await this.#contentsInstance.downloadObject({
-        key: `${userName}/${fileName}`,
+        key: `FoundationBuildingApp/${userName}/${fileName}`,
         versionId: versionId,
       });
       console.log("result: ", result);
@@ -147,7 +147,7 @@ export class ContentsOperation extends IStorage {
   }) {
     try {
       const result = await this.#contentsInstance.deleteObject({
-        key: `${userName}/${fileName}`,
+        key: `FoundationBuildingApp/${userName}/${fileName}`,
         versionId: versionId,
       });
       console.log("result: ", result);
@@ -169,7 +169,7 @@ export class ContentsOperation extends IStorage {
   }) {
     try {
       const result = await this.#contentsInstance.infoObjectTag({
-        key: `${userName}/${fileName}`,
+        key: `FoundationBuildingApp/${userName}/${fileName}`,
         versionId: versionId,
       });
 

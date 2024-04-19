@@ -261,6 +261,12 @@ Resources:
       Name: DockerHubSecret
       Description: DockerHubSecret
       SecretString: !Ref dockerCredentialsParameter
+  RDSMasterPasswordSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: RDSMasterPasswordSecret
+      Description: RDSMasterPasswordSecret
+      SecretString: !Ref rdsMasterPasswordParameter
   FreeUserPoolGroup:
     Type: AWS::Cognito::UserPoolGroup
     Properties:
@@ -825,24 +831,20 @@ Resources:
     Properties:
       DBClusterIdentifier: aurora-postgresql-cluster
       Engine: aurora-postgresql
+      EngineMode: provisioned
       EngineVersion: '16.1'
       DatabaseName: foundation_building
       DBClusterParameterGroupName: default.aurora-postgresql16
       EnableCloudwatchLogsExports:
         - postgresql
-      MasterUsername: !Ref rdsUserName
-      MasterUserPassword: !Ref rdsPassword
+      MasterUsername: !Sub '{{resolve:secretsmanager:${RDSMasterPasswordSecret}:SecretString:username}}'
+      MasterUserPassword: !Sub '{{resolve:secretsmanager:${RDSMasterPasswordSecret}:SecretString:password}}'
+      MasterUserSecret:
+        SecretArn: !Ref RDSMasterPasswordSecret
       StorageEncrypted: true
       DBSubnetGroupName: !Ref DBSubnetGroup
       VpcSecurityGroupIds:
         - !Ref rdsSecurityGroupId
-  DBSubnetGroup:
-    Type: AWS::RDS::DBSubnetGroup
-    Properties:
-      DBSubnetGroupDescription: DBSubnetGroup
-      SubnetIds:
-        - !Ref privateSubnet1Id
-        - !Ref privateSubnet2Id
   DBInstance1:
     Type: AWS::RDS::DBInstance
     Properties:
@@ -850,6 +852,13 @@ Resources:
       DBInstanceClass: db.t3.medium
       Engine: aurora-postgresql
       DBClusterIdentifier: !Ref DBCluster
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: DBSubnetGroup
+      SubnetIds:
+        - !Ref privateSubnet1Id
+        - !Ref privateSubnet2Id
   ObjectStorage:
     Type: AWS::S3::Bucket
     Properties:
@@ -880,7 +889,7 @@ Resources:
               - !Sub https://${domain}
             ExposedHeaders:
               - ETag
-              - "x-amz-meta-custom-header"
+              - x-amz-meta-custom-header
             Id: myCORSRuleId1
             MaxAge: 3600
   ObjectStorageBucketPolicy:
@@ -1058,6 +1067,106 @@ Resources:
       Roles:
         authenticated: !GetAtt AuthRole.Arn
         unauthenticated: !GetAtt UnAuthRole.Arn
+  ConnectionGlueRDS:
+    Type: AWS::Glue::Connection
+    Properties:
+      ConnectionInput:
+        Name: ConnectionGlueRDS
+        ConnectionType: JDBC
+        Description: Connection to my RDS database
+        ConnectionProperties:
+          JDBC_CONNECTION_URL: !Sub jdbc:postgresql://${DBInstance1.Endpoint.Address}:${DBInstance1.Endpoint.Port}/foundation_building
+          USERNAME: !Sub '{{resolve:secretsmanager:${RDSMasterPasswordSecret}:SecretString:username}}'
+          PASSWORD: !Sub '{{resolve:secretsmanager:${RDSMasterPasswordSecret}:SecretString:password}}'
+        PhysicalConnectionRequirements:
+          SubnetId: !Ref privateSubnet2Id
+          SecurityGroupIdList:
+            - !Ref rdsSecurityGroupId
+      CatalogId: !Ref AWS::AccountId
+  Crawler:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Targets:
+        S3Targets:
+          - Path: !Sub s3://${ObjectStorage}/FoundationBuildingApp/
+        JdbcTargets:
+          - ConnectionName: !Ref ConnectionGlueRDS
+            Exclusions:
+              - auth_*
+              - django_*
+            Path: foundation_building/public/%
+      Role: !GetAtt GlueRole.Arn
+      DatabaseName: !Ref GlueDatabase
+      SchemaChangePolicy:
+        UpdateBehavior: UPDATE_IN_DATABASE
+        DeleteBehavior: DEPRECATE_IN_DATABASE
+      Name: crawler-for-foundation-building-s3-rds
+  GlueDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      DatabaseInput:
+        Name: foundation-building-s3-rds
+        Description: Database created by S3 RDS
+      CatalogId: !Ref AWS::AccountId
+  GlueRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: GlueRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AwsGlueDataBrewFullAccessPolicy
+        - arn:aws:iam::aws:policy/service-role/AWSGlueServiceNotebookRole
+        - arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole
+        - arn:aws:iam::aws:policy/AmazonRDSFullAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/SecretsManagerReadWrite
+      MaxSessionDuration: 3600
+      Policies:
+        - PolicyName: PassRoleGlue
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - iam:PassRole
+                Resource:
+                  - !Sub arn:aws:iam::${AWS::AccountId}:role/GlueRole
+                Effect: Allow
+        - PolicyName: GlueRDSSecrets
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Ref RDSMasterPasswordSecret
+                Effect: Allow
+        - PolicyName: GlueS3
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource:
+                  - !Sub ${ObjectStorage.Arn}/*
+                Effect: Allow
+        - PolicyName: GlueRDS
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - rds-db:connect
+                Resource:
+                  - !Sub ${DBInstance1.DBInstanceArn}/*
+                Effect: Allow
+      AssumeRolePolicyDocument:
+        Version: '2008-10-17'
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: glue.amazonaws.com
+            Sid: ''
 Transform: AWS::Serverless-2016-10-31
 Parameters:
   clientSecret:
@@ -1076,13 +1185,11 @@ Parameters:
     Type: String
   dockerCredentialsParameter:
     Type: String
+  rdsMasterPasswordParameter:
+    Type: String
   apiCognitoId:
     Type: String
   apiCognitoAuthorizedId:
-    Type: String
-  rdsUserName:
-    Type: String
-  rdsPassword:
     Type: String
   publicSubnet1Id:
     Type: String

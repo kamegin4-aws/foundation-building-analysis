@@ -213,14 +213,14 @@ class UserContentsList(generics.ListCreateAPIView):
     pagination_class = UserContentsPagination
 
     def get(self, request, *args, **kwargs):
-        """
+
         # トークン検証
         token_validation_result = token_validation(request)
         if token_validation_result is not True:
             return response.Response(
                 token_validation_result,
                 status=status.HTTP_401_UNAUTHORIZED)
-        """
+
         # フィルタリングされたクエリセットを取得
         filtered_qs = self.filter_queryset(self.get_queryset())
         paginate_qs = self.paginate_queryset(filtered_qs)
@@ -232,14 +232,14 @@ class UserContentsList(generics.ListCreateAPIView):
             status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        """
+
         # トークン検証
         token_validation_result = token_validation(request)
         if token_validation_result is not True:
             return response.Response(
                 token_validation_result,
                 status=status.HTTP_401_UNAUTHORIZED)
-        """
+
         # リクエストデータをシリアライズして新しいデータを作成
         # self.user_results = request.data.get('user_results')
         serializer = self.get_serializer(data=request.data)
@@ -272,14 +272,14 @@ class UserContentsDetail(generics.RetrieveUpdateDestroyAPIView):
     lookup_fields = ['pk']
 
     def get(self, request, *args, **kwargs):
-        """
+
         # トークン検証
         token_validation_result = token_validation(request)
         if token_validation_result is not True:
             return response.Response(
                 token_validation_result,
                 status=status.HTTP_401_UNAUTHORIZED)
-        """
+
         queryset = self.get_queryset()
 
         filter = {}
@@ -295,14 +295,14 @@ class UserContentsDetail(generics.RetrieveUpdateDestroyAPIView):
             status=status.HTTP_200_OK)
 
     def put(self, request, *args, **kwargs):
-        """
+
         # トークン検証
         token_validation_result = token_validation(request)
         if token_validation_result is not True:
             return response.Response(
                 token_validation_result,
                 status=status.HTTP_401_UNAUTHORIZED)
-        """
+
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -312,14 +312,14 @@ class UserContentsDetail(generics.RetrieveUpdateDestroyAPIView):
             status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
-        """
+
         # トークン検証
         token_validation_result = token_validation(request)
         if token_validation_result is not True:
             return response.Response(
                 token_validation_result,
                 status=status.HTTP_401_UNAUTHORIZED)
-        """
+
         instance = self.get_object()
         self.perform_destroy(instance)
         return response.Response(status=status.HTTP_204_NO_CONTENT)

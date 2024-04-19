@@ -4,7 +4,7 @@ Metadata:
     350108e5-ca85-47f8-8d29-9a2ad77fceeb:
       size:
         width: 1310
-        height: 520
+        height: 650
       position:
         x: 280
         'y': 190
@@ -14,10 +14,13 @@ Metadata:
         - 180e2ee1-8578-4629-b20b-4cd47d57f011
         - c43c019d-9ffe-43b3-ae02-d60b4d4bc5d6
         - c9011329-7e1f-43cc-aa61-c2c8f7682cb5
+        - 0b70d9bd-f468-4ad8-a76b-0ed9cbc9bc95
         - 748cf0da-74e5-43eb-92dd-97b3337f3831
         - c172b2b4-1e18-46f4-a9ac-e5feefb27c6d
         - e616c472-8719-4b09-ade8-958721f4dbfa
         - 98527b75-4047-4ee1-8c9d-f73ea82e84fd
+        - b905d21b-a08c-489f-88d5-c1668033a80e
+        - a79a369e-e52e-4461-81b8-85a7a5a292f3
         - 3d63d8d7-768c-4598-a3f7-3dffdbc00411
         - 9384b3df-130b-4b04-8107-2ea01180adfb
         - ac9c17dc-48e6-4001-abf5-767138f4c670
@@ -30,7 +33,7 @@ Metadata:
         width: 420
         height: 260
       position:
-        x: 310
+        x: 320
         'y': 220
       z: 1
       parent: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
@@ -155,7 +158,7 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 330
+        x: 340
         'y': 250
       z: 2
       parent: e616c472-8719-4b09-ade8-958721f4dbfa
@@ -165,7 +168,7 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 330
+        x: 340
         'y': 320
       z: 2
       parent: e616c472-8719-4b09-ade8-958721f4dbfa
@@ -175,7 +178,7 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 560
+        x: 570
         'y': 230
       z: 2
       parent: e616c472-8719-4b09-ade8-958721f4dbfa
@@ -185,7 +188,7 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 640
+        x: 650
         'y': 230
       z: 2
       parent: e616c472-8719-4b09-ade8-958721f4dbfa
@@ -207,7 +210,7 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 560
+        x: 570
         'y': 300
       z: 2
       parent: e616c472-8719-4b09-ade8-958721f4dbfa
@@ -217,7 +220,7 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 640
+        x: 650
         'y': 300
       z: 2
       parent: e616c472-8719-4b09-ade8-958721f4dbfa
@@ -237,8 +240,8 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 1440
-        'y': 590
+        x: 1490
+        'y': 520
       z: 1
       parent: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
       embeds: []
@@ -287,7 +290,7 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 330
+        x: 340
         'y': 400
       z: 2
       parent: e616c472-8719-4b09-ade8-958721f4dbfa
@@ -315,10 +318,46 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 440
+        x: 450
         'y': 370
       z: 2
       parent: e616c472-8719-4b09-ade8-958721f4dbfa
+      embeds: []
+    a79a369e-e52e-4461-81b8-85a7a5a292f3:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 1350
+        'y': 590
+      z: 1
+      parent: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+      embeds: []
+    4646c1b8-02ba-409a-bdfc-31f6a1f6d621:
+      source:
+        id: c7875a33-6903-4ddb-b14c-970ff5ef58f5
+      target:
+        id: c7875a33-6903-4ddb-b14c-970ff5ef58f5
+      z: 1
+    0b70d9bd-f468-4ad8-a76b-0ed9cbc9bc95:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 1480
+        'y': 620
+      z: 1
+      parent: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+      embeds: []
+    b905d21b-a08c-489f-88d5-c1668033a80e:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 1360
+        'y': 680
+      z: 1
+      parent: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
       embeds: []
 Resources:
   VPC:
@@ -386,21 +425,15 @@ Resources:
         - IpProtocol: '-1'
           FromPort: -1
           ToPort: -1
-          CidrIp: !GetAtt 
-            - VPC
-            - CidrBlock
+          CidrIp: !GetAtt VPC.CidrBlock
         - IpProtocol: '-1'
           FromPort: -1
           ToPort: -1
-          CidrIp: !GetAtt 
-            - PublicSubnet
-            - CidrBlock
+          CidrIp: !GetAtt PublicSubnet.CidrBlock
         - IpProtocol: '-1'
           FromPort: -1
           ToPort: -1
-          CidrIp: !GetAtt 
-            - PublicSubnet2
-            - CidrBlock
+          CidrIp: !GetAtt PublicSubnet2.CidrBlock
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
@@ -426,21 +459,15 @@ Resources:
         - IpProtocol: '-1'
           FromPort: -1
           ToPort: -1
-          CidrIp: !GetAtt 
-            - VPC
-            - CidrBlock
+          CidrIp: !GetAtt VPC.CidrBlock
         - IpProtocol: '-1'
           FromPort: -1
           ToPort: -1
-          CidrIp: !GetAtt 
-            - PrivateSubnet
-            - CidrBlock
+          CidrIp: !GetAtt PrivateSubnet.CidrBlock
         - IpProtocol: '-1'
           FromPort: -1
           ToPort: -1
-          CidrIp: !GetAtt 
-            - PrivateSubnet2
-            - CidrBlock
+          CidrIp: !GetAtt PrivateSubnet2.CidrBlock
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
@@ -507,12 +534,8 @@ Resources:
         - Name: !Ref AName
           Type: A
           AliasTarget:
-            HostedZoneId: !GetAtt 
-              - ExternalLoadBalancer
-              - CanonicalHostedZoneID
-            DNSName: !GetAtt 
-              - ExternalLoadBalancer
-              - DNSName
+            HostedZoneId: !GetAtt ExternalLoadBalancer.CanonicalHostedZoneID
+            DNSName: !GetAtt ExternalLoadBalancer.DNSName
     Metadata:
       'AWS::CloudFormation::Designer':
         id: ae7edc86-2097-4a67-95b3-ed5b0c95017a
@@ -537,16 +560,12 @@ Resources:
         - Type: forward
           ForwardConfig:
             TargetGroups:
-              - TargetGroupArn: !GetAtt 
-                  - WebTargetGroup
-                  - TargetGroupArn
+              - TargetGroupArn: !GetAtt WebTargetGroup.TargetGroupArn
                 Weight: 1
             TargetGroupStickinessConfig:
               DurationSeconds: 3600
               Enabled: true
-      LoadBalancerArn: !GetAtt 
-        - ExternalLoadBalancer
-        - LoadBalancerArn
+      LoadBalancerArn: !GetAtt ExternalLoadBalancer.LoadBalancerArn
       Port: 80
       Protocol: HTTP
     Metadata:
@@ -559,16 +578,12 @@ Resources:
         - Type: forward
           ForwardConfig:
             TargetGroups:
-              - TargetGroupArn: !GetAtt 
-                  - WebTargetGroup
-                  - TargetGroupArn
+              - TargetGroupArn: !GetAtt WebTargetGroup.TargetGroupArn
                 Weight: 1
             TargetGroupStickinessConfig:
               DurationSeconds: 3600
               Enabled: true
-      LoadBalancerArn: !GetAtt 
-        - ExternalLoadBalancer
-        - LoadBalancerArn
+      LoadBalancerArn: !GetAtt ExternalLoadBalancer.LoadBalancerArn
       Certificates:
         - CertificateArn: !Ref CertificateArn
       Port: 443
@@ -593,12 +608,8 @@ Resources:
     Properties:
       DefaultActions:
         - Type: forward
-          TargetGroupArn: !GetAtt 
-            - PresentationTargetGroup
-            - TargetGroupArn
-      LoadBalancerArn: !GetAtt 
-        - ExternalLoadBalancer
-        - LoadBalancerArn
+          TargetGroupArn: !GetAtt PresentationTargetGroup.TargetGroupArn
+      LoadBalancerArn: !GetAtt ExternalLoadBalancer.LoadBalancerArn
       Port: 8080
       Protocol: HTTP
     Metadata:
@@ -609,12 +620,8 @@ Resources:
     Properties:
       DefaultActions:
         - Type: forward
-          TargetGroupArn: !GetAtt 
-            - ApplicationTargetGroup
-            - TargetGroupArn
-      LoadBalancerArn: !GetAtt 
-        - ExternalLoadBalancer
-        - LoadBalancerArn
+          TargetGroupArn: !GetAtt ApplicationTargetGroup.TargetGroupArn
+      LoadBalancerArn: !GetAtt ExternalLoadBalancer.LoadBalancerArn
       Port: 8081
       Protocol: HTTP
     Metadata:
@@ -680,33 +687,23 @@ Resources:
         - IpProtocol: '-1'
           FromPort: -1
           ToPort: -1
-          CidrIp: !GetAtt 
-            - VPC
-            - CidrBlock
+          CidrIp: !GetAtt VPC.CidrBlock
         - IpProtocol: '-1'
           FromPort: -1
           ToPort: -1
-          CidrIp: !GetAtt 
-            - PublicSubnet
-            - CidrBlock
+          CidrIp: !GetAtt PublicSubnet.CidrBlock
         - IpProtocol: '-1'
           FromPort: -1
           ToPort: -1
-          CidrIp: !GetAtt 
-            - PublicSubnet2
-            - CidrBlock
+          CidrIp: !GetAtt PublicSubnet2.CidrBlock
         - IpProtocol: '-1'
           FromPort: -1
           ToPort: -1
-          CidrIp: !GetAtt 
-            - PrivateSubnet
-            - CidrBlock
+          CidrIp: !GetAtt PrivateSubnet.CidrBlock
         - IpProtocol: '-1'
           FromPort: -1
           ToPort: -1
-          CidrIp: !GetAtt 
-            - PrivateSubnet2
-            - CidrBlock
+          CidrIp: !GetAtt PrivateSubnet2.CidrBlock
       SecurityGroupEgress:
         - IpProtocol: '-1'
           FromPort: -1
@@ -789,6 +786,17 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: c7875a33-6903-4ddb-b14c-970ff5ef58f5
+  SelfRefSecurityGroupIgress:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !GetAtt RDSSecurityGroup.GroupId
+      IpProtocol: tcp
+      FromPort: 0
+      ToPort: 65535
+      SourceSecurityGroupId: !GetAtt RDSSecurityGroup.GroupId
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 4646c1b8-02ba-409a-bdfc-31f6a1f6d621
   GlobalWebACL:
     Type: 'AWS::WAFv2::WebACL'
     Properties:
@@ -931,6 +939,47 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 5a43d249-4eb3-4135-88e1-a6cd6265ee48
+  VPS3GatewayEndpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: Gateway
+      VpcId: !Ref VPC
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.s3'
+      RouteTableIds:
+        - !Ref PrivateRouteTable
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 0b70d9bd-f468-4ad8-a76b-0ed9cbc9bc95
+  VPCS3InterfaceEndpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.s3'
+      VpcId: !Ref VPC
+      SubnetIds:
+        - !Ref PrivateSubnet
+        - !Ref PrivateSubnet2
+      SecurityGroupIds:
+        - !Ref VPCEndpointSecurityGroup
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: a79a369e-e52e-4461-81b8-85a7a5a292f3
+  RDSVPCEndpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.rds'
+      VpcId: !Ref VPC
+      SubnetIds:
+        - !Ref PrivateSubnet
+        - !Ref PrivateSubnet2
+      SecurityGroupIds:
+        - !Ref VPCEndpointSecurityGroup
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: b905d21b-a08c-489f-88d5-c1668033a80e
 Parameters:
   SSHLocation:
     Description: ' The IP address range that can be used to access the web server using SSH.'
@@ -954,7 +1003,5 @@ Parameters:
     Default: 'arn:aws:acm:ap-northeast-1:XXXXXXXXX:certificate/XXXX'
 Outputs:
   URL:
-    Value: !GetAtt 
-      - ExternalLoadBalancer
-      - DNSName
+    Value: !GetAtt ExternalLoadBalancer.DNSName
     Description: Newly created application URL
