@@ -33,7 +33,7 @@ export class ContentsOperation extends IStorage {
 
       const result = await this.#contentsInstance.uploadObject({
         body: body,
-        key: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/${mimeTypeForApp}/${fileName}`,
+        key: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/mimeType=${mimeTypeForApp}/${fileName}`,
         tagging: tagging,
       });
 
@@ -89,7 +89,7 @@ export class ContentsOperation extends IStorage {
   }) {
     try {
       const result = await this.#contentsInstance.listObjectVersions({
-        prefix: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/${mimeTyp}/${fileName}`,
+        prefix: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/mimeType=${mimeTyp}/${fileName}`,
         maxKeys: maxKeys,
       });
       console.log("result: ", result);
@@ -112,7 +112,7 @@ export class ContentsOperation extends IStorage {
   }) {
     try {
       const result = await this.#contentsInstance.infoObject({
-        key: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/${mimeTyp}/${fileName}`,
+        key: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/mimeType=${mimeTyp}/${fileName}`,
         versionId: versionId,
       });
       console.log("result: ", result);
@@ -135,7 +135,7 @@ export class ContentsOperation extends IStorage {
   }) {
     try {
       const result = await this.#contentsInstance.downloadObject({
-        key: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/${mimeTyp}/${fileName}`,
+        key: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/mimeType=${mimeTyp}/${fileName}`,
         versionId: versionId,
       });
       console.log("result: ", result);
@@ -158,7 +158,7 @@ export class ContentsOperation extends IStorage {
   }) {
     try {
       const result = await this.#contentsInstance.deleteObject({
-        key: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/${mimeTyp}/${fileName}`,
+        key: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/mimeType=${mimeTyp}/${fileName}`,
         versionId: versionId,
       });
       console.log("result: ", result);
@@ -181,7 +181,7 @@ export class ContentsOperation extends IStorage {
   }) {
     try {
       const result = await this.#contentsInstance.infoObjectTag({
-        key: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/${mimeTyp}/${fileName}`,
+        key: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/mimeType=${mimeTyp}/${fileName}`,
         versionId: versionId,
       });
 
