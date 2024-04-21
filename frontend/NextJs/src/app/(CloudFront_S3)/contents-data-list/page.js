@@ -45,40 +45,15 @@ export default function ListPage() {
           let items = [];
           for (let i = 0; i < objects.length; i++) {
             let fileName = objects[i].Key.split("/").slice(-1)[0];
-            let mimeType = "";
-            contentsClient
-              .infoTag({
-                userName: userAttributes.userName,
-                fileName: fileName,
-              })
-              .then((tags) => {
-                for (let tag of tags) {
-                  if (tag.Key == "mimeType") mimeType = tag.Value;
-                }
+            let mimeType = objects[i].Key.split("/").slice(-2)[0];
 
-                items.push({
-                  key: objects[i].Key,
-                  fileName: fileName,
-                  mimeType: mimeType,
-                  size: String(objects[i].Size),
-                  lastModified: objects[i].LastModified,
-                });
-
-                if (i == objects.length - 1) setContentsTableItems(items);
-              })
-              .catch((error) => {
-                if (error instanceof Error) {
-                  setAlertDisplay(true);
-                  setAlertType("error");
-                  setAlertHeader("タグの取得に失敗しました。");
-                  setAlertMessage(error.message);
-                } else {
-                  setAlertDisplay(true);
-                  setAlertType("error");
-                  setAlertHeader("タグの取得に失敗しました。");
-                  setAlertMessage("CLient Error");
-                }
-              });
+            items.push({
+              key: objects[i].Key,
+              fileName: fileName,
+              mimeType: mimeType,
+              size: String(objects[i].Size),
+              lastModified: objects[i].LastModified,
+            });
           }
         })
         .catch((error) => {

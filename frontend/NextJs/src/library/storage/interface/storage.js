@@ -47,6 +47,7 @@ export class IStorage {
    * @typedef {Object} InputObjectListVersions
    * @property {string} userName ユーザー名
    * @property {string} fileName ファイル名
+   * @property {string} [mimeTyp="UnKnown"] MIMEタイプ
    * @property {number} [maxKeys=1000] 応答で返されるキーの最大数を設定します。
    * @param {InputObjectListVersions} input インプット
    * @return {Promise<import("@aws-sdk/client-s3").ListObjectVersionsCommandOutput>} 結果
@@ -55,6 +56,7 @@ export class IStorage {
   async listVersions({
     userName: userName,
     fileName: fileName,
+    mimeTyp: mimeTyp = "UnKnown",
     maxKeys: maxKeys = 1000,
   }) {
     throw new Error("Not implemented");
@@ -65,6 +67,7 @@ export class IStorage {
    * @typedef {Object} InputObjectInfo
    * @property {string} userName ユーザー名
    * @property {string} fileName ファイル名
+   * @property {string} [mimeTyp="UnKnown"] MIMEタイプ
    * @property {string} [versionId=undefined] オブジェクトの特定のバージョンを参照するために使用されるバージョン ID
    * @param {InputObjectInfo} input インプット
    * @return {Promise<import("@aws-sdk/client-s3").GetObjectAttributesCommandOutput>} 結果
@@ -73,6 +76,7 @@ export class IStorage {
   async info({
     userName: userName,
     fileName: fileName,
+    mimeTyp: mimeTyp = "UnKnown",
     versionId: versionId = undefined,
   }) {
     throw new Error("Not implemented");
@@ -83,6 +87,7 @@ export class IStorage {
    * @typedef {Object} InputObjectDownload
    * @property {string} userName ユーザー名
    * @property {string} fileName ファイル名
+   * @property {string} [mimeTyp="UnKnown"] MIMEタイプ
    * @property {string} [versionId=undefined] オブジェクトの特定のバージョンを参照するために使用されるバージョン ID
    * @param {InputObjectDownload} input インプット
    * @return {Promise<import("@aws-sdk/client-s3").GetObjectCommandOutput>} 結果
@@ -91,6 +96,7 @@ export class IStorage {
   async download({
     userName: userName,
     fileName: fileName,
+    mimeTyp: mimeTyp = "UnKnown",
     versionId: versionId = undefined,
   }) {
     throw new Error("Not implemented");
@@ -101,6 +107,7 @@ export class IStorage {
    * @typedef {Object} InputObjectDelete
    * @property {string} userName ユーザー名
    * @property {string} fileName ファイル名
+   * @property {string} [mimeTyp="UnKnown"] MIMEタイプ
    * @property {string} [versionId=undefined] オブジェクトの特定のバージョンを参照するために使用されるバージョン ID
    * @param {InputObjectDelete} input インプット
    * @return {Promise<boolean>} 成功時:True
@@ -108,6 +115,7 @@ export class IStorage {
   async delete({
     userName: userName,
     fileName: fileName,
+    mimeTyp: mimeTyp = "UnKnown",
     versionId: versionId = undefined,
   }) {
     throw new Error("Not implemented");
@@ -118,6 +126,7 @@ export class IStorage {
    * @typedef {Object} InputObjectInfoObjectTag
    * @property {string} userName ユーザー名
    * @property {string} fileName ファイル名
+   * @property {string} [mimeTyp="UnKnown"] MIMEタイプ
    * @property {string} [versionId=undefined] オブジェクトの特定のバージョンを参照するために使用されるバージョン ID
    * @param {InputObjectInfoObjectTag} input インプット
    * @return {Promise<import("@aws-sdk/client-s3").GetObjectTaggingCommandOutput>} 結果
@@ -126,6 +135,7 @@ export class IStorage {
   async infoTag({
     userName: userName,
     fileName: fileName,
+    mimeTyp: mimeTyp = "UnKnown",
     versionId: versionId = undefined,
   }) {
     throw new Error("Not implemented");

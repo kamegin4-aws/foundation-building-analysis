@@ -1,3 +1,5 @@
+import { MIME_TYPE } from "@/library/common/constant/mimeType_check";
+import { mimeTypeCheck } from "@/library/common/mimeType_check";
 import { IStorage } from "@/library/storage/interface/storage";
 
 export class ContentsOperation extends IStorage {
@@ -16,8 +18,13 @@ export class ContentsOperation extends IStorage {
   }) {
     try {
       let tagging = "";
+      let mimeTypeForApp = MIME_TYPE[10];
+
       if (keyValueArray) {
         for (let i = 0; i < keyValueArray.length; i++) {
+          if (keyValueArray[i].key == "mimeType")
+            // @ts-ignore
+            mimeTypeForApp = mimeTypeCheck(keyValueArray[i].value);
           if (i == keyValueArray.length - 1)
             tagging += `${keyValueArray[i].key}=${keyValueArray[i].value}`;
           else tagging += `${keyValueArray[i].key}=${keyValueArray[i].value}&`;
@@ -26,7 +33,7 @@ export class ContentsOperation extends IStorage {
 
       const result = await this.#contentsInstance.uploadObject({
         body: body,
-        key: `FoundationBuildingApp/${userName}/${fileName}`,
+        key: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/${mimeTypeForApp}/${fileName}`,
         tagging: tagging,
       });
 
@@ -47,7 +54,7 @@ export class ContentsOperation extends IStorage {
   }) {
     try {
       const result = await this.#contentsInstance.listObjects({
-        prefix: `FoundationBuildingApp/${userName}/`,
+        prefix: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/`,
         maxKeys: maxKeys,
         startAfter: startAfter,
       });
@@ -77,11 +84,12 @@ export class ContentsOperation extends IStorage {
   async listVersions({
     userName: userName,
     fileName: fileName,
+    mimeTyp: mimeTyp = "UnKnown",
     maxKeys: maxKeys = 1000,
   }) {
     try {
       const result = await this.#contentsInstance.listObjectVersions({
-        prefix: `FoundationBuildingApp/${userName}/${fileName}`,
+        prefix: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/${mimeTyp}/${fileName}`,
         maxKeys: maxKeys,
       });
       console.log("result: ", result);
@@ -99,11 +107,12 @@ export class ContentsOperation extends IStorage {
   async info({
     userName: userName,
     fileName: fileName,
+    mimeTyp: mimeTyp = "UnKnown",
     versionId: versionId = undefined,
   }) {
     try {
       const result = await this.#contentsInstance.infoObject({
-        key: `FoundationBuildingApp/${userName}/${fileName}`,
+        key: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/${mimeTyp}/${fileName}`,
         versionId: versionId,
       });
       console.log("result: ", result);
@@ -121,11 +130,12 @@ export class ContentsOperation extends IStorage {
   async download({
     userName: userName,
     fileName: fileName,
+    mimeTyp: mimeTyp = "UnKnown",
     versionId: versionId = undefined,
   }) {
     try {
       const result = await this.#contentsInstance.downloadObject({
-        key: `FoundationBuildingApp/${userName}/${fileName}`,
+        key: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/${mimeTyp}/${fileName}`,
         versionId: versionId,
       });
       console.log("result: ", result);
@@ -143,11 +153,12 @@ export class ContentsOperation extends IStorage {
   async delete({
     userName: userName,
     fileName: fileName,
+    mimeTyp: mimeTyp = "UnKnown",
     versionId: versionId = undefined,
   }) {
     try {
       const result = await this.#contentsInstance.deleteObject({
-        key: `FoundationBuildingApp/${userName}/${fileName}`,
+        key: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/${mimeTyp}/${fileName}`,
         versionId: versionId,
       });
       console.log("result: ", result);
@@ -165,11 +176,12 @@ export class ContentsOperation extends IStorage {
   async infoTag({
     userName: userName,
     fileName: fileName,
+    mimeTyp: mimeTyp = "UnKnown",
     versionId: versionId = undefined,
   }) {
     try {
       const result = await this.#contentsInstance.infoObjectTag({
-        key: `FoundationBuildingApp/${userName}/${fileName}`,
+        key: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/${mimeTyp}/${fileName}`,
         versionId: versionId,
       });
 

@@ -11,6 +11,8 @@ import ZipIcon from "@/ui/react_icons/zip";
 import WordIcon from "@/ui/react_icons/word";
 import PowerPointIcon from "@/ui/react_icons/power_point";
 import ExcelIcon from "@/ui/react_icons/excel";
+import { mimeTypeCheck } from "@/library/common/mimeType_check";
+import { MIME_TYPE } from "@/library/common/constant/mimeType_check";
 
 export default function ContentsTable(props) {
   const columnDefinitions = [
@@ -31,26 +33,17 @@ export default function ContentsTable(props) {
       id: "mimeType",
       header: "MIME Type",
       cell: (item) => {
-        let regex = /audio\//;
-        if (regex.test(item.mimeType)) return <AudioIcon />;
-        regex = /image\//;
-        if (regex.test(item.mimeType)) return <ImageIcon />;
-        regex = /text\//;
-        if (regex.test(item.mimeType)) return <TextIcon />;
-        regex = /video\//;
-        if (regex.test(item.mimeType)) return <VideoIcon />;
-        regex = /application\/json/;
-        if (regex.test(item.mimeType)) return <JSONIcon />;
-        regex = /application\/pdf/;
-        if (regex.test(item.mimeType)) return <PDFIcon />;
-        regex = /application\/zip/;
-        if (regex.test(item.mimeType)) return <ZipIcon />;
-        regex = /application\/msword/;
-        if (regex.test(item.mimeType)) return <WordIcon />;
-        regex = /application\/vnd\.ms-powerpoint/;
-        if (regex.test(item.mimeType)) return <PowerPointIcon />;
-        regex = /application\/vnd\.ms-excel/;
-        if (regex.test(item.mimeType)) return <ExcelIcon />;
+        let mimeTypeForApp = mimeTypeCheck(item.mimeType);
+        if (mimeTypeForApp == MIME_TYPE[0]) return <AudioIcon />;
+        if (mimeTypeForApp == MIME_TYPE[2]) return <ImageIcon />;
+        if (mimeTypeForApp == MIME_TYPE[3]) return <TextIcon />;
+        if (mimeTypeForApp == MIME_TYPE[1]) return <VideoIcon />;
+        if (mimeTypeForApp == MIME_TYPE[4]) return <JSONIcon />;
+        if (mimeTypeForApp == MIME_TYPE[5]) return <PDFIcon />;
+        if (mimeTypeForApp == MIME_TYPE[6]) return <ZipIcon />;
+        if (mimeTypeForApp == MIME_TYPE[7]) return <WordIcon />;
+        if (mimeTypeForApp == MIME_TYPE[8]) return <PowerPointIcon />;
+        if (mimeTypeForApp == MIME_TYPE[9]) return <ExcelIcon />;
       },
     },
     {
