@@ -21,44 +21,36 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: "/sam/cognito/login",
-        destination:
-          "https://hoe2vu7fdg.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/login",
+        source: "/cognito/login",
+        destination: process.env.NEXT_PUBLIC_COGNITO_LOGIN,
       },
       {
-        source: "/sam/cognito/logout",
-        destination:
-          "https://hoe2vu7fdg.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/logout",
+        source: "/cognito/logout",
+        destination: process.env.NEXT_PUBLIC_COGNITO_LOGOUT,
       },
       {
-        source: "/sam/cognito/signup",
-        destination:
-          "https://hoe2vu7fdg.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/signup",
+        source: "/cognito/signup",
+        destination: process.env.NEXT_PUBLIC_COGNITO_SIGNUP,
       },
       {
-        source: "/sam/cognito/token/refresh",
-        destination:
-          "https://hoe2vu7fdg.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/token/refresh",
+        source: "/cognito/token/refresh",
+        destination: process.env.NEXT_PUBLIC_COGNITO_TOKEN_REFRESH,
       },
       {
-        source: "/sam/cognito/signup/confirm",
-        destination:
-          "https://hoe2vu7fdg.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/signup/confirm",
+        source: "/cognito/signup/confirm",
+        destination: process.env.NEXT_PUBLIC_COGNITO_SIGNUP_CONFIRM,
       },
       {
-        source: "/sam/cognito/group/user/list",
-        destination:
-          "https://p8xcu8000m.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/group/user/list",
+        source: "/cognito/group/user/list",
+        destination: process.env.NEXT_PUBLIC_COGNITO_GROUP_USER_LIST,
       },
       {
-        source: "/sam/cognito/group/user/add",
-        destination:
-          "https://p8xcu8000m.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/group/user/add",
+        source: "/cognito/group/user/add",
+        destination: process.env.NEXT_PUBLIC_COGNITO_GROUP_USER_ADD,
       },
       {
-        source: "/sam/cognito/user/info",
-        destination:
-          "https://p8xcu8000m.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/user/info",
+        source: "/cognito/user/info",
+        destination: process.env.NEXT_PUBLIC_COGNITO_USER_INFO,
       },
       {
         source: "/drf/user-contents",

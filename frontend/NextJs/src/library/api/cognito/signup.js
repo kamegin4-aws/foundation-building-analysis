@@ -1,7 +1,7 @@
 import { IApi } from "@/library/api/interface/api";
 
 export class Signup extends IApi {
-  #url = "/sam/cognito/signup";
+  #url = "/cognito/signup";
   #options = {
     method: "POST", // *GET, POST, PUT, DELETE, etc.
     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached

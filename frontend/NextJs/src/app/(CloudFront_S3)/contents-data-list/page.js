@@ -45,7 +45,7 @@ export default function ListPage() {
           let items = [];
           for (let i = 0; i < objects.length; i++) {
             let fileName = objects[i].Key.split("/").slice(-1)[0];
-            let mimeType = objects[i].Key.split("/").slice(-2)[0];
+            let mimeType = objects[i].Key.split("/").slice(-2)[0].split("=")[1];
 
             items.push({
               key: objects[i].Key,
@@ -55,6 +55,8 @@ export default function ListPage() {
               lastModified: objects[i].LastModified,
             });
           }
+
+          setContentsTableItems(items);
         })
         .catch((error) => {
           if (error instanceof Error) {

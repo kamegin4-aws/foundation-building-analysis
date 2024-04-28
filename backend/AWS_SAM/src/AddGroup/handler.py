@@ -63,8 +63,8 @@ def handler(event, context):
             'statusCode': 200,
             'headers': {
                 'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': '*'},
+                'Access-Control-Allow-Origin': os.environ['ORIGINS'],
+                'Access-Control-Allow-Methods': 'POST,OPTIONS'},
             'body': json.dumps(add_user_to_group)}
 
     except Exception:
@@ -73,8 +73,8 @@ def handler(event, context):
             'statusCode': 500,
             'headers': {
                 'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': '*'},
+                'Access-Control-Allow-Origin': os.environ['ORIGINS'],
+                'Access-Control-Allow-Methods': 'POST,OPTIONS'},
             'body': json.dumps(
                 traceback.format_exc())}
 

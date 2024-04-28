@@ -939,7 +939,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 5a43d249-4eb3-4135-88e1-a6cd6265ee48
-  VPS3GatewayEndpoint:
+  VPCS3GatewayEndpoint:
     Type: 'AWS::EC2::VPCEndpoint'
     Properties:
       VpcEndpointType: Gateway
@@ -965,7 +965,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: a79a369e-e52e-4461-81b8-85a7a5a292f3
-  RDSVPCEndpoint:
+  VPCRDSEndpoint:
     Type: 'AWS::EC2::VPCEndpoint'
     Properties:
       VpcEndpointType: Interface
@@ -986,7 +986,7 @@ Parameters:
     Type: String
     MinLength: '9'
     MaxLength: '18'
-    Default: 0.0.0.0/0
+    Default: 0.0.0.0/32
     AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
     ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
   HostedZoneName:
@@ -1002,6 +1002,36 @@ Parameters:
     Type: String
     Default: 'arn:aws:acm:ap-northeast-1:XXXXXXXXX:certificate/XXXX'
 Outputs:
-  URL:
-    Value: !GetAtt ExternalLoadBalancer.DNSName
-    Description: Newly created application URL
+  VPCId:
+    Value: !GetAtt VPC.VpcId
+    Description: VPC.VpcId
+  ELBWebTargetGroupArn:
+    Value: !GetAtt WebTargetGroup.TargetGroupArn
+    Description: WebTargetGroup.TargetGroupArn
+  ELBPresentationTargetGroupArn:
+    Value: !GetAtt PresentationTargetGroup.TargetGroupArn
+    Description: PresentationTargetGroup.TargetGroupArn
+  ELBApplicationTargetGroupArn:
+    Value: !GetAtt ApplicationTargetGroup.TargetGroupArn
+    Description: ApplicationTargetGroup.TargetGroupArn
+  PublicSubnet1Id:
+    Value: !GetAtt PublicSubnet.SubnetId
+    Description: PublicSubnet.SubnetId
+  PublicSubnet2Id:
+    Value: !GetAtt PublicSubnet2.SubnetId
+    Description: PublicSubnet2.SubnetId
+  PrivateSubnet1Id:
+    Value: !GetAtt PrivateSubnet.SubnetId
+    Description: PrivateSubnet.SubnetId
+  PrivateSubnet2Id:
+    Value: !GetAtt PrivateSubnet2.SubnetId
+    Description: PrivateSubnet2.SubnetId
+  PublicSecurityGroupId:
+    Value: !GetAtt PublicSecurityGroup.GroupId
+    Description: PublicSecurityGroup.GroupId
+  ElastiCacheSecurityGroupId:
+    Value: !GetAtt ElastiCacheSecurityGroup.GroupId
+    Description: ElastiCacheSecurityGroup.GroupId
+  RDSSecurityGroupId:
+    Value: !GetAtt RDSSecurityGroup.GroupId
+    Description: RDSSecurityGroup.GroupId

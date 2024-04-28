@@ -1,3 +1,7 @@
+[project]
+name = "Django_RF"
+version = "0.0.1"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
@@ -6,8 +10,8 @@ build-backend = "poetry.core.masonry.api"
 name = "Foundation_Building"
 version = "0.1.0"
 packages = [
-    { include = "Foundation_Building/library" },
-    { include = "Foundation_Building/Foundation_Building" }
+  { include = "Foundation_Building/library" },
+  { include = "Foundation_Building/Foundation_Building" },
 ]
 authors = ["kamegin4-aws <kamegin4@outlook.jp>"]
 description = "Backend App of Foundation_Building"
@@ -16,7 +20,7 @@ license = "MIT"
 #keywords = ["egg", "bacon", "sausage", "tomatoes", "Lobster Thermidor"]
 classifiers = [
   "Development Status :: 4 - Beta",
-  "Programming Language :: Python"
+  "Programming Language :: Python",
 ]
 
 [tool.poetry.dependencies]
@@ -31,15 +35,13 @@ psycopg2-binary = "^2.9.9"
 django-environ = "^0.11.2"
 #AWS
 pymemcache = "^4.0.0"
-pyjwt = {extras = ["crypto"], version = "^2.8.0"}
+pyjwt = { extras = ["crypto"], version = "^2.8.0" }
 datetime = "^5.4"
+django-cors-headers = "^4.3.1"
 
 [project.optional-dependencies]
-#gui = ["PyQt5"]
-#cli = [
-#  "rich",
-#  "click",
-#]
+gui = ["PyQt5"]
+cli = ["rich", "click"]
 
 [project.urls]
 Homepage = "https://example.com"

@@ -37,8 +37,8 @@ ALLOWED_HOSTS = ['*']
 
 if DEBUG is not True:
     CSRF_TRUSTED_ORIGINS = [
-        'https://*.kamegin.com',
-        'http://*.kamegin.com:8080',
+        f"https://{env('HOST_DOMEIN')}",
+        f"http://{env('HOST_DOMEIN')}:8080",
     ]
     # SECURE_SSL_REDIRECT = True
     # SESSION_COOKIE_SECURE = True
@@ -56,7 +56,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_filters',
-    'mini_aws'
+    'mini_aws',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -67,6 +68,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 
@@ -124,6 +126,32 @@ else:
         }
     }
 
+# CORS
+CORS_ALLOWED_ORIGINS = [
+    f"https://{env('HOST_DOMEIN')}",
+    f"http://{env('LOCAL_DOMEIN')}",
+]
+
+CORS_ALLOW_METHODS = (
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+)
+
+CORS_ALLOW_HEADERS = (
+    'accept',
+    'authorization',
+    'content-type',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'x-amz-date',
+    'x-amz-security-token',
+    'x-api-key',
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

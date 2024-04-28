@@ -3,7 +3,7 @@ import { UserInfoCookie } from "@/library/cookies/cognito/user_info";
 import { IApi } from "@/library/api/interface/api";
 
 export class GetUserInfo extends IApi {
-  #url = "/sam/cognito/user/info";
+  #url = "/cognito/user/info";
   #options = {
     method: "POST", // *GET, POST, PUT, DELETE, etc.
     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached

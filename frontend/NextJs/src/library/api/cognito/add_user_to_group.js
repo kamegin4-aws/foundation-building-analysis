@@ -2,7 +2,7 @@ import { CognitoTokensCookie } from "@/library/cookies/cognito/login";
 import { IApi } from "@/library/api/interface/api";
 
 export class AddUserToGroup extends IApi {
-  #url = "/sam/cognito/group/user/add";
+  #url = "/cognito/group/user/add";
   #options = {
     method: "POST", // *GET, POST, PUT, DELETE, etc.
     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached

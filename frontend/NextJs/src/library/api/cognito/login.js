@@ -7,7 +7,7 @@ import { FREE_USER_GROUP } from "@/library/api/constant/list_user_in_group";
 import { IApi } from "@/library/api/interface/api";
 
 export class UserNameLogin extends IApi {
-  #url = "/sam/cognito/login";
+  #url = "/cognito/login";
   #options = {
     method: "POST", // *GET, POST, PUT, DELETE, etc.
     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
