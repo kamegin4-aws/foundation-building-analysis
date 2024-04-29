@@ -1,22 +1,22 @@
 "use client";
 
-import AlertWrapper from "@/ui/cloudscape/alert";
-import ContainerWrapper from "@/ui/cloudscape/container";
-import ContentLayoutWrapper from "@/ui/cloudscape/content_layout";
-import FormWrapper from "@/ui/cloudscape/form";
-import HeaderWrapper from "@/ui/cloudscape/header";
-import LinkWrapper from "@/ui/cloudscape/link";
-import TabsWrapper from "@/ui/cloudscape/tabs";
-import ButtonWrapper from "@/ui/cloudscape/button";
-import FormFieldWrapper from "@/ui/cloudscape/form_field";
-import InputWrapper from "@/ui/cloudscape/input";
+import AlertWrapper from "@/ui/Cloudscape/alert";
+import ContainerWrapper from "@/ui/Cloudscape/container";
+import ContentLayoutWrapper from "@/ui/Cloudscape/content_layout";
+import FormWrapper from "@/ui/Cloudscape/form";
+import HeaderWrapper from "@/ui/Cloudscape/header";
+import LinkWrapper from "@/ui/Cloudscape/link";
+import TabsWrapper from "@/ui/Cloudscape/tabs";
+import ButtonWrapper from "@/ui/Cloudscape/button";
+import FormFieldWrapper from "@/ui/Cloudscape/form_field";
+import InputWrapper from "@/ui/Cloudscape/input";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
 import { LoginValidation } from "@/library/validation/cognito/login";
 import { ZodWrapper } from "@/library/validation/infrastructure/zod/zod_client";
 import { UserNameLogin } from "@/library/api/cognito/login";
-import TextContentWrapper from "@/ui/cloudscape/text_content";
+import TextContentWrapper from "@/ui/Cloudscape/text_content";
 import BreadcrumbProvider from "@/ui/components/provider/bread_crumb";
 import FlashBarProvider from "@/ui/components/provider/flash_bar";
 import React from "react";

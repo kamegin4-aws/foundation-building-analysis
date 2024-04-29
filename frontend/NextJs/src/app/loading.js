@@ -1,6 +1,6 @@
 "use client";
 
-import SpinnerWrapper from "@/ui/cloudscape/spinner";
+import SpinnerWrapper from "@/ui/Cloudscape/spinner";
 import React from "react";
 
 export default function Loading() {

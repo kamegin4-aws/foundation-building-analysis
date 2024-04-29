@@ -1,10 +1,10 @@
 "use client";
 
-import TopNavigationWrapper from "@/ui/cloudscape/top_navigation";
-import SideNavigationWrapper from "@/ui/cloudscape/side_navigation";
-import AppLayoutWrapper from "@/ui/cloudscape/app_layout";
-import BreadcrumbGroupWrapper from "@/ui/cloudscape/breadcrumb_group";
-import FlashBarWrapper from "@/ui/cloudscape/flashbar";
+import TopNavigationWrapper from "@/ui/Cloudscape/top_navigation";
+import SideNavigationWrapper from "@/ui/Cloudscape/side_navigation";
+import AppLayoutWrapper from "@/ui/Cloudscape/app_layout";
+import BreadcrumbGroupWrapper from "@/ui/Cloudscape/breadcrumb_group";
+import FlashBarWrapper from "@/ui/Cloudscape/flashbar";
 import { useState, useContext } from "react";
 import CognitoProvider from "@/ui/components/provider/cognito_provider";
 import AppLayoutProvider, {

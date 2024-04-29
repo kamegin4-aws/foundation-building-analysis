@@ -1,16 +1,16 @@
 import React from "react";
-import TableWrapper from "@/ui/cloudscape/table";
+import TableWrapper from "@/ui/Cloudscape/table";
 import Link from "next/link";
-import AudioIcon from "@/ui/react_icons/audio";
-import ImageIcon from "@/ui/react_icons/image";
-import TextIcon from "@/ui/react_icons/text";
-import VideoIcon from "@/ui/react_icons/video";
-import JSONIcon from "@/ui/react_icons/json_icon";
-import PDFIcon from "@/ui/react_icons/pdf";
-import ZipIcon from "@/ui/react_icons/zip";
-import WordIcon from "@/ui/react_icons/word";
-import PowerPointIcon from "@/ui/react_icons/power_point";
-import ExcelIcon from "@/ui/react_icons/excel";
+import AudioIcon from "@/ui/React_icons/audio";
+import ImageIcon from "@/ui/React_icons/image";
+import TextIcon from "@/ui/React_icons/text";
+import VideoIcon from "@/ui/React_icons/video";
+import JSONIcon from "@/ui/React_icons/json_icon";
+import PDFIcon from "@/ui/React_icons/pdf";
+import ZipIcon from "@/ui/React_icons/zip";
+import WordIcon from "@/ui/React_icons/word";
+import PowerPointIcon from "@/ui/React_icons/power_point";
+import ExcelIcon from "@/ui/React_icons/excel";
 import { mimeTypeCheck } from "@/library/common/mimeType_check";
 import { MIME_TYPE } from "@/library/common/constant/mimeType_check";
 
@@ -33,7 +33,7 @@ export default function ContentsTable(props) {
       id: "mimeType",
       header: "MIME Type",
       cell: (item) => {
-        let mimeTypeForApp = mimeTypeCheck(item.mimeType);
+        let mimeTypeForApp = item.mimeType;
         if (mimeTypeForApp == MIME_TYPE[0]) return <AudioIcon />;
         if (mimeTypeForApp == MIME_TYPE[2]) return <ImageIcon />;
         if (mimeTypeForApp == MIME_TYPE[3]) return <TextIcon />;

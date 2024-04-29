@@ -1,13 +1,13 @@
 "use client";
 
-import AlertWrapper from "@/ui/cloudscape/alert";
-import ContainerWrapper from "@/ui/cloudscape/container";
-import ContentLayoutWrapper from "@/ui/cloudscape/content_layout";
-import FormWrapper from "@/ui/cloudscape/form";
-import HeaderWrapper from "@/ui/cloudscape/header";
-import ButtonWrapper from "@/ui/cloudscape/button";
-import FormFieldWrapper from "@/ui/cloudscape/form_field";
-import InputWrapper from "@/ui/cloudscape/input";
+import AlertWrapper from "@/ui/Cloudscape/alert";
+import ContainerWrapper from "@/ui/Cloudscape/container";
+import ContentLayoutWrapper from "@/ui/Cloudscape/content_layout";
+import FormWrapper from "@/ui/Cloudscape/form";
+import HeaderWrapper from "@/ui/Cloudscape/header";
+import ButtonWrapper from "@/ui/Cloudscape/button";
+import FormFieldWrapper from "@/ui/Cloudscape/form_field";
+import InputWrapper from "@/ui/Cloudscape/input";
 import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
 

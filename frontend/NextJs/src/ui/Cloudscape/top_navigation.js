@@ -3,7 +3,7 @@ import {
   LOGO_SRC,
   SETTINGS_ITEMS,
   USER_PROFILE_ITEMS,
-} from "@/ui/cloudscape/constant/top_navigation";
+} from "@/ui/Cloudscape/constant/top_navigation";
 import React from "react";
 
 export default function TopNavigationWrapper(props) {

@@ -1,17 +1,17 @@
 "use client";
 
-import AlertWrapper from "@/ui/cloudscape/alert";
-import ContentLayoutWrapper from "@/ui/cloudscape/content_layout";
-import HeaderWrapper from "@/ui/cloudscape/header";
-import ButtonWrapper from "@/ui/cloudscape/button";
+import AlertWrapper from "@/ui/Cloudscape/alert";
+import ContentLayoutWrapper from "@/ui/Cloudscape/content_layout";
+import HeaderWrapper from "@/ui/Cloudscape/header";
+import ButtonWrapper from "@/ui/Cloudscape/button";
 import { useEffect, useState, useContext } from "react";
 import { useRouter } from "next/navigation";
 
-import BoxWrapper from "@/ui/cloudscape/box";
-import SpaceBetweenWrapper from "@/ui/cloudscape/space_between";
-import IconWrapper from "@/ui/cloudscape/icon";
-import ColumnLayoutWrapper from "@/ui/cloudscape/column_layout";
-import ContainerWrapper from "@/ui/cloudscape/container";
+import BoxWrapper from "@/ui/Cloudscape/box";
+import SpaceBetweenWrapper from "@/ui/Cloudscape/space_between";
+import IconWrapper from "@/ui/Cloudscape/icon";
+import ColumnLayoutWrapper from "@/ui/Cloudscape/column_layout";
+import ContainerWrapper from "@/ui/Cloudscape/container";
 import Image from "next/image";
 
 import { CognitoContext } from "@/ui/components/provider/cognito_provider";

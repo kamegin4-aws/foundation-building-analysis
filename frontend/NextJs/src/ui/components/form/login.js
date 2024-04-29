@@ -1,15 +1,15 @@
 "use client";
 
-import FormWrapper from "@/ui/cloudscape/form";
-import ButtonWrapper from "@/ui/cloudscape/button";
-import FormFieldWrapper from "@/ui/cloudscape/form_field";
-import InputWrapper from "@/ui/cloudscape/input";
+import FormWrapper from "@/ui/Cloudscape/form";
+import ButtonWrapper from "@/ui/Cloudscape/button";
+import FormFieldWrapper from "@/ui/Cloudscape/form_field";
+import InputWrapper from "@/ui/Cloudscape/input";
 import { useState } from "react";
 
 import { LoginValidation } from "@/library/validation/cognito/login";
 import { ZodWrapper } from "@/library/validation/infrastructure/zod/zod_client";
 import { UserNameLogin } from "@/library/api/cognito/login";
-import TextContentWrapper from "@/ui/cloudscape/text_content";
+import TextContentWrapper from "@/ui/Cloudscape/text_content";
 import React from "react";
 
 export default function LoginForm(props) {

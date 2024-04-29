@@ -1,10 +1,10 @@
 "use client";
 
-import FormWrapper from "@/ui/cloudscape/form";
+import FormWrapper from "@/ui/Cloudscape/form";
 
-import ButtonWrapper from "@/ui/cloudscape/button";
-import FormFieldWrapper from "@/ui/cloudscape/form_field";
-import InputWrapper from "@/ui/cloudscape/input";
+import ButtonWrapper from "@/ui/Cloudscape/button";
+import FormFieldWrapper from "@/ui/Cloudscape/form_field";
+import InputWrapper from "@/ui/Cloudscape/input";
 
 import { useState } from "react";
 
@@ -12,7 +12,7 @@ import { SignupValidation } from "@/library/validation/cognito/signup";
 import { ZodWrapper } from "@/library/validation/infrastructure/zod/zod_client";
 import { Signup } from "@/library/api/cognito/signup";
 
-import TextContentWrapper from "@/ui/cloudscape/text_content";
+import TextContentWrapper from "@/ui/Cloudscape/text_content";
 
 import React from "react";
 

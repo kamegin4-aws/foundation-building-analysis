@@ -1,11 +1,11 @@
 "use client";
 
-import AlertWrapper from "@/ui/cloudscape/alert";
-import ContainerWrapper from "@/ui/cloudscape/container";
-import ContentLayoutWrapper from "@/ui/cloudscape/content_layout";
-import FormWrapper from "@/ui/cloudscape/form";
-import HeaderWrapper from "@/ui/cloudscape/header";
-import ButtonWrapper from "@/ui/cloudscape/button";
+import AlertWrapper from "@/ui/Cloudscape/alert";
+import ContainerWrapper from "@/ui/Cloudscape/container";
+import ContentLayoutWrapper from "@/ui/Cloudscape/content_layout";
+import FormWrapper from "@/ui/Cloudscape/form";
+import HeaderWrapper from "@/ui/Cloudscape/header";
+import ButtonWrapper from "@/ui/Cloudscape/button";
 import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
 
@@ -14,8 +14,8 @@ import BreadcrumbProvider from "@/ui/components/provider/bread_crumb";
 import FlashBarProvider from "@/ui/components/provider/flash_bar";
 import TopNavigationProvider from "@/ui/components/provider/top_menu";
 import React from "react";
-import FileUploadWrapper from "@/ui/cloudscape/file_upload";
-import TextContentWrapper from "@/ui/cloudscape/text_content";
+import FileUploadWrapper from "@/ui/Cloudscape/file_upload";
+import TextContentWrapper from "@/ui/Cloudscape/text_content";
 import { ContentsDataUploadValidation } from "@/library/validation/cloudfront_s3/upload";
 import { S3Context } from "@/ui/components/provider/s3_provider";
 import { CognitoContext } from "@/ui/components/provider/cognito_provider";

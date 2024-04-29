@@ -1,6 +1,6 @@
 import SideNavigation from "@cloudscape-design/components/side-navigation";
 
-import { HEADER, ITEMS } from "@/ui/cloudscape/constant/side_navigation";
+import { HEADER, ITEMS } from "@/ui/Cloudscape/constant/side_navigation";
 import React from "react";
 
 export default function SideNavigationWrapper(props) {

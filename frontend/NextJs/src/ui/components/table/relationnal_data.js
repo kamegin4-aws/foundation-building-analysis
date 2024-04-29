@@ -1,5 +1,5 @@
 import React from "react";
-import TableWrapper from "@/ui/cloudscape/table";
+import TableWrapper from "@/ui/Cloudscape/table";
 import Link from "next/link";
 
 export default function RelationalTable(props) {
