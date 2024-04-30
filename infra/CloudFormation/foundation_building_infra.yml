@@ -902,12 +902,8 @@ Resources:
         - Type: forward
           ForwardConfig:
             TargetGroups:
-              - TargetGroupArn: !GetAtt
-                  - PresentationTargetGroup
-                  - TargetGroupArn
-      LoadBalancerArn: !GetAtt
-        - InternalLoadBalancer
-        - LoadBalancerArn
+              - TargetGroupArn: !GetAtt PresentationTargetGroup.TargetGroupArn
+      LoadBalancerArn: !GetAtt InternalLoadBalancer.LoadBalancerArn
       Port: 8080
       Protocol: TCP
     Metadata:
@@ -939,12 +935,8 @@ Resources:
         - Type: forward
           ForwardConfig:
             TargetGroups:
-              - TargetGroupArn: !GetAtt
-                  - ApplicationTargetGroup
-                  - TargetGroupArn
-      LoadBalancerArn: !GetAtt
-        - InternalLoadBalancer
-        - LoadBalancerArn
+              - TargetGroupArn: !GetAtt ApplicationTargetGroup.TargetGroupArn
+      LoadBalancerArn: !GetAtt InternalLoadBalancer.LoadBalancerArn
       Port: 8081
       Protocol: TCP
     Metadata:
