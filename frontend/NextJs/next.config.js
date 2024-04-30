@@ -7,7 +7,10 @@ const nextConfig = {
   output: "standalone",
   experimental: {
     serverActions: {
-      allowedOrigins: [process.env.NEXT_PUBLIC_HOST_DOMAIN, "*.kamegin.com"],
+      allowedOrigins: [
+        process.env.NEXT_PUBLIC_HOST_DOMAIN,
+        process.env.NEXT_PUBLIC_APP_DOMAIN,
+      ],
     },
   },
   images: {
@@ -22,35 +25,35 @@ const nextConfig = {
     return [
       {
         source: "/cognito/login",
-        destination: process.env.NEXT_PUBLIC_COGNITO_LOGIN,
+        destination: `https://${process.env.NEXT_PUBLIC_UnAUTH_API_ID}.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/login`,
       },
       {
         source: "/cognito/logout",
-        destination: process.env.NEXT_PUBLIC_COGNITO_LOGOUT,
+        destination: `https://${process.env.NEXT_PUBLIC_UnAUTH_API_ID}.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/logout`,
       },
       {
         source: "/cognito/signup",
-        destination: process.env.NEXT_PUBLIC_COGNITO_SIGNUP,
+        destination: `https://${process.env.NEXT_PUBLIC_UnAUTH_API_ID}.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/signup`,
       },
       {
         source: "/cognito/token/refresh",
-        destination: process.env.NEXT_PUBLIC_COGNITO_TOKEN_REFRESH,
+        destination: `https://${process.env.NEXT_PUBLIC_UnAUTH_API_ID}.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/token/refresh`,
       },
       {
         source: "/cognito/signup/confirm",
-        destination: process.env.NEXT_PUBLIC_COGNITO_SIGNUP_CONFIRM,
+        destination: `https://${process.env.NEXT_PUBLIC_UnAUTH_API_ID}.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/signup/confirm`,
       },
       {
         source: "/cognito/group/user/list",
-        destination: process.env.NEXT_PUBLIC_COGNITO_GROUP_USER_LIST,
+        destination: `https://${process.env.NEXT_PUBLIC_AUTH_API_ID}.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/group/user/list`,
       },
       {
         source: "/cognito/group/user/add",
-        destination: process.env.NEXT_PUBLIC_COGNITO_GROUP_USER_ADD,
+        destination: `https://${process.env.NEXT_PUBLIC_AUTH_API_ID}.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/group/user/add`,
       },
       {
         source: "/cognito/user/info",
-        destination: process.env.NEXT_PUBLIC_COGNITO_USER_INFO,
+        destination: `https://${process.env.NEXT_PUBLIC_AUTH_API_ID}.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/user/info`,
       },
       {
         source: "/drf/user-contents",

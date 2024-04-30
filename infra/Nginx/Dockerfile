@@ -11,8 +11,10 @@ ENV TZ "Asia/Tokyo"
 
 ARG HOST_DOMAIN
 ENV HOST_DOMAIN=${HOST_DOMAIN}
+ARG APP_DOMAIN
+ENV APP_DOMAIN=${APP_DOMAIN}
 
-COPY nginx.conf.template /etc/nginx/templates/nginx.conf.template
+COPY nginx.conf /etc/nginx/templates/nginx.conf.template
 
 RUN set -x \
     && apkArch="$(cat /etc/apk/arch)" \
@@ -97,4 +99,4 @@ RUN set -x \
 EXPOSE 80
 EXPOSE 443
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/bin/sh", "-c", "envsubst '$HOST_DOMAIN $APP_DOMAIN' < /etc/nginx/templates/nginx.conf.template > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"]

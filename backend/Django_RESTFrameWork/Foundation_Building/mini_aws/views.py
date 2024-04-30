@@ -35,8 +35,6 @@ class APIRoot(generics.ListAPIView):
         filters.OrderingFilter]
 
     def get(self, request, *args, **kwargs):
-        user_queryset = User.objects.all()
-        user_serializer = UserSerializer(user_queryset, many=True)
 
         elasticache_queryset = ElastiCache.objects.all()
         elasticache_serializer = ElastiCacheSerializer(
@@ -44,7 +42,6 @@ class APIRoot(generics.ListAPIView):
 
         return response.Response(
             {
-                'users': user_serializer.data,
                 'elasticache': elasticache_serializer.data
             },
             status=status.HTTP_200_OK)

@@ -38,7 +38,7 @@ ALLOWED_HOSTS = ['*']
 if DEBUG is not True:
     CSRF_TRUSTED_ORIGINS = [
         f"https://{env('HOST_DOMEIN')}",
-        f"http://{env('HOST_DOMEIN')}:8080",
+        f"http://{env('APP_DOMAIN')}:8080",
     ]
     # SECURE_SSL_REDIRECT = True
     # SESSION_COOKIE_SECURE = True
@@ -129,7 +129,7 @@ else:
 # CORS
 CORS_ALLOWED_ORIGINS = [
     f"https://{env('HOST_DOMEIN')}",
-    f"http://{env('LOCAL_DOMEIN')}",
+    f"http://{env('APP_DOMAIN')}",
 ]
 
 CORS_ALLOW_METHODS = (

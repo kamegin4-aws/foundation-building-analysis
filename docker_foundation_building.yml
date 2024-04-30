@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile
       args:
         - HOST_DOMAIN=${HOST_DOMAIN}
+        - APP_DOMAIN=${APP_DOMAIN}
     image: kamegin4/foundation-building:nginx
     container_name: nginx
     restart: always

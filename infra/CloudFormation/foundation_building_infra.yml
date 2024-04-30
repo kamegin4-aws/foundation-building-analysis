@@ -24,28 +24,29 @@ Metadata:
         - 3d63d8d7-768c-4598-a3f7-3dffdbc00411
         - 9384b3df-130b-4b04-8107-2ea01180adfb
         - ac9c17dc-48e6-4001-abf5-767138f4c670
+        - 5ce5b250-2492-454f-8629-1aa84e7be81e
         - c9b4d4ee-cfb4-4913-a8b1-6b079f2de24a
         - c7875a33-6903-4ddb-b14c-970ff5ef58f5
         - ed43b443-0134-463d-92fa-97721a39eb33
-        - 67c2bab4-f28f-462a-a9ab-ca985467d3d4
     e616c472-8719-4b09-ade8-958721f4dbfa:
       size:
-        width: 420
-        height: 260
+        width: 430
+        height: 410
       position:
         x: 320
         'y': 220
       z: 1
       parent: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
       embeds:
+        - 12feec27-08b7-49bb-ad2e-c5d91794edff
+        - f880c388-26e5-45ed-bd6d-0f6b15d7b464
         - 5a43d249-4eb3-4135-88e1-a6cd6265ee48
-        - 999c3473-1ef3-4fbf-a45f-b678fe148865
-        - 55bf8504-814b-4f73-b648-3cf6fb8e6bc2
         - 4703e375-3d3c-4cc5-b7ff-fd132e5bc879
-        - 1777cda4-260c-412c-a894-fef4a80ad684
-        - f36be177-cec3-4a07-87d8-840610a53221
         - 858329c2-e110-4f9a-819e-41d58272fe7c
         - 09adaace-5635-4afd-a037-758ca6091634
+        - a6a6320c-95bb-4b75-ad09-804ea053ed8c
+        - 25d3c3f7-5a53-4737-b2dc-20466b4528da
+        - 66f7b881-80b6-4a5b-8ecf-6427532dcc24
     c172b2b4-1e18-46f4-a9ac-e5feefb27c6d:
       size:
         width: 140
@@ -94,8 +95,8 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 1240
-        'y': 240
+        x: 1160
+        'y': 230
       z: 1
       parent: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
       embeds: []
@@ -104,8 +105,8 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 1250
-        'y': 320
+        x: 1170
+        'y': 330
       z: 1
       parent: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
       embeds: []
@@ -163,16 +164,6 @@ Metadata:
       z: 2
       parent: e616c472-8719-4b09-ade8-958721f4dbfa
       embeds: []
-    55bf8504-814b-4f73-b648-3cf6fb8e6bc2:
-      size:
-        width: 60
-        height: 60
-      position:
-        x: 340
-        'y': 320
-      z: 2
-      parent: e616c472-8719-4b09-ade8-958721f4dbfa
-      embeds: []
     09adaace-5635-4afd-a037-758ca6091634:
       size:
         width: 60
@@ -200,38 +191,8 @@ Metadata:
         width: 130
         height: 126.62577069354427
       position:
-        x: 330
-        'y': 540
-      z: 1
-      parent: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
-      embeds: []
-    f36be177-cec3-4a07-87d8-840610a53221:
-      size:
-        width: 60
-        height: 60
-      position:
-        x: 570
-        'y': 300
-      z: 2
-      parent: e616c472-8719-4b09-ade8-958721f4dbfa
-      embeds: []
-    1777cda4-260c-412c-a894-fef4a80ad684:
-      size:
-        width: 60
-        height: 60
-      position:
-        x: 650
-        'y': 300
-      z: 2
-      parent: e616c472-8719-4b09-ade8-958721f4dbfa
-      embeds: []
-    67c2bab4-f28f-462a-a9ab-ca985467d3d4:
-      size:
-        width: 60
-        height: 60
-      position:
-        x: 1470
-        'y': 340
+        x: 350
+        'y': 700
       z: 1
       parent: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
       embeds: []
@@ -260,8 +221,8 @@ Metadata:
         width: 140
         height: 140
       position:
-        x: 564.1049586736016
-        'y': 532.3313254556795
+        x: 640
+        'y': 680
       z: 1
       parent: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
       embeds: []
@@ -284,16 +245,6 @@ Metadata:
         'y': 500.0696468059381
       z: 1
       parent: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
-      embeds: []
-    999c3473-1ef3-4fbf-a45f-b678fe148865:
-      size:
-        width: 60
-        height: 60
-      position:
-        x: 340
-        'y': 400
-      z: 2
-      parent: e616c472-8719-4b09-ade8-958721f4dbfa
       embeds: []
     bd476613-5374-4df3-a7c5-06e03a5e509a:
       size:
@@ -319,7 +270,7 @@ Metadata:
         height: 60
       position:
         x: 450
-        'y': 370
+        'y': 300
       z: 2
       parent: e616c472-8719-4b09-ade8-958721f4dbfa
       embeds: []
@@ -356,6 +307,66 @@ Metadata:
       position:
         x: 1360
         'y': 680
+      z: 1
+      parent: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
+      embeds: []
+    a6a6320c-95bb-4b75-ad09-804ea053ed8c:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 340
+        'y': 520
+      z: 2
+      parent: e616c472-8719-4b09-ade8-958721f4dbfa
+      embeds: []
+    66f7b881-80b6-4a5b-8ecf-6427532dcc24:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 570
+        'y': 400
+      z: 2
+      parent: e616c472-8719-4b09-ade8-958721f4dbfa
+      embeds: []
+    f880c388-26e5-45ed-bd6d-0f6b15d7b464:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 440
+        'y': 450
+      z: 2
+      parent: e616c472-8719-4b09-ade8-958721f4dbfa
+      embeds: []
+    25d3c3f7-5a53-4737-b2dc-20466b4528da:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 660
+        'y': 390
+      z: 2
+      parent: e616c472-8719-4b09-ade8-958721f4dbfa
+      embeds: []
+    12feec27-08b7-49bb-ad2e-c5d91794edff:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 440
+        'y': 530
+      z: 2
+      parent: e616c472-8719-4b09-ade8-958721f4dbfa
+      embeds: []
+    5ce5b250-2492-454f-8629-1aa84e7be81e:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 1270
+        'y': 280
       z: 1
       parent: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
       embeds: []
@@ -494,14 +505,6 @@ Resources:
           FromPort: 443
           ToPort: 443
           CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 8080
-          ToPort: 8080
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 8081
-          ToPort: 8081
-          CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         - IpProtocol: '-1'
           FromPort: -1
@@ -603,52 +606,6 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 180e2ee1-8578-4629-b20b-4cd47d57f011
-  ExternalELBPresentationListener:
-    Type: 'AWS::ElasticLoadBalancingV2::Listener'
-    Properties:
-      DefaultActions:
-        - Type: forward
-          TargetGroupArn: !GetAtt PresentationTargetGroup.TargetGroupArn
-      LoadBalancerArn: !GetAtt ExternalLoadBalancer.LoadBalancerArn
-      Port: 8080
-      Protocol: HTTP
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: f36be177-cec3-4a07-87d8-840610a53221
-  ExternalELBAppListener:
-    Type: 'AWS::ElasticLoadBalancingV2::Listener'
-    Properties:
-      DefaultActions:
-        - Type: forward
-          TargetGroupArn: !GetAtt ApplicationTargetGroup.TargetGroupArn
-      LoadBalancerArn: !GetAtt ExternalLoadBalancer.LoadBalancerArn
-      Port: 8081
-      Protocol: HTTP
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 1777cda4-260c-412c-a894-fef4a80ad684
-  EFSSecurityGroup:
-    Type: 'AWS::EC2::SecurityGroup'
-    Properties:
-      GroupDescription: Allow access from public and private subnet
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 2049
-          ToPort: 2049
-          SourceSecurityGroupId: !Ref PublicSecurityGroup
-        - IpProtocol: tcp
-          FromPort: 2049
-          ToPort: 2049
-          SourceSecurityGroupId: !Ref PrivateSecurityGroup
-      SecurityGroupEgress:
-        - IpProtocol: '-1'
-          FromPort: -1
-          ToPort: -1
-          CidrIp: 0.0.0.0/0
-      VpcId: !Ref VPC
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 67c2bab4-f28f-462a-a9ab-ca985467d3d4
   VPCLogsEndpoint:
     Type: 'AWS::EC2::VPCEndpoint'
     Properties:
@@ -855,62 +812,6 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 9675c918-4365-4b04-a9ef-1090d3f06346
-  PresentationTargetGroup:
-    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
-    Properties:
-      HealthCheckEnabled: true
-      HealthCheckIntervalSeconds: 35
-      HealthCheckPath: /
-      HealthCheckPort: '8080'
-      HealthCheckProtocol: HTTP
-      HealthCheckTimeoutSeconds: 30
-      HealthyThresholdCount: 5
-      Name: PresentationTargetGroup
-      Port: 8080
-      Protocol: HTTP
-      TargetType: ip
-      UnhealthyThresholdCount: 2
-      VpcId: !Ref VPC
-      TargetGroupAttributes:
-        - Key: stickiness.enabled
-          Value: 'true'
-        - Key: stickiness.type
-          Value: lb_cookie
-        - Key: stickiness.lb_cookie.duration_seconds
-          Value: '3600'
-        - Key: deregistration_delay.timeout_seconds
-          Value: '300'
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 55bf8504-814b-4f73-b648-3cf6fb8e6bc2
-  ApplicationTargetGroup:
-    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
-    Properties:
-      HealthCheckEnabled: true
-      HealthCheckIntervalSeconds: 35
-      HealthCheckPath: /
-      HealthCheckPort: '8081'
-      HealthCheckProtocol: HTTP
-      HealthCheckTimeoutSeconds: 30
-      HealthyThresholdCount: 5
-      Name: ApplicationTargetGroup
-      Port: 8081
-      Protocol: HTTP
-      TargetType: ip
-      UnhealthyThresholdCount: 2
-      VpcId: !Ref VPC
-      TargetGroupAttributes:
-        - Key: stickiness.enabled
-          Value: 'true'
-        - Key: stickiness.type
-          Value: lb_cookie
-        - Key: stickiness.lb_cookie.duration_seconds
-          Value: '3600'
-        - Key: deregistration_delay.timeout_seconds
-          Value: '300'
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 999c3473-1ef3-4fbf-a45f-b678fe148865
   WebTargetGroup:
     Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
     Properties:
@@ -980,6 +881,112 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: b905d21b-a08c-489f-88d5-c1668033a80e
+  InternalLoadBalancer:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      Name: InternalLoadBalancer
+      Scheme: internal
+      SecurityGroups:
+        - !Ref InternalLoadBalancerSecurityGroup
+      Subnets:
+        - !Ref PublicSubnet
+        - !Ref PublicSubnet2
+      Type: network
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: a6a6320c-95bb-4b75-ad09-804ea053ed8c
+  InternalELBPresentationListener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      DefaultActions:
+        - Type: forward
+          ForwardConfig:
+            TargetGroups:
+              - TargetGroupArn: !GetAtt
+                  - PresentationTargetGroup
+                  - TargetGroupArn
+      LoadBalancerArn: !GetAtt
+        - InternalLoadBalancer
+        - LoadBalancerArn
+      Port: 8080
+      Protocol: TCP
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 66f7b881-80b6-4a5b-8ecf-6427532dcc24
+  PresentationTargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: 35
+      HealthCheckPath: /
+      HealthCheckPort: '8080'
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 30
+      HealthyThresholdCount: 5
+      Name: PresentationTargetGroup
+      Port: 8080
+      Protocol: TCP
+      TargetType: ip
+      UnhealthyThresholdCount: 2
+      VpcId: !Ref VPC
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: f880c388-26e5-45ed-bd6d-0f6b15d7b464
+  InternalELBApplicationListener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      DefaultActions:
+        - Type: forward
+          ForwardConfig:
+            TargetGroups:
+              - TargetGroupArn: !GetAtt
+                  - ApplicationTargetGroup
+                  - TargetGroupArn
+      LoadBalancerArn: !GetAtt
+        - InternalLoadBalancer
+        - LoadBalancerArn
+      Port: 8081
+      Protocol: TCP
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 25d3c3f7-5a53-4737-b2dc-20466b4528da
+  ApplicationTargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: 35
+      HealthCheckPath: /
+      HealthCheckPort: '8081'
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 30
+      HealthyThresholdCount: 5
+      Name: ApplicationTargetGroup
+      Port: 8081
+      Protocol: TCP
+      TargetType: ip
+      UnhealthyThresholdCount: 2
+      VpcId: !Ref VPC
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 12feec27-08b7-49bb-ad2e-c5d91794edff
+  InternalLoadBalancerSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Allow access from Public
+      SecurityGroupIngress:
+        - IpProtocol: '-1'
+          FromPort: -1
+          ToPort: -1
+          SourceSecurityGroupId: !Ref PublicSecurityGroup
+      SecurityGroupEgress:
+        - IpProtocol: '-1'
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref VPC
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 5ce5b250-2492-454f-8629-1aa84e7be81e
 Parameters:
   SSHLocation:
     Description: ' The IP address range that can be used to access the web server using SSH.'
@@ -1002,6 +1009,9 @@ Parameters:
     Type: String
     Default: 'arn:aws:acm:ap-northeast-1:XXXXXXXXX:certificate/XXXX'
 Outputs:
+  AppDomain:
+    Value: !GetAtt InternalLoadBalancer.DNSName
+    Description: InternalLoadBalancer.DNSName
   VPCId:
     Value: !GetAtt VPC.VpcId
     Description: VPC.VpcId
@@ -1035,3 +1045,6 @@ Outputs:
   RDSSecurityGroupId:
     Value: !GetAtt RDSSecurityGroup.GroupId
     Description: RDSSecurityGroup.GroupId
+  InternalELBSecurityGroupId:
+    Value: !GetAtt InternalLoadBalancerSecurityGroup.GroupId
+    Description: InternalLoadBalancerSecurityGroup.GroupId
