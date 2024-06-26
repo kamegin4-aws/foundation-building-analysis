@@ -1,0 +1,281 @@
+Resources:
+  DBCluster:
+    Type: AWS::RDS::DBCluster
+    Properties:
+      DBClusterIdentifier: aurora-postgresql-cluster
+      Engine: aurora-postgresql
+      EngineMode: provisioned
+      EngineVersion: !Ref dbEngineVersion
+      DatabaseName: foundation_building
+      DBClusterParameterGroupName: !Ref dbClusterParameterGroupName
+      MasterUsername: foundation_building
+      ManageMasterUserPassword: true
+      MasterUserSecret:
+        KmsKeyId: !Ref AuroraKey
+      StorageEncrypted: true
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      VpcSecurityGroupIds:
+        - !ImportValue rdsSecurityGroupId
+  DBInstance1:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: aurora-postgresql-instance1
+      DBInstanceClass: db.t3.medium
+      Engine: aurora-postgresql
+      DBClusterIdentifier: !Ref DBCluster
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: DBSubnetGroup
+      SubnetIds:
+        - !ImportValue privateSubnet1Id
+        - !ImportValue privateSubnet2Id
+  ObjectStorage:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AWS::StackName}-objects-${AWS::AccountId}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: alias/aws/s3
+      PublicAccessBlockConfiguration:
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+      VersioningConfiguration:
+        Status: Enabled
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - '*'
+            AllowedMethods:
+              - HEAD
+              - GET
+              - PUT
+              - POST
+              - DELETE
+            AllowedOrigins:
+              - !Sub https://${domain}
+              - !Sub
+                - http://${appDomain}
+                - appDomain: !ImportValue appDomain
+            ExposedHeaders:
+              - ETag
+              - x-amz-meta-custom-header
+            Id: myCORSRuleId1
+            MaxAge: 3600
+  ObjectStorageBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ObjectStorage
+      PolicyDocument:
+        Id: RequireEncryptionInTransit
+        Version: '2012-10-17'
+        Statement:
+          - Sid: default-policy
+            Principal: '*'
+            Action: '*'
+            Effect: Deny
+            Resource:
+              - !GetAtt ObjectStorage.Arn
+              - !Sub ${ObjectStorage.Arn}/*
+            Condition:
+              Bool:
+                aws:SecureTransport: 'false'
+          - Sid: AllowCloudFront
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub arn:aws:s3:::${ObjectStorage}/*
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${Distribution}
+          - Sid: AllowGlue
+            Effect: Allow
+            Principal:
+              Service: glue.amazonaws.com
+            Action: 's3:*'
+            Resource: !Sub arn:aws:s3:::${ObjectStorage}/*
+            Condition:
+              StringEquals:
+                aws:PrincipalAccount: !Ref AWS::AccountId
+          - Sid: AllowVPC
+            Effect: Allow
+            Principal: '*'
+            Action: 's3:*'
+            Resource: !Sub arn:aws:s3:::${ObjectStorage}/*
+            Condition:
+              StringEquals:
+                aws:sourceVpc: !ImportValue vpcId
+  Distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        DefaultCacheBehavior:
+          TargetOriginId: !GetAtt ObjectStorage.RegionalDomainName
+          ViewerProtocolPolicy: allow-all
+          CachePolicyId: !GetAtt CachePolicy.Id
+        Enabled: true
+        Origins:
+          - DomainName: !GetAtt ObjectStorage.RegionalDomainName
+            Id: !GetAtt ObjectStorage.RegionalDomainName
+            OriginAccessControlId: !GetAtt OriginAccessControl.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        SigningBehavior: always
+        OriginAccessControlOriginType: s3
+        SigningProtocol: sigv4
+        Name: ObjectStorageOAC
+  CachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        MinTTL: 300
+        MaxTTL: 31536000
+        ParametersInCacheKeyAndForwardedToOrigin:
+          HeadersConfig:
+            HeaderBehavior: none
+          CookiesConfig:
+            CookieBehavior: none
+          EnableAcceptEncodingGzip: true
+          QueryStringsConfig:
+            QueryStringBehavior: none
+        DefaultTTL: 86400
+        Name: CloudfrontCachePolicy
+  ServerlessCache:
+    Type: AWS::ElastiCache::ServerlessCache
+    Properties:
+      ServerlessCacheName: serverless-cache
+      Engine: memcached
+      Description: My Serverless memcached Cache
+      KmsKeyId: !Ref ElasticCacheKey
+      SecurityGroupIds:
+        - !ImportValue elastiCacheSecurityGroupId
+      SubnetIds:
+        - !ImportValue privateSubnet1Id
+        - !ImportValue privateSubnet2Id
+  ElasticCacheKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: My Symmetric Encryption Key
+      Enabled: true
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Id: key-default-ElasticCacheKey
+        Statement:
+          - Sid: Allow use of the key
+            Effect: Allow
+            Principal:
+              AWS: !Ref userArn1
+            Action:
+              - kms:*
+            Resource: '*'
+          - Sid: Allow use2 of the key
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::{AWS::AccountId}:root
+            Action:
+              - kms:*
+              - sts:AssumeRole
+              - sts:AssumeRoleWithWebIdentity
+            Condition:
+              ArnLike:
+                aws:PrincipalArn: !Ref userArn2
+            Resource: '*'
+          - Sid: Allow use of the key from VPC
+            Effect: Allow
+            Principal: '*'
+            Action:
+              - kms:*
+            Resource: '*'
+            Condition:
+              StringEquals:
+                aws:sourceVpc: !ImportValue vpcId
+          - Sid: Allow use of the key from ElastiCache
+            Effect: Allow
+            Principal:
+              Service: elasticache.amazonaws.com
+            Action:
+              - kms:*
+            Resource: '*'
+            Condition:
+              StringEquals:
+                aws:PrincipalAccount: !Ref AWS::AccountId
+  AuroraKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: My Symmetric Encryption Key
+      Enabled: true
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Id: key-default-AuroraKey
+        Statement:
+          - Sid: Allow use of the key
+            Effect: Allow
+            Principal:
+              AWS: !Ref userArn1
+            Action:
+              - kms:*
+            Resource: '*'
+          - Sid: Allow use2 of the key
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::{AWS::AccountId}:root
+            Action:
+              - kms:*
+              - sts:AssumeRole
+              - sts:AssumeRoleWithWebIdentity
+            Condition:
+              ArnLike:
+                aws:PrincipalArn: !Ref userArn2
+            Resource: '*'
+          - Sid: Allow use of the key from VPC
+            Effect: Allow
+            Principal: '*'
+            Action:
+              - kms:*
+            Resource: '*'
+            Condition:
+              StringEquals:
+                aws:sourceVpc: !ImportValue vpcId
+          - Sid: Allow use of the key from rds
+            Effect: Allow
+            Principal:
+              Service: rds.amazonaws.com
+            Action:
+              - kms:*
+            Resource: '*'
+            Condition:
+              StringEquals:
+                aws:PrincipalAccount: !Ref AWS::AccountId
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  dbEngineVersion:
+    Description: dbEngineVersion
+    Type: String
+    Default: 13.13
+  dbClusterParameterGroupName:
+    Description: dbClusterParameterGroupName
+    Type: String
+    Default: default.aurora-postgresql13
+  domain:
+    Description: A NAME(ELB)
+    Type: String
+    Default: foundation-building.XXXX.com.
+  userArn1:
+    Description: Developer User ARNs
+    Type: String
+    Default: arn:aws:iam::XXXX:user/XXXX
+  userArn2:
+    Description: Developer User ARNs
+    Type: String
+    Default: arn:aws:sts::XXXX:assumed-role/AWSReservedSSO_AdministratorAccess_XXXX
