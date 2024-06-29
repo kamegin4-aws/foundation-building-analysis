@@ -37,8 +37,7 @@ Resources:
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
-              SSEAlgorithm: aws:kms
-              KMSMasterKeyID: alias/aws/s3
+              SSEAlgorithm: AES256
       PublicAccessBlockConfiguration:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
@@ -97,15 +96,15 @@ Resources:
             Effect: Allow
             Principal:
               Service: glue.amazonaws.com
-            Action: 's3:*'
+            Action: s3:*
             Resource: !Sub arn:aws:s3:::${ObjectStorage}/*
             Condition:
               StringEquals:
-                aws:PrincipalAccount: !Ref AWS::AccountId
+                aws:ResourceAccount: !Ref AWS::AccountId
           - Sid: AllowVPC
             Effect: Allow
             Principal: '*'
-            Action: 's3:*'
+            Action: s3:*
             Resource: !Sub arn:aws:s3:::${ObjectStorage}/*
             Condition:
               StringEquals:
@@ -174,21 +173,11 @@ Resources:
           - Sid: Allow use of the key
             Effect: Allow
             Principal:
-              AWS: !Ref userArn1
+              AWS:
+                - !Sub arn:aws:iam::${AWS::AccountId}:root
+                - !Sub arn:aws:sts::${AWS::AccountId}:federated-user/${userName}
             Action:
               - kms:*
-            Resource: '*'
-          - Sid: Allow use2 of the key
-            Effect: Allow
-            Principal:
-              AWS: !Sub arn:aws:iam::{AWS::AccountId}:root
-            Action:
-              - kms:*
-              - sts:AssumeRole
-              - sts:AssumeRoleWithWebIdentity
-            Condition:
-              ArnLike:
-                aws:PrincipalArn: !Ref userArn2
             Resource: '*'
           - Sid: Allow use of the key from VPC
             Effect: Allow
@@ -208,7 +197,7 @@ Resources:
             Resource: '*'
             Condition:
               StringEquals:
-                aws:PrincipalAccount: !Ref AWS::AccountId
+                aws:ResourceAccount: !Ref AWS::AccountId
   AuroraKey:
     Type: AWS::KMS::Key
     Properties:
@@ -222,21 +211,11 @@ Resources:
           - Sid: Allow use of the key
             Effect: Allow
             Principal:
-              AWS: !Ref userArn1
+              AWS:
+                - !Sub arn:aws:iam::${AWS::AccountId}:root
+                - !Sub arn:aws:sts::${AWS::AccountId}:federated-user/${userName}
             Action:
               - kms:*
-            Resource: '*'
-          - Sid: Allow use2 of the key
-            Effect: Allow
-            Principal:
-              AWS: !Sub arn:aws:iam::{AWS::AccountId}:root
-            Action:
-              - kms:*
-              - sts:AssumeRole
-              - sts:AssumeRoleWithWebIdentity
-            Condition:
-              ArnLike:
-                aws:PrincipalArn: !Ref userArn2
             Resource: '*'
           - Sid: Allow use of the key from VPC
             Effect: Allow
@@ -256,7 +235,7 @@ Resources:
             Resource: '*'
             Condition:
               StringEquals:
-                aws:PrincipalAccount: !Ref AWS::AccountId
+                aws:ResourceAccount: !Ref AWS::AccountId
 Transform: AWS::Serverless-2016-10-31
 Parameters:
   dbEngineVersion:
@@ -271,11 +250,7 @@ Parameters:
     Description: A NAME(ELB)
     Type: String
     Default: foundation-building.XXXX.com.
-  userArn1:
-    Description: Developer User ARNs
+  userName:
+    Description: User Name
     Type: String
-    Default: arn:aws:iam::XXXX:user/XXXX
-  userArn2:
-    Description: Developer User ARNs
-    Type: String
-    Default: arn:aws:sts::XXXX:assumed-role/AWSReservedSSO_AdministratorAccess_XXXX
+    Default: XXXX
