@@ -1,0 +1,53 @@
+Resources:
+  APIAccount:
+    Type: AWS::ApiGateway::Account
+    Properties:
+      CloudWatchRoleArn: !GetAtt APIGatewayRole.Arn
+  APIGatewayRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowAPIGateway
+            Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:ResourceAccount: !Ref AWS::AccountId
+  DockerHubSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: DockerHubSecret
+      Description: DockerHubSecret
+      SecretString: !Ref dockerCredentialsParameter
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: Cluster
+      CapacityProviders:
+        - FARGATE
+        - FARGATE_SPOT
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  dockerCredentialsParameter:
+    Type: String
+    Description: DockerHub credentials
+    Default: '{"username":"XXXX","password":"XXXX"}'
+Outputs:
+  clusterArn:
+    Value: !GetAtt Cluster.Arn
+    Description: Cluster Arn
+    Export:
+      Name: clusterArn
+  dockerHubSecretArn:
+    Value: !Ref DockerHubSecret
+    Description: DockerHubSecret ARN
+    Export:
+      Name: dockerHubSecretArn

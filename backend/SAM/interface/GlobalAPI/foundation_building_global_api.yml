@@ -1,0 +1,489 @@
+Resources:
+  LambdaCognitoRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AWS::StackName}-LambdaRole
+      Path: /
+      MaxSessionDuration: 3600
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AmazonCognitoPowerUser
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:ResourceAccount: !Ref AWS::AccountId
+  Login:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: Login
+      CodeUri: src/Login
+      Handler: handler.handler
+      Runtime: python3.12
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Role: !GetAtt LambdaCognitoRole.Arn
+      Environment:
+        Variables:
+          USER_POOL_ID: !ImportValue userPoolId
+          CLIENT_ID: !ImportValue userPoolClientId
+          CLIENT_SECRET: !Ref clientSecret
+      Events:
+        CognitoPOSTcognitologin:
+          Type: Api
+          Properties:
+            Path: /cognito/login
+            Method: POST
+            RestApiId: !Ref CognitoAPI
+  LoginLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${Login}
+      RetentionInDays: 7
+  Logout:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: Logout
+      CodeUri: src/Logout
+      Handler: handler.handler
+      Runtime: python3.12
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Role: !GetAtt LambdaCognitoRole.Arn
+      Events:
+        CognitoPOSTcognitologout:
+          Type: Api
+          Properties:
+            Path: /cognito/logout
+            Method: POST
+            RestApiId: !Ref CognitoAPI
+      Environment:
+        Variables:
+          USER_POOL_ID: !ImportValue userPoolId
+          CLIENT_ID: !ImportValue userPoolClientId
+          CLIENT_SECRET: !Ref clientSecret
+  LogoutLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${Logout}
+      RetentionInDays: 7
+  CognitoAPILogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${CognitoAPI}
+      RetentionInDays: 7
+  CognitoAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub
+        - ${ResourceName} From Stack ${AWS::StackName}
+        - ResourceName: CognitoAPI
+      StageName: paid
+      Variables:
+        alias: free
+      OpenApiVersion: 3.1.0
+      DefinitionBody:
+        openapi: '3.0'
+        info: {}
+        paths:
+          /cognito/login:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Login.Arn}/invocations
+              responses: {}
+          /cognito/logout:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Logout.Arn}/invocations
+              responses: {}
+          /cognito/signup:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SignUp.Arn}/invocations
+              responses: {}
+          /cognito/signup/confirm:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConfirmSignUp.Arn}/invocations
+              responses: {}
+          /cognito/token/refresh:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TokenRefresh.Arn}/invocations
+              responses: {}
+      EndpointConfiguration: REGIONAL
+      TracingEnabled: true
+      AccessLogSetting:
+        DestinationArn: !GetAtt CognitoAPILogsGroup.Arn
+        Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp",
+          "caller":"$context.identity.caller", "user":"$context.identity.user",
+          "requestTime":"$context.requestTime",
+          "httpMethod":"$context.httpMethod",
+          "resourcePath":"$context.resourcePath", "status":"$context.status",
+          "responseLength":"$context.responseLength" }'
+      Auth:
+        ResourcePolicy:
+          CustomStatements:
+            - Sid: AllowGlobalIPForFree
+              Effect: Allow
+              Principal: '*'
+              Action: execute-api:Invoke
+              Resource:
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/free/*/*
+              Condition:
+                IpAddress:
+                  aws:SourceIp:
+                    - !Ref globalIP
+            - Sid: AllowVPCForFree
+              Effect: Allow
+              Principal: '*'
+              Action: execute-api:Invoke
+              Resource:
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/free/*/*
+              Condition:
+                IpAddress:
+                  aws:sourceVpc:
+                    - !ImportValue vpcId
+            - Sid: AllowGlobalIPForPaid
+              Effect: Allow
+              Principal: '*'
+              Action: execute-api:Invoke
+              Resource:
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/paid/*/*
+              Condition:
+                IpAddress:
+                  aws:SourceIp:
+                    - !Ref globalIP
+            - Sid: AllowVPCForPaid
+              Effect: Allow
+              Principal: '*'
+              Action: execute-api:Invoke
+              Resource:
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/paid/*/*
+              Condition:
+                IpAddress:
+                  aws:sourceVpc:
+                    - !ImportValue vpcId
+      Cors:
+        AllowOrigin: '''*'''
+        AllowHeaders: '''Content-Type, X-Amz-Date, Authorization, X-Api-Key,
+          X-Amz-Security-Token'''
+        AllowMethods: '''*'''
+        MaxAge: 600
+  SignUp:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: SignUp
+      CodeUri: src/SignUp
+      Handler: handler.handler
+      Runtime: python3.12
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Role: !GetAtt LambdaCognitoRole.Arn
+      Events:
+        CognitoPOSTcognitosignup:
+          Type: Api
+          Properties:
+            Path: /cognito/signup
+            Method: POST
+            RestApiId: !Ref CognitoAPI
+      Environment:
+        Variables:
+          USER_POOL_ID: !ImportValue userPoolId
+          CLIENT_ID: !ImportValue userPoolClientId
+          CLIENT_SECRET: !Ref clientSecret
+  SignUpLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${SignUp}
+      RetentionInDays: 7
+  ConfirmSignUp:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: ConfirmSignUp
+      CodeUri: src/ConfirmSignUp
+      Handler: handler.handler
+      Runtime: python3.12
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Role: !GetAtt LambdaCognitoRole.Arn
+      Environment:
+        Variables:
+          USER_POOL_ID: !ImportValue userPoolId
+          CLIENT_ID: !ImportValue userPoolClientId
+          CLIENT_SECRET: !Ref clientSecret
+      Events:
+        CognitoPOSTcognitosignupconfirm:
+          Type: Api
+          Properties:
+            Path: /cognito/signup/confirm
+            Method: POST
+            RestApiId: !Ref CognitoAPI
+  ConfirmSignUpLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${ConfirmSignUp}
+      RetentionInDays: 7
+  GetUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: GetUser
+      CodeUri: src/GetUser
+      Handler: handler.handler
+      Runtime: python3.12
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Role: !GetAtt LambdaCognitoRole.Arn
+      Environment:
+        Variables:
+          USER_POOL_ID: !ImportValue userPoolId
+          CLIENT_ID: !ImportValue userPoolClientId
+          CLIENT_SECRET: !Ref clientSecret
+      Events:
+        CognitoAuthorizedAPIPOSTcognitouserdetail:
+          Type: Api
+          Properties:
+            Path: /cognito/user/detail
+            Method: POST
+            RestApiId: !Ref CognitoAuthorizedAPI
+  GetUserLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${GetUser}
+      RetentionInDays: 7
+  CognitoAuthorizedAPILogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${CognitoAuthorizedAPI}
+      RetentionInDays: 7
+  CognitoAuthorizedAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub
+        - ${ResourceName} From Stack ${AWS::StackName}
+        - ResourceName: CognitoAuthorizedAPI
+      StageName: paid
+      Variables:
+        alias: free
+      OpenApiVersion: 3.1.0
+      DefinitionBody:
+        openapi: '3.0'
+        info: {}
+        paths:
+          /cognito/user/detail:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUser.Arn}/invocations
+              responses: {}
+      EndpointConfiguration: REGIONAL
+      TracingEnabled: true
+      AccessLogSetting:
+        DestinationArn: !GetAtt CognitoAuthorizedAPILogsGroup.Arn
+        Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp",
+          "caller":"$context.identity.caller", "user":"$context.identity.user",
+          "requestTime":"$context.requestTime",
+          "httpMethod":"$context.httpMethod",
+          "resourcePath":"$context.resourcePath", "status":"$context.status",
+          "responseLength":"$context.responseLength" }'
+      Auth:
+        Authorizers:
+          Cognito:
+            UserPoolArn: !ImportValue userPoolArn
+        DefaultAuthorizer: Cognito
+      Cors:
+        AllowOrigin: '''*'''
+        AllowHeaders: '''Content-Type, X-Amz-Date, Authorization, X-Api-Key,
+          X-Amz-Security-Token'''
+        AllowMethods: '''*'''
+        MaxAge: 600
+  LoginVersion:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref Login
+      Description: v1.0
+  SignUpVersion:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref SignUp
+      Description: v1.0
+  ConfirmSignUpVersion:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref ConfirmSignUp
+      Description: v1.0
+  LogoutVersion:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref Logout
+      Description: v1.0
+  GetUserVersion:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref GetUser
+      Description: v1.0
+  LoginFreeAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref Login
+      FunctionVersion: !GetAtt LoginVersion.Version
+      Name: free
+  SignUpFreeAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref SignUp
+      FunctionVersion: !GetAtt SignUpVersion.Version
+      Name: free
+  ConfirmSignUpFreeAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref ConfirmSignUp
+      FunctionVersion: !GetAtt ConfirmSignUpVersion.Version
+      Name: free
+  LogoutFreeAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref Logout
+      FunctionVersion: !GetAtt LogoutVersion.Version
+      Name: free
+  GetUserFreeAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref GetUser
+      FunctionVersion: !GetAtt GetUserVersion.Version
+      Name: free
+  CognitoAPIDeployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref CognitoAPI
+      Description: Cognito deployment
+  CognitoAuthorizedAPIDeployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref CognitoAuthorizedAPI
+      Description: CognitoAuthorized deployment
+  CognitoAPIFreeStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref CognitoAPI
+      StageName: free
+      Description: Free stage
+      DeploymentId: !GetAtt CognitoAPIDeployment.DeploymentId
+      Variables:
+        alias: free
+      AccessLogSetting:
+        DestinationArn: !GetAtt CognitoAPILogsGroup.Arn
+        Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp",
+          "caller":"$context.identity.caller", "user":"$context.identity.user",
+          "requestTime":"$context.requestTime",
+          "httpMethod":"$context.httpMethod",
+          "resourcePath":"$context.resourcePath", "status":"$context.status",
+          "responseLength":"$context.responseLength" }'
+      MethodSettings:
+        - ResourcePath: /*
+          HttpMethod: '*'
+          DataTraceEnabled: true
+          LoggingLevel: INFO
+  CognitoAuthorizedAPIFreeStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref CognitoAuthorizedAPI
+      StageName: free
+      Description: Free stage
+      DeploymentId: !GetAtt CognitoAuthorizedAPIDeployment.DeploymentId
+      Variables:
+        alias: free
+      AccessLogSetting:
+        DestinationArn: !GetAtt CognitoAuthorizedAPILogsGroup.Arn
+        Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp",
+          "caller":"$context.identity.caller", "user":"$context.identity.user",
+          "requestTime":"$context.requestTime",
+          "httpMethod":"$context.httpMethod",
+          "resourcePath":"$context.resourcePath", "status":"$context.status",
+          "responseLength":"$context.responseLength" }'
+      MethodSettings:
+        - ResourcePath: /*
+          HttpMethod: '*'
+          DataTraceEnabled: true
+          LoggingLevel: INFO
+  TokenRefresh:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: TokenRefresh
+      CodeUri: src/TokenRefresh
+      Handler: handler.handler
+      Runtime: python3.12
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Environment:
+        Variables:
+          USER_POOL_ID: !ImportValue userPoolId
+          CLIENT_ID: !ImportValue userPoolClientId
+          CLIENT_SECRET: !Ref clientSecret
+      Events:
+        CognitoPOSTcognitotokenrefresh:
+          Type: Api
+          Properties:
+            Path: /cognito/token/refresh
+            Method: POST
+            RestApiId: !Ref CognitoAPI
+  TokenRefreshLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${TokenRefresh}
+      RetentionInDays: 7
+  TokenRefreshVersion:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref TokenRefresh
+      Description: v1.0
+  TokenRefreshFreeAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref TokenRefresh
+      FunctionVersion: !GetAtt TokenRefreshVersion.Version
+      Name: free
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  globalIP:
+    Type: String
+    Description: Global IP
+    Default: 0.0.0.0
+  clientSecret:
+    Type: String
+    Description: UserPoolClient secret
+    Default: XXXX

@@ -2,26 +2,28 @@ Resources:
   DBCluster:
     Type: AWS::RDS::DBCluster
     Properties:
-      DBClusterIdentifier: aurora-postgresql-cluster
       Engine: aurora-postgresql
       EngineMode: provisioned
-      EngineVersion: !Ref dbEngineVersion
-      DatabaseName: foundation_building
-      DBClusterParameterGroupName: !Ref dbClusterParameterGroupName
+      DBClusterIdentifier: serverless-v2-aurora-postgresql
       MasterUsername: foundation_building
       ManageMasterUserPassword: true
       MasterUserSecret:
         KmsKeyId: !Ref AuroraKey
+      ServerlessV2ScalingConfiguration:
+        MinCapacity: 0.5
+        MaxCapacity: 4
       StorageEncrypted: true
+      EnableHttpEndpoint: true
       DBSubnetGroupName: !Ref DBSubnetGroup
       VpcSecurityGroupIds:
         - !ImportValue rdsSecurityGroupId
-  DBInstance1:
+      EnableCloudwatchLogsExports:
+        - postgresql
+  DBInstance:
     Type: AWS::RDS::DBInstance
     Properties:
-      DBInstanceIdentifier: aurora-postgresql-instance1
-      DBInstanceClass: db.t3.medium
       Engine: aurora-postgresql
+      DBInstanceClass: db.serverless
       DBClusterIdentifier: !Ref DBCluster
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
@@ -56,15 +58,18 @@ Resources:
               - POST
               - DELETE
             AllowedOrigins:
-              - !Sub https://${domain}
               - !Sub
                 - http://${appDomain}
                 - appDomain: !ImportValue appDomain
+              - !Sub https://${hostDomain}
             ExposedHeaders:
               - ETag
               - x-amz-meta-custom-header
             Id: myCORSRuleId1
             MaxAge: 3600
+      LoggingConfiguration:
+        DestinationBucketName: !Ref LoggingBucket
+        LogFilePrefix: foundation_building
   ObjectStorageBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -74,9 +79,9 @@ Resources:
         Version: '2012-10-17'
         Statement:
           - Sid: default-policy
-            Principal: '*'
-            Action: '*'
             Effect: Deny
+            Action: '*'
+            Principal: '*'
             Resource:
               - !GetAtt ObjectStorage.Arn
               - !Sub ${ObjectStorage.Arn}/*
@@ -86,16 +91,18 @@ Resources:
           - Sid: AllowCloudFront
             Effect: Allow
             Principal:
-              Service: cloudfront.amazonaws.com
+              Service:
+                - cloudfront.amazonaws.com
             Action: s3:GetObject
             Resource: !Sub arn:aws:s3:::${ObjectStorage}/*
             Condition:
               StringEquals:
-                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${Distribution}
+                aws:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${Distribution}
           - Sid: AllowGlue
             Effect: Allow
             Principal:
-              Service: glue.amazonaws.com
+              Service:
+                - glue.amazonaws.com
             Action: s3:*
             Resource: !Sub arn:aws:s3:::${ObjectStorage}/*
             Condition:
@@ -108,7 +115,32 @@ Resources:
             Resource: !Sub arn:aws:s3:::${ObjectStorage}/*
             Condition:
               StringEquals:
-                aws:sourceVpc: !ImportValue vpcId
+                aws:SourceVpc: !ImportValue vpcId
+  LoggingBucket:
+    Type: AWS::S3::Bucket
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref LoggingBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - logging.s3.amazonaws.com
+            Action:
+              - s3:PutObject
+            Resource: !Join
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref LoggingBucket
+                - /*
+            Condition:
+              ArnLike:
+                aws:SourceArn: !GetAtt ObjectStorage.Arn
+              StringEquals:
+                aws:SourceAccount: !Sub ${AWS::AccountId}
   Distribution:
     Type: AWS::CloudFront::Distribution
     Properties:
@@ -191,7 +223,8 @@ Resources:
           - Sid: Allow use of the key from ElastiCache
             Effect: Allow
             Principal:
-              Service: elasticache.amazonaws.com
+              Service:
+                - elasticache.amazonaws.com
             Action:
               - kms:*
             Resource: '*'
@@ -229,7 +262,8 @@ Resources:
           - Sid: Allow use of the key from rds
             Effect: Allow
             Principal:
-              Service: rds.amazonaws.com
+              Service:
+                - rds.amazonaws.com
             Action:
               - kms:*
             Resource: '*'
@@ -238,19 +272,17 @@ Resources:
                 aws:ResourceAccount: !Ref AWS::AccountId
 Transform: AWS::Serverless-2016-10-31
 Parameters:
-  dbEngineVersion:
-    Description: dbEngineVersion
-    Type: String
-    Default: 13.13
-  dbClusterParameterGroupName:
-    Description: dbClusterParameterGroupName
-    Type: String
-    Default: default.aurora-postgresql13
-  domain:
-    Description: A NAME(ELB)
-    Type: String
-    Default: foundation-building.XXXX.com.
   userName:
     Description: User Name
     Type: String
     Default: XXXX
+  hostDomain:
+    Description: Host Domain
+    Type: String
+    Default: foundation-building.XXXX.com
+Outputs:
+  objectStorageName:
+    Value: !Ref ObjectStorage
+    Description: ObjectStorage Name
+    Export:
+      Name: objectStorageName

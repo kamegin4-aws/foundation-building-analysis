@@ -1,0 +1,213 @@
+Resources:
+  CloudWatchLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/cognito/${AWS::StackName}-UserPool
+      RetentionInDays: 7
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: false
+      AliasAttributes:
+        - email
+        - preferred_username
+      UserPoolName: !Sub ${AWS::StackName}-UserPool
+      AutoVerifiedAttributes:
+        - email
+      Schema:
+        - Name: plan
+          AttributeDataType: String
+          Mutable: true
+          Required: false
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+      GenerateSecret: true
+  IdentityPool:
+    Type: AWS::Cognito::IdentityPool
+    Properties:
+      AllowUnauthenticatedIdentities: false
+      CognitoIdentityProviders:
+        - ClientId: !GetAtt UserPoolClient.ClientId
+          ProviderName: !Sub cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}
+      IdentityPoolName: CognitoIdentityPool
+  CognitoUserPoolLogDelivery:
+    Type: AWS::Cognito::LogDeliveryConfiguration
+    Properties:
+      UserPoolId: !Ref UserPool
+      LogConfigurations:
+        - CloudWatchLogsConfiguration:
+            LogGroupArn: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/cognito/${AWS::StackName}-UserPool
+          EventSource: userNotification
+          LogLevel: ERROR
+  AuthRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AWS::StackName}-AuthRole
+      Path: /
+      MaxSessionDuration: 3600
+      Policies:
+        - PolicyName: Allow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: AllowAPI
+                Effect: Allow
+                Action:
+                  - execute-api:Invoke
+                Resource: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/free/*
+              - Sid: AllowS3
+                Effect: Allow
+                Action:
+                  - s3:*
+                Resource: !Sub
+                  - arn:aws:s3:::${ObjectStorage}/free/*
+                  - ObjectStorage: !ImportValue objectStorageName
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action: sts:AssumeRoleWithWebIdentity
+            Effect: Allow
+            Principal:
+              Federated: cognito-identity.amazonaws.com
+            Condition:
+              StringEquals:
+                cognito-identity.amazonaws.com:aud: !Ref IdentityPool
+              ForAnyValue:StringLike:
+                cognito-identity.amazonaws.com:amr: authenticated
+  UnAuthRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AWS::StackName}-UnAuthRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/job-function/ViewOnlyAccess
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: '2008-10-17'
+        Statement:
+          - Action: sts:AssumeRoleWithWebIdentity
+            Effect: Allow
+            Principal:
+              Federated: cognito-identity.amazonaws.com
+            Condition:
+              StringEquals:
+                cognito-identity.amazonaws.com:aud: !Ref IdentityPool
+              ForAnyValue:StringLike:
+                cognito-identity.amazonaws.com:amr: unauthenticated
+  FreeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AWS::StackName}-FreeRole
+      Path: /
+      MaxSessionDuration: 3600
+      Policies:
+        - PolicyName: Allow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: AllowAPI
+                Effect: Allow
+                Action:
+                  - execute-api:Invoke
+                Resource: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/free/*
+              - Sid: AllowS3
+                Effect: Allow
+                Action:
+                  - s3:*
+                Resource: !Sub
+                  - arn:aws:s3:::${ObjectStorage}/free/*
+                  - ObjectStorage: !ImportValue objectStorageName
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action: sts:AssumeRoleWithWebIdentity
+            Effect: Allow
+            Principal:
+              Federated: cognito-identity.amazonaws.com
+            Condition:
+              StringEquals:
+                cognito-identity.amazonaws.com:aud: !Ref IdentityPool
+              ForAnyValue:StringLike:
+                cognito-identity.amazonaws.com:amr: authenticated
+  PaidRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AWS::StackName}-PaidRole
+      Path: /
+      MaxSessionDuration: 3600
+      Policies:
+        - PolicyName: Allow
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: AllowAPI
+                Effect: Allow
+                Action:
+                  - execute-api:Invoke
+                Resource: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/paid/*
+              - Sid: AllowS3
+                Effect: Allow
+                Action:
+                  - s3:*
+                Resource: !Sub
+                  - arn:aws:s3:::${ObjectStorage}/paid/*
+                  - ObjectStorage: !ImportValue objectStorageName
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action: sts:AssumeRoleWithWebIdentity
+            Effect: Allow
+            Principal:
+              Federated: cognito-identity.amazonaws.com
+            Condition:
+              StringEquals:
+                cognito-identity.amazonaws.com:aud: !Ref IdentityPool
+              ForAnyValue:StringLike:
+                cognito-identity.amazonaws.com:amr: authenticated
+  IdentityPoolRoleAttachment:
+    Type: AWS::Cognito::IdentityPoolRoleAttachment
+    Properties:
+      IdentityPoolId: !Ref IdentityPool
+      Roles:
+        authenticated: !GetAtt AuthRole.Arn
+        unauthenticated: !GetAtt UnAuthRole.Arn
+      RoleMappings:
+        ModelServingMapping:
+          Type: Rules
+          AmbiguousRoleResolution: Deny
+          IdentityProvider: !Sub cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}:${UserPoolClient.ClientId}
+          RulesConfiguration:
+            Rules:
+              - Claim: custom:plan
+                MatchType: Equals
+                Value: Paid
+                RoleARN: !GetAtt PaidRole.Arn
+              - Claim: custom:plan
+                MatchType: Equals
+                Value: Free
+                RoleARN: !GetAtt FreeRole.Arn
+Transform: AWS::Serverless-2016-10-31
+Outputs:
+  userPoolId:
+    Value: !Ref UserPool
+    Description: UserPool ID
+    Export:
+      Name: userPoolId
+  userPoolArn:
+    Value: !GetAtt UserPool.Arn
+    Description: UserPool ARN
+    Export:
+      Name: userPoolArn
+  userPoolClientId:
+    Value: !GetAtt UserPoolClient.ClientId
+    Description: UserPoolClient ID
+    Export:
+      Name: userPoolClientId
+  identityPoolId:
+    Value: !Ref IdentityPool
+    Description: IdentityPool ID
+    Export:
+      Name: identityPoolId
