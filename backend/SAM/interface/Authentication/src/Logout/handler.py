@@ -1,10 +1,11 @@
-import json
-import boto3
-import os
-import logging
-from cgi import parse_header, parse_multipart
-import traceback
 import io
+import json
+import logging
+import os
+import traceback
+from cgi import parse_header, parse_multipart
+
+import boto3
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -12,7 +13,7 @@ logger.setLevel(logging.INFO)
 
 def handler(event, context):
     # Log the event argument for debugging and for use in local development.
-    logger.debug(f'Received event: {json.dumps(event,indent=2)}')
+    logger.debug(f'Received event: {json.dumps(event, indent=2)}')
 
     try:
         if ('body' in event):
