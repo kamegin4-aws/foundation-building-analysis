@@ -147,14 +147,20 @@ Resources:
                 Effect: Allow
                 Action:
                   - execute-api:Invoke
-                Resource: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/paid/*
+                Resource:
+                  - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/paid/*
+                  - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/free/*
               - Sid: AllowS3
                 Effect: Allow
                 Action:
                   - s3:*
-                Resource: !Sub
-                  - arn:aws:s3:::${ObjectStorage}/paid/*
-                  - ObjectStorage: !ImportValue objectStorageName
+                Resource:
+                  - !Sub
+                    - arn:aws:s3:::${ObjectStorage}/paid/*
+                    - ObjectStorage: !ImportValue objectStorageName
+                  - !Sub
+                    - arn:aws:s3:::${ObjectStorage}/free/*
+                    - ObjectStorage: !ImportValue objectStorageName
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:

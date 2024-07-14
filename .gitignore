@@ -39,7 +39,7 @@ next-env.d.ts
 
 ###### Backend ######
 
-envDjango/
+envSAM/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
