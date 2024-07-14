@@ -1,5 +1,9 @@
 import traceback
+import logging
 from library.token.interface.token import IToken
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class Cognito(IToken):
@@ -12,7 +16,7 @@ class Cognito(IToken):
 
             return result
         except Exception:
-            print(traceback.format_exc())
+            logger.error(traceback.format_exc())
             raise RuntimeError(f'client error: {traceback.format_exc()}')
 
     def id_token_user_validation(self, *, id_token, user_name):
@@ -22,5 +26,5 @@ class Cognito(IToken):
 
             return result
         except Exception:
-            print(traceback.format_exc())
+            logger.error(traceback.format_exc())
             raise RuntimeError(f'client error: {traceback.format_exc()}')

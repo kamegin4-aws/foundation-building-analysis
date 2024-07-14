@@ -1,0 +1,22 @@
+@startuml
+' Entities
+entity "User" as user {
+  +user_id: varchar: Cognito User ID [PK]
+  --
+}
+
+entity "InMemoryData" as in_memory_data {
+  +id: varchar: データID [PK]
+  --
+  key: varchar: キー
+  value: varchar: バリュー
+  created_at: timestamptz: 作成日時
+  updated_at : timestamptz: 更新日時
+  user_id: varchar [FK]
+  unique : [user_id, key] 
+}
+
+' Relationships
+user ||--o{ in_memory_data: "Key:Valueデータを保存"
+
+@enduml

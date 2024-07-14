@@ -13,7 +13,7 @@ class IToken(metaclass=abc.ABCMeta):
             id_token (str): IDトークン
 
         Returns:
-            result (boolean): 検証合格:True。
+            result (boolean | dict): 検証合格:トークン, 不合格:False。
         """
         raise NotImplementedError()
 

@@ -1,12 +1,11 @@
-from django.urls import path
-from mini_aws import views
+from django.urls import include, path
+from mini_aws.views import InMemoryDataViewSet, UserViewSet
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r'cognitousers', UserViewSet)
+router.register(r'inmemorydata', InMemoryDataViewSet)
 
 urlpatterns = [
-    path('', views.APIRoot.as_view()),
-    path('elasticache', views.ElastiCacheList.as_view()),
-    path('elasticache/<uuid:pk>', views.ElastiCacheDetail.as_view()),
-    path('user-contents', views.UserContentsList.as_view()),
-    path('user-contents/<str:pk>', views.UserContentsDetail.as_view()),
-    path('users', views.UserList.as_view()),
-    path('users/<int:pk>', views.UserDetail.as_view()),
+    path('', include(router.urls)),
 ]

@@ -1,5 +1,5 @@
 [project]
-name = "Django_RF"
+name = "Django_RESTFrameWork"
 version = "0.0.1"
 
 [build-system]
@@ -10,8 +10,8 @@ build-backend = "poetry.core.masonry.api"
 name = "Foundation_Building"
 version = "0.1.0"
 packages = [
-  { include = "Foundation_Building/library" },
   { include = "Foundation_Building/Foundation_Building" },
+  { include = "Foundation_Building/library" },
 ]
 authors = ["kamegin4-aws <kamegin4@outlook.jp>"]
 description = "Backend App of Foundation_Building"
@@ -24,18 +24,16 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.10"
-django = "^5.0.2"
-djangorestframework = "^3.14.0"
-markdown = "^3.5.2"
-django-filter = "^23.5"
-pygments = "^2.17.2"
-psycopg2-binary = "^2.9.9"
-django-environ = "^0.11.2"
-pymemcache = "^4.0.0"
+python = "^3.12.1"
+django = "^5.0.7"
+djangorestframework = "^3.15.2"
+pygments = "^2.18.0"
+django-filter = "^24.2"
 pyjwt = { extras = ["crypto"], version = "^2.8.0" }
-datetime = "^5.4"
-django-cors-headers = "^4.3.1"
+pymemcache = "^4.0.0"
+django-environ = "^0.11.2"
+django-cors-headers = "^4.4.0"
+
 
 [project.optional-dependencies]
 gui = ["PyQt5"]

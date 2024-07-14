@@ -1,10 +1,15 @@
-from library.token.infrastructure.interface.token import ITokenInstance
-import jwt
-import traceback
-import environ
-import os
 import datetime
+import logging
+import os
+import traceback
+
+import environ
+import jwt
 from Foundation_Building.settings import BASE_DIR
+from library.token.infrastructure.interface.token import ITokenInstance
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 env = environ.Env()
 # reading .env file
@@ -38,7 +43,7 @@ class PyJWTWrapper(ITokenInstance):
                 issuer=self.issuer
             )
 
-            # print(f'decode_token: {decode_token}')
+            logger.debug(f'decode_token: {decode_token}')
 
             dt_now_jst_aware = datetime.datetime.now(
                 datetime.timezone(datetime.timedelta(hours=9))
@@ -49,9 +54,9 @@ class PyJWTWrapper(ITokenInstance):
             if decode_token['token_use'] != 'id' or decode_token['iss'] != self.issuer or dt_jst_aware_token < dt_now_jst_aware:
                 return False
 
-            return True
+            return decode_token
         except Exception:
-            print(traceback.format_exc())
+            logger.error(traceback.format_exc())
             raise RuntimeError(f'jwt server error: {traceback.format_exc()}')
 
     def user_validation(self, *, jwt_token, user_name):
@@ -73,5 +78,5 @@ class PyJWTWrapper(ITokenInstance):
 
             return True
         except Exception:
-            print(traceback.format_exc())
+            logger.error(traceback.format_exc())
             raise RuntimeError(f'jwt server error: {traceback.format_exc()}')

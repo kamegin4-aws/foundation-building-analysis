@@ -15,7 +15,7 @@ logger.setLevel(logging.INFO)
 
 def handler(event, context):
     # Log the event argument for debugging and for use in local development.
-    logger.debug(f'Received event: {json.dumps(event,indent=2)}')
+    logger.debug(f'Received event: {json.dumps(event, indent=2)}')
 
     try:
 

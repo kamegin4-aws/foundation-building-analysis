@@ -13,7 +13,7 @@ class ITokenInstance(metaclass=abc.ABCMeta):
             jwt_token (str): JWT形式のトークン
 
         Returns:
-            result (boolean): 検証合格:True。
+            result (boolean | dict): 検証合格:トークン, 不合格:False。
         """
         raise NotImplementedError()
 
