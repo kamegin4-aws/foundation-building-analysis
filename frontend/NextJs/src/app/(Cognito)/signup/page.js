@@ -1,63 +1,65 @@
-"use client";
+'use client';
 
-import AlertWrapper from "@/ui/Cloudscape/alert";
-import ContainerWrapper from "@/ui/Cloudscape/container";
-import ContentLayoutWrapper from "@/ui/Cloudscape/content_layout";
-import FormWrapper from "@/ui/Cloudscape/form";
-import HeaderWrapper from "@/ui/Cloudscape/header";
-import LinkWrapper from "@/ui/Cloudscape/link";
-import ButtonWrapper from "@/ui/Cloudscape/button";
-import FormFieldWrapper from "@/ui/Cloudscape/form_field";
-import InputWrapper from "@/ui/Cloudscape/input";
-import Image from "next/image";
-import { useEffect, useState, useContext } from "react";
-import { useRouter } from "next/navigation";
+import { ConfirmSignup } from '@/library/api/cognito/confirm_signup';
+import { Signup } from '@/library/api/cognito/signup';
+import { ConfirmSignupValidation } from '@/library/validation/cognito/confirm_signup';
+import { SignupValidation } from '@/library/validation/cognito/signup';
+import { ZodWrapper } from '@/library/validation/infrastructure/zod/zod_client';
+import AlertWrapper from '@/ui/Cloudscape/alert';
+import ButtonWrapper from '@/ui/Cloudscape/button';
+import ContainerWrapper from '@/ui/Cloudscape/container';
+import ContentLayoutWrapper from '@/ui/Cloudscape/content_layout';
+import FormWrapper from '@/ui/Cloudscape/form';
+import FormFieldWrapper from '@/ui/Cloudscape/form_field';
+import HeaderWrapper from '@/ui/Cloudscape/header';
+import InputWrapper from '@/ui/Cloudscape/input';
+import LinkWrapper from '@/ui/Cloudscape/link';
+import ModalWrapper from '@/ui/Cloudscape/modal';
+import TextContentWrapper from '@/ui/Cloudscape/text_content';
+import BreadcrumbProvider from '@/ui/components/provider/bread_crumb';
+import FlashBarProvider from '@/ui/components/provider/flash_bar';
+import log4js from 'log4js';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
-import { SignupValidation } from "@/library/validation/cognito/signup";
-import { ZodWrapper } from "@/library/validation/infrastructure/zod/zod_client";
-import { Signup } from "@/library/api/cognito/signup";
-import ModalWrapper from "@/ui/Cloudscape/modal";
-import { ConfirmSignupValidation } from "@/library/validation/cognito/confirm_signup";
-import { ConfirmSignup } from "@/library/api/cognito/confirm_signup";
-import TextContentWrapper from "@/ui/Cloudscape/text_content";
-import BreadcrumbProvider from "@/ui/components/provider/bread_crumb";
-import FlashBarProvider from "@/ui/components/provider/flash_bar";
-import React from "react";
+const logger = log4js.getLogger();
+logger.level = 'debug';
 
 export default function SignupPage() {
   const router = useRouter();
 
   //Alert
   const [alertDisplay, setAlertDisplay] = useState(false);
-  const [alertType, setAlertType] = useState("");
-  const [alertHeader, setAlertHeader] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState('');
+  const [alertHeader, setAlertHeader] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
   const [alertAction, setAlertAction] = useState(<></>);
 
   //Form
-  const [userNameInputValue, setUserNameInputValue] = useState("");
-  const [userNameErrorText, setUserNameErrorText] = useState("");
-  const [emailInputValue, setEmailInputValue] = useState("");
-  const [emailErrorText, setEmailErrorText] = useState("");
-  const [passwordInputValue, setPasswordInputValue] = useState("");
-  const [passwordErrorText, setPasswordErrorText] = useState("");
+  const [userNameInputValue, setUserNameInputValue] = useState('');
+  const [userNameErrorText, setUserNameErrorText] = useState('');
+  const [emailInputValue, setEmailInputValue] = useState('');
+  const [emailErrorText, setEmailErrorText] = useState('');
+  const [passwordInputValue, setPasswordInputValue] = useState('');
+  const [passwordErrorText, setPasswordErrorText] = useState('');
   const [signupButtonLoading, setSignupButtonLoading] = useState(false);
-  const [signupButtonLoadingText, setSignupButtonLoadingText] = useState("");
+  const [signupButtonLoadingText, setSignupButtonLoadingText] = useState('');
 
   //Modal
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
-  const [confirmCodeInputValue, setConfirmCodeInputValue] = useState("");
-  const [confirmCodeErrorText, setConfirmCodeErrorText] = useState("");
+  const [confirmCodeInputValue, setConfirmCodeInputValue] = useState('');
+  const [confirmCodeErrorText, setConfirmCodeErrorText] = useState('');
   const [confirmCodeButtonLoading, setConfirmCodeButtonLoading] =
     useState(false);
   const [confirmCodeButtonLoadingText, setConfirmCodeButtonLoadingText] =
-    useState("");
+    useState('');
 
   const onSubmit = async (event) => {
     event.preventDefault();
     try {
       setSignupButtonLoading(true);
-      setSignupButtonLoadingText("サインアップ中...");
+      setSignupButtonLoadingText('サインアップ中...');
 
       const signupValidation = new SignupValidation({
         validationInstance: new ZodWrapper(),
@@ -73,65 +75,65 @@ export default function SignupPage() {
       const validationResult = signupValidation.execute({
         formData: formObject,
       });
-      setUserNameErrorText("");
-      setEmailErrorText("");
-      setPasswordErrorText("");
+      setUserNameErrorText('');
+      setEmailErrorText('');
+      setPasswordErrorText('');
       setAlertDisplay(false);
 
       if (validationResult == true) {
-        console.log("signupValidation: true");
+        logger.info('signupValidation: true');
         const apiResponse = await signup.execute({ formData: formObject });
 
         if (apiResponse.ok) {
           const apiResponseObject = await apiResponse.json();
-          console.log("apiResponseObject:", apiResponseObject);
+          logger.debug('apiResponseObject:', apiResponseObject);
           setAlertDisplay(true);
-          setAlertType("success");
-          setAlertHeader("確認番号を送信しました。");
+          setAlertType('success');
+          setAlertHeader('確認番号を送信しました。');
           setAlertMessage(
-            "メールアドレスを確認してください（件名: Your verification code）"
+            'メールアドレスを確認してください（件名: Your verification code）'
           );
           setAlertAction(
             <ButtonWrapper
-              variant={"normal"}
-              iconName={"treeview-expand"}
-              iconAlt={"確認コードを入力"}
-              name={"確認コードを入力"}
+              variant={'normal'}
+              iconName={'treeview-expand'}
+              iconAlt={'確認コードを入力'}
+              name={'確認コードを入力'}
               onClick={openConfirmCodeModal}
             />
           );
         } else {
           setAlertDisplay(true);
-          setAlertType("error");
-          setAlertHeader("サインアップに失敗しました。");
+          setAlertType('error');
+          setAlertHeader('サインアップに失敗しました。');
           setAlertMessage(await apiResponse.json());
         }
       } else {
-        console.log("signupValidation: false: ", validationResult);
+        logger.info('signupValidation: false: ', validationResult);
         const validationResultObject = validationResult;
         for (const validation of validationResultObject) {
-          if (validation["index"] == "userName")
-            setUserNameErrorText(validation["message"]);
-          else if (validation["index"] == "password")
-            setEmailErrorText(validation["message"]);
-          else if (validation["index"] == "email")
-            setPasswordErrorText(validation["message"]);
+          if (validation['index'] == 'userName')
+            setUserNameErrorText(validation['message']);
+          else if (validation['index'] == 'password')
+            setEmailErrorText(validation['message']);
+          else if (validation['index'] == 'email')
+            setPasswordErrorText(validation['message']);
         }
 
         return false;
       }
     } catch (e) {
       if (e instanceof Error) {
-        console.log(e.message);
+        logger.error(e.message);
         setAlertDisplay(true);
-        setAlertType("error");
-        setAlertHeader("エラーが発生しました。");
+        setAlertType('error');
+        setAlertHeader('エラーが発生しました。');
         setAlertMessage(e.message);
       } else {
         setAlertDisplay(true);
-        setAlertType("error");
-        setAlertHeader("エラーが発生しました。");
-        setAlertMessage("Client Error");
+        setAlertType('error');
+        setAlertHeader('エラーが発生しました。');
+        setAlertMessage('Client Error');
       }
     } finally {
       setSignupButtonLoading(false);
@@ -141,35 +143,35 @@ export default function SignupPage() {
   const clearOnClick = (event) => {
     event.preventDefault();
 
-    console.log(event.detail);
-    setUserNameInputValue("");
-    setPasswordInputValue("");
-    setEmailInputValue("");
-    setUserNameErrorText("");
-    setEmailErrorText("");
-    setPasswordErrorText("");
+    logger.debug(event.detail);
+    setUserNameInputValue('');
+    setPasswordInputValue('');
+    setEmailInputValue('');
+    setUserNameErrorText('');
+    setEmailErrorText('');
+    setPasswordErrorText('');
   };
 
   const openConfirmCodeModal = (event) => {
     event.preventDefault();
-    console.log(event.detail);
+    logger.debug(event.detail);
     setConfirmModalVisible(true);
   };
 
   const confirmCodeCancelOnClick = (event) => {
     event.preventDefault();
-    console.log(event.detail);
+    logger.debug(event.detail);
     setConfirmModalVisible(false);
-    setUserNameErrorText("");
-    setConfirmCodeErrorText("");
+    setUserNameErrorText('');
+    setConfirmCodeErrorText('');
   };
 
   const confirmCodeSubmitOnClick = async (event) => {
     event.preventDefault();
-    console.log(event.detail);
+    logger.debug(event.detail);
     try {
       setConfirmCodeButtonLoading(true);
-      setConfirmCodeButtonLoadingText("確認中...");
+      setConfirmCodeButtonLoadingText('確認中...');
 
       const confirmSignupValidation = new ConfirmSignupValidation({
         validationInstance: new ZodWrapper(),
@@ -184,39 +186,39 @@ export default function SignupPage() {
       const validationResult = confirmSignupValidation.execute({
         formData: formObject,
       });
-      setUserNameErrorText("");
-      setConfirmCodeErrorText("");
+      setUserNameErrorText('');
+      setConfirmCodeErrorText('');
       setAlertDisplay(false);
 
       if (validationResult == true) {
-        console.log("confirmSignupValidation: true");
+        logger.info('confirmSignupValidation: true');
         const apiResponse = await confirmSignup.execute({
           formData: formObject,
         });
 
         if (apiResponse.ok) {
           const apiResponseObject = await apiResponse.json();
-          console.log("apiResponseObject:", apiResponseObject);
+          logger.debug('apiResponseObject:', apiResponseObject);
           setAlertDisplay(true);
-          setAlertType("success");
-          setAlertHeader("確認完了。");
-          setAlertMessage("メールアドレス確認を完了しました。");
+          setAlertType('success');
+          setAlertHeader('確認完了。');
+          setAlertMessage('メールアドレス確認を完了しました。');
 
-          router.push("/login?type=success&message=ユーザーを作成しました。");
+          router.push('/login?type=success&message=ユーザーを作成しました。');
         } else {
           setAlertDisplay(true);
-          setAlertType("error");
-          setAlertHeader("確認に失敗しました。");
+          setAlertType('error');
+          setAlertHeader('確認に失敗しました。');
           setAlertMessage(await apiResponse.json());
         }
       } else {
-        console.log("confirmSignupValidation: false: ", validationResult);
+        logger.info('confirmSignupValidation: false: ', validationResult);
         const validationResultObject = validationResult;
         for (const validation of validationResultObject) {
-          if (validation["index"] == "userName")
-            setUserNameErrorText(validation["message"]);
-          else if (validation["index"] == "code")
-            setConfirmCodeErrorText(validation["message"]);
+          if (validation['index'] == 'userName')
+            setUserNameErrorText(validation['message']);
+          else if (validation['index'] == 'code')
+            setConfirmCodeErrorText(validation['message']);
         }
 
         return false;
@@ -225,14 +227,14 @@ export default function SignupPage() {
       if (e instanceof Error) {
         console.log(e.message);
         setAlertDisplay(true);
-        setAlertType("error");
-        setAlertHeader("エラーが発生しました。");
+        setAlertType('error');
+        setAlertHeader('エラーが発生しました。');
         setAlertMessage(e.message);
       } else {
         setAlertDisplay(true);
-        setAlertType("error");
-        setAlertHeader("エラーが発生しました。");
-        setAlertMessage("Client Error");
+        setAlertType('error');
+        setAlertHeader('エラーが発生しました。');
+        setAlertMessage('Client Error');
       }
     } finally {
       setConfirmCodeButtonLoading(false);
@@ -247,12 +249,12 @@ export default function SignupPage() {
       <FlashBarProvider />
       <BreadcrumbProvider />
       <ContentLayoutWrapper
-        header={<HeaderWrapper title={"Signup"} />}
+        header={<HeaderWrapper title={'Signup'} />}
         content={
           <ContainerWrapper
             header={
               <HeaderWrapper
-                title={"SignUp Form"}
+                title={'SignUp Form'}
                 alert={
                   alertDisplay ? (
                     <AlertWrapper
@@ -266,7 +268,7 @@ export default function SignupPage() {
                 }
               />
             }
-            footer={<LinkWrapper href={"/login"} alt={"ログインに戻る"} />}
+            footer={<LinkWrapper href={'/login'} alt={'ログインに戻る'} />}
             media={{
               content: (
                 <Image
@@ -276,27 +278,27 @@ export default function SignupPage() {
                   height={500}
                 />
               ),
-              position: "side",
-              width: "25%",
+              position: 'side',
+              width: '25%',
             }}
             content={
               <FormWrapper
-                id={"login_form"}
+                id={'login_form'}
                 onSubmit={onSubmit}
                 actions={
                   <>
                     <ButtonWrapper
-                      variant={"normal"}
-                      iconName={"refresh"}
-                      iconAlt={"クリア"}
-                      name={"クリア"}
+                      variant={'normal'}
+                      iconName={'refresh'}
+                      iconAlt={'クリア'}
+                      name={'クリア'}
                       onClick={clearOnClick}
                     />
                     <ButtonWrapper
-                      formAction={"submit"}
-                      iconName={"user-profile"}
-                      iconAlt={"サインアップ"}
-                      name={"サインアップ"}
+                      formAction={'submit'}
+                      iconName={'user-profile'}
+                      iconAlt={'サインアップ'}
+                      name={'サインアップ'}
                       loading={signupButtonLoading}
                       loadingText={signupButtonLoadingText}
                     />
@@ -305,8 +307,8 @@ export default function SignupPage() {
                 container={
                   <>
                     <FormFieldWrapper
-                      label={"ユーザー名"}
-                      description={"ユーザー名を入力してください。(例)太郎"}
+                      label={'ユーザー名'}
+                      description={'ユーザー名を入力してください。(例)太郎'}
                       formField={
                         <InputWrapper
                           value={userNameInputValue}
@@ -316,11 +318,11 @@ export default function SignupPage() {
                       errorText={userNameErrorText}
                     />
                     <FormFieldWrapper
-                      label={"メールアドレス"}
+                      label={'メールアドレス'}
                       description={
                         <TextContentWrapper
                           contents={
-                            <p style={{ color: "gray" }}>
+                            <p style={{ color: 'gray' }}>
                               メースアドレスを入力してください。(例)example@example.com。
                               <br />
                               サインアップに必要な確認番号が送られてきます。
@@ -332,18 +334,18 @@ export default function SignupPage() {
                         <InputWrapper
                           value={emailInputValue}
                           parentSetValue={setEmailInputValue}
-                          type={"email"}
-                          inputMode={"email"}
+                          type={'email'}
+                          inputMode={'email'}
                         />
                       }
                       errorText={emailErrorText}
                     />
                     <FormFieldWrapper
-                      label={"パスワード"}
+                      label={'パスワード'}
                       description={
                         <TextContentWrapper
                           contents={
-                            <ul style={{ color: "gray" }}>
+                            <ul style={{ color: 'gray' }}>
                               <li>パスワードを入力してください。</li>
                               <li>パスワードの最小文字数:8 文字。</li>
                               <li>少なくとも 1 つの数字を含む。</li>
@@ -356,7 +358,7 @@ export default function SignupPage() {
                       }
                       formField={
                         <InputWrapper
-                          type={"password"}
+                          type={'password'}
                           value={passwordInputValue}
                           parentSetValue={setPasswordInputValue}
                         />
@@ -371,18 +373,18 @@ export default function SignupPage() {
         }
       />
       <ModalWrapper
-        header={"確認コード"}
+        header={'確認コード'}
         visible={confirmModalVisible}
         parentSetVisible={setConfirmModalVisible}
         content={
           <FormFieldWrapper
-            label={"確認コード"}
+            label={'確認コード'}
             description={`メースアドレスに記載の confirmation code を入力してください。`}
             formField={
               <InputWrapper
                 value={confirmCodeInputValue}
                 parentSetValue={setConfirmCodeInputValue}
-                inputMode={"numeric"}
+                inputMode={'numeric'}
               />
             }
             errorText={confirmCodeErrorText}
@@ -391,17 +393,17 @@ export default function SignupPage() {
         footer={
           <>
             <ButtonWrapper
-              variant={"normal"}
-              iconName={"redo"}
-              iconAlt={"キャンセル"}
-              name={"キャンセル"}
+              variant={'normal'}
+              iconName={'redo'}
+              iconAlt={'キャンセル'}
+              name={'キャンセル'}
               onClick={confirmCodeCancelOnClick}
             />
             <ButtonWrapper
               onClick={confirmCodeSubmitOnClick}
-              iconName={"upload-download"}
-              iconAlt={"送信"}
-              name={"送信"}
+              iconName={'upload-download'}
+              iconAlt={'送信'}
+              name={'送信'}
               loading={confirmCodeButtonLoading}
               loadingText={confirmCodeButtonLoadingText}
             />

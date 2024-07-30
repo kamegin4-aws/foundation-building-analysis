@@ -1,7 +1,7 @@
-import { IGlobalAuthentication } from "@/library/authentication/interface/authentication";
-import { CognitoTokensCookie } from "@/library/cookies/cognito/login";
-import { TokenRefresh } from "@/library/api/cognito/token_refresh";
-import { GetUserInfo } from "@/library/api/cognito/get_user_info";
+import { GetUserInfo } from '@/library/api/cognito/get_user';
+import { TokenRefresh } from '@/library/api/cognito/token_refresh';
+import { IGlobalAuthentication } from '@/library/authentication/interface/authentication';
+import { CognitoTokensCookie } from '@/library/cookies/cognito/login';
 
 export class GlobalAuthentication extends IGlobalAuthentication {
   constructor() {
@@ -15,8 +15,8 @@ export class GlobalAuthentication extends IGlobalAuthentication {
       if (!tokens) return false;
 
       const date = new Date();
-      const dateString = date.toLocaleString("ja-JP", {
-        timeZone: "Asia/Tokyo",
+      const dateString = date.toLocaleString('ja-JP', {
+        timeZone: 'Asia/Tokyo',
       });
 
       if (new Date(dateString) < new Date(tokens.ExpiresIn)) return true;
@@ -29,7 +29,7 @@ export class GlobalAuthentication extends IGlobalAuthentication {
           const getUserInfo = new GetUserInfo();
           const formDataGetUserInfo = new FormData();
           formDataGetUserInfo.append(
-            "access_token",
+            'access_token',
             responseRefreshTokenObject.AccessToken
           );
 
@@ -37,7 +37,7 @@ export class GlobalAuthentication extends IGlobalAuthentication {
             formData: formDataGetUserInfo,
           });
           if (!responseGetUserInfo.ok) {
-            throw new Error("Get User Info Error");
+            throw new Error('Get User Info Error');
           }
           return true;
         }
@@ -48,7 +48,7 @@ export class GlobalAuthentication extends IGlobalAuthentication {
       if (e instanceof Error) {
         throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("client error: Session");
+        throw new Error('client error: Session');
       }
     }
   }

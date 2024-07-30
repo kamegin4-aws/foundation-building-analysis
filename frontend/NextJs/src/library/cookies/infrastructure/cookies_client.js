@@ -1,8 +1,10 @@
-"use server";
+'use server';
+import log4js from 'log4js';
+import { cookies } from 'next/headers';
+/* Server Actionでexportできるのはfunctionのみ*/
 
-import { cookies } from "next/headers";
-/* Server Actionでexportできるのはfunctionのみ
- */
+const logger = log4js.getLogger();
+logger.level = 'info';
 
 export async function setCookie({ key: key, value: value }) {
   try {
@@ -10,14 +12,14 @@ export async function setCookie({ key: key, value: value }) {
       name: key,
       value: value,
       httpOnly: true,
-      path: "/",
+      path: '/',
       domain: process.env.NEXT_PUBLIC_HOST_DOMAIN,
     });
   } catch (e) {
     if (e instanceof Error) {
       throw new Error(`cookie server error: ${e.message}`);
     } else {
-      throw new Error("server error: Cookie");
+      throw new Error('server error: Cookie');
     }
   }
 }
@@ -25,14 +27,14 @@ export async function setCookie({ key: key, value: value }) {
 export async function getCookies() {
   try {
     const cookiesAll = cookies().getAll();
-    console.log("cookieStore.getAll", cookiesAll);
+    logger.debug('cookieStore.getAll', cookiesAll);
 
     return cookiesAll;
   } catch (e) {
     if (e instanceof Error) {
       throw new Error(`cookie server error: ${e.message}`);
     } else {
-      throw new Error("server error: Cookie");
+      throw new Error('server error: Cookie');
     }
   }
 }
@@ -44,7 +46,7 @@ export async function getCookie({ key: key }) {
     if (e instanceof Error) {
       throw new Error(`cookie server error: ${e.message}`);
     } else {
-      throw new Error("server error: Cookie");
+      throw new Error('server error: Cookie');
     }
   }
 }
@@ -56,7 +58,7 @@ export async function deleteCookie({ key: key }) {
     if (e instanceof Error) {
       throw new Error(`cookie server error: ${e.message}`);
     } else {
-      throw new Error("server error: Cookie");
+      throw new Error('server error: Cookie');
     }
   }
 }

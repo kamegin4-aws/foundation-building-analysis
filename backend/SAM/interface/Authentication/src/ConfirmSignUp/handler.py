@@ -1,12 +1,10 @@
 import base64
 import hashlib
 import hmac
-import io
 import json
 import logging
 import os
 import traceback
-from cgi import parse_header, parse_multipart
 
 import boto3
 
@@ -21,28 +19,8 @@ def handler(event, context):
     try:
 
         if ('body' in event):
-            if 'content-type' in event['headers'].keys():
-                c_type, c_data = parse_header(event['headers']['content-type'])
-            elif 'Content-Type' in event['headers'].keys():
-                c_type, c_data = parse_header(event['headers']['Content-Type'])
-            else:
-                raise RuntimeError('content-type or Content-Type not found')
-
-            if c_type == 'multipart/form-data':
-                encoded_string = event['body'].encode('utf-8')
-                # For Python 3: these two lines of bugfixing are mandatory
-                # see also:
-                # https://stackoverflow.com/questions/31486618/cgi-parse-multipart-function-throws-typeerror-in-python-3
-                c_data['boundary'] = bytes(c_data['boundary'], 'utf-8')
-                # c_data['CONTENT-LENGTH'] = event['headers']['Content-length']
-                data_dict = parse_multipart(io.BytesIO(encoded_string), c_data)
-
-                # 整形
-                body = {k: v[0] for k, v in data_dict.items()}
-
-            else:
-                body = json.loads(event['body'])
-                # body = event["body"]
+            body = json.loads(event['body'])
+            # body = event["body"]
 
         user_pool_id = os.environ['USER_POOL_ID']
 

@@ -1,38 +1,37 @@
-"use client";
+'use client';
+import AlertWrapper from '@/ui/Cloudscape/alert';
+import ButtonWrapper from '@/ui/Cloudscape/button';
+import ContainerWrapper from '@/ui/Cloudscape/container';
+import ContentLayoutWrapper from '@/ui/Cloudscape/content_layout';
+import FormWrapper from '@/ui/Cloudscape/form';
+import HeaderWrapper from '@/ui/Cloudscape/header';
+import { S3Context } from '@/ui/components/provider/s3_provider';
+import Image from 'next/image';
+import { useContext, useEffect, useState } from 'react';
 
-import AlertWrapper from "@/ui/Cloudscape/alert";
-import ContainerWrapper from "@/ui/Cloudscape/container";
-import ContentLayoutWrapper from "@/ui/Cloudscape/content_layout";
-import FormWrapper from "@/ui/Cloudscape/form";
-import HeaderWrapper from "@/ui/Cloudscape/header";
-import ButtonWrapper from "@/ui/Cloudscape/button";
-import Image from "next/image";
-import { useContext, useEffect, useState } from "react";
+import { ContentsDataUploadValidation } from '@/library/validation/cloudfront_s3/upload';
+import { ZodWrapper } from '@/library/validation/infrastructure/zod/zod_client';
+import FileUploadWrapper from '@/ui/Cloudscape/file_upload';
+import TextContentWrapper from '@/ui/Cloudscape/text_content';
+import BreadcrumbProvider from '@/ui/components/provider/bread_crumb';
+import { CognitoContext } from '@/ui/components/provider/cognito_provider';
+import FlashBarProvider from '@/ui/components/provider/flash_bar';
 
-import { ZodWrapper } from "@/library/validation/infrastructure/zod/zod_client";
-import BreadcrumbProvider from "@/ui/components/provider/bread_crumb";
-import FlashBarProvider from "@/ui/components/provider/flash_bar";
-import TopNavigationProvider from "@/ui/components/provider/top_menu";
-import React from "react";
-import FileUploadWrapper from "@/ui/Cloudscape/file_upload";
-import TextContentWrapper from "@/ui/Cloudscape/text_content";
-import { ContentsDataUploadValidation } from "@/library/validation/cloudfront_s3/upload";
-import { S3Context } from "@/ui/components/provider/s3_provider";
-import { CognitoContext } from "@/ui/components/provider/cognito_provider";
+import TopNavigationProvider from '@/ui/components/provider/top_menu';
 
 export default function NewPage() {
   //Alert
   const [alertDisplay, setAlertDisplay] = useState(false);
-  const [alertType, setAlertType] = useState("");
-  const [alertHeader, setAlertHeader] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState('');
+  const [alertHeader, setAlertHeader] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
 
   //Form
   const [files, setFiles] = useState([]);
   const [uploadButtonLoading, setUploadButtonLoading] = useState(false);
-  const [uploadButtonLoadingText, setUploadButtonLoadingText] = useState("");
+  const [uploadButtonLoadingText, setUploadButtonLoadingText] = useState('');
   const [fileErrors, setFileErrors] = useState([]);
-  const [errorText, setErrorText] = useState("");
+  const [errorText, setErrorText] = useState('');
 
   //S3Context
   const { contentsClient } = useContext(S3Context);
@@ -44,7 +43,7 @@ export default function NewPage() {
     event.preventDefault();
     try {
       setUploadButtonLoading(true);
-      setUploadButtonLoadingText("保存中...");
+      setUploadButtonLoadingText('保存中...');
 
       const uploadValidation = new ContentsDataUploadValidation({
         validationInstance: new ZodWrapper(),
@@ -65,11 +64,11 @@ export default function NewPage() {
         formData: formObject,
       });
       setFileErrors([]);
-      setErrorText("");
+      setErrorText('');
       setAlertDisplay(false);
 
       if (uploadValidationResult == true) {
-        console.log("Validation: true");
+        console.log('Validation: true');
 
         let promiseFunctions = [];
         for (let file of files) {
@@ -78,33 +77,33 @@ export default function NewPage() {
               body: await file.arrayBuffer(),
               userName: userAttributes.userName,
               fileName: file.name,
-              keyValueArray: [{ key: "mimeType", value: file.type }],
+              keyValueArray: [{ key: 'mimeType', value: file.type }],
             })
           );
         }
 
         Promise.all(promiseFunctions)
           .then((uploadResults) => {
-            console.log("uploadResults", uploadResults);
+            console.log('uploadResults', uploadResults);
 
             setAlertDisplay(true);
-            setAlertType("success");
-            setAlertHeader("保存しました。");
-            setAlertMessage("");
+            setAlertType('success');
+            setAlertHeader('保存しました。');
+            setAlertMessage('');
           })
           .catch((error) => {
             setAlertDisplay(true);
-            setAlertType("error");
-            setAlertHeader("保存に失敗しました。");
+            setAlertType('error');
+            setAlertHeader('保存に失敗しました。');
             setAlertMessage(error);
           });
       } else {
-        console.log("Validation: false: ", uploadValidationResult);
+        console.log('Validation: false: ', uploadValidationResult);
         const validationResultObject = uploadValidationResult;
-        if (validationResultObject[0].index == "-1") {
+        if (validationResultObject[0].index == '-1') {
           setErrorText(validationResultObject[0].message);
         } else {
-          let fileErrors = new Array(uploadValidationResult.length).fill("");
+          let fileErrors = new Array(uploadValidationResult.length).fill('');
           for (let validation of validationResultObject) {
             fileErrors[Number(validation.index)] = validation.message;
           }
@@ -118,14 +117,14 @@ export default function NewPage() {
       if (e instanceof Error) {
         console.log(e.message);
         setAlertDisplay(true);
-        setAlertType("error");
-        setAlertHeader("エラーが発生しました。");
+        setAlertType('error');
+        setAlertHeader('エラーが発生しました。');
         setAlertMessage(e.message);
       } else {
         setAlertDisplay(true);
-        setAlertType("error");
-        setAlertHeader("エラーが発生しました。");
-        setAlertMessage("Client Error");
+        setAlertType('error');
+        setAlertHeader('エラーが発生しました。');
+        setAlertMessage('Client Error');
       }
     } finally {
       setUploadButtonLoading(false);
@@ -137,7 +136,7 @@ export default function NewPage() {
     console.log(event.detail);
     setFiles([]);
     setFileErrors([]);
-    setErrorText("");
+    setErrorText('');
   };
 
   useEffect(() => {}, []);
@@ -148,12 +147,12 @@ export default function NewPage() {
       <BreadcrumbProvider />
       <TopNavigationProvider />
       <ContentLayoutWrapper
-        header={<HeaderWrapper title={"Contents Data New"} />}
+        header={<HeaderWrapper title={'Contents Data New'} />}
         content={
           <ContainerWrapper
             header={
               <HeaderWrapper
-                title={"Contents Data Form"}
+                title={'Contents Data Form'}
                 alert={
                   alertDisplay ? (
                     <AlertWrapper
@@ -170,27 +169,27 @@ export default function NewPage() {
               content: (
                 <Image src={`/s3.svg`} alt="rds" width={500} height={500} />
               ),
-              position: "side",
-              width: "25%",
+              position: 'side',
+              width: '25%',
             }}
             content={
               <FormWrapper
-                id={"contents_data_form"}
+                id={'contents_data_form'}
                 onSubmit={onSubmit}
                 actions={
                   <>
                     <ButtonWrapper
-                      variant={"normal"}
-                      iconName={"refresh"}
-                      iconAlt={"クリア"}
-                      name={"クリア"}
+                      variant={'normal'}
+                      iconName={'refresh'}
+                      iconAlt={'クリア'}
+                      name={'クリア'}
                       onClick={clearOnClick}
                     />
                     <ButtonWrapper
-                      formAction={"submit"}
-                      iconName={"upload"}
-                      iconAlt={"アップロード"}
-                      name={"アップロード"}
+                      formAction={'submit'}
+                      iconName={'upload'}
+                      iconAlt={'アップロード'}
+                      name={'アップロード'}
                       loading={uploadButtonLoading}
                       loadingText={uploadButtonLoadingText}
                     />
@@ -199,17 +198,17 @@ export default function NewPage() {
                 container={
                   <>
                     <FileUploadWrapper
-                      label={"コンテンツのアップロード"}
-                      description={"ファイルをアップロードできます。"}
+                      label={'コンテンツのアップロード'}
+                      description={'ファイルをアップロードできます。'}
                       value={files}
                       accept={
-                        "audio/*,image/*,text/*,video/*,application/msword,application/json,application/pdf,application/vnd.ms-powerpoint,application/zip,application/vnd.ms-excel"
+                        'audio/*,image/*,text/*,video/*,application/msword,application/json,application/pdf,application/vnd.ms-powerpoint,application/zip,application/vnd.ms-excel'
                       }
                       parentSetValue={setFiles}
                       constraintText={
                         <TextContentWrapper
                           contents={
-                            <ul style={{ color: "gray" }}>
+                            <ul style={{ color: 'gray' }}>
                               <li>ファイル名が必要。</li>
                               <li>1つのファイルサイズは500MBまで。</li>
                               <li>1度にアップロードできるのは100ファイル。</li>
