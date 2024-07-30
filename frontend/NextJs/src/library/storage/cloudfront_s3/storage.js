@@ -1,6 +1,6 @@
-import { MIME_TYPE } from "@/library/common/constant/mimeType_check";
-import { mimeTypeCheck } from "@/library/common/mimeType_check";
-import { IStorage } from "@/library/storage/interface/storage";
+import { MIME_TYPE } from '@/library/common/constant/mimeType_check';
+import { mimeTypeCheck } from '@/library/common/mimeType_check';
+import { IStorage } from '@/library/storage/interface/storage';
 
 export class ContentsOperation extends IStorage {
   #contentsInstance;
@@ -17,12 +17,12 @@ export class ContentsOperation extends IStorage {
     keyValueArray: keyValueArray = undefined,
   }) {
     try {
-      let tagging = "";
+      let tagging = '';
       let mimeTypeForApp = MIME_TYPE[10];
 
       if (keyValueArray) {
         for (let i = 0; i < keyValueArray.length; i++) {
-          if (keyValueArray[i].key == "mimeType")
+          if (keyValueArray[i].key == 'mimeType')
             // @ts-ignore
             mimeTypeForApp = mimeTypeCheck(keyValueArray[i].value);
           if (i == keyValueArray.length - 1)
@@ -42,7 +42,7 @@ export class ContentsOperation extends IStorage {
       if (e instanceof Error) {
         throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("client error: Storage");
+        throw new Error('client error: Storage');
       }
     }
   }
@@ -62,11 +62,11 @@ export class ContentsOperation extends IStorage {
       let toString = Object.prototype.toString;
 
       for (let i = 0; i < result.Contents.length; i++) {
-        if ("LastModified" in result.Contents[i]) {
+        if ('LastModified' in result.Contents[i]) {
           let flg = toString.call(result.Contents[i].LastModified).slice(8, -1);
-          if (flg == "Date") {
+          if (flg == 'Date') {
             result.Contents[i].LastModified =
-              result.Contents[i].LastModified.toLocaleString("ja-JP");
+              result.Contents[i].LastModified.toLocaleString('ja-JP');
           }
         }
       }
@@ -76,7 +76,7 @@ export class ContentsOperation extends IStorage {
       if (e instanceof Error) {
         throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("client error: Storage");
+        throw new Error('client error: Storage');
       }
     }
   }
@@ -84,7 +84,7 @@ export class ContentsOperation extends IStorage {
   async listVersions({
     userName: userName,
     fileName: fileName,
-    mimeTyp: mimeTyp = "UnKnown",
+    mimeTyp: mimeTyp = 'UnKnown',
     maxKeys: maxKeys = 1000,
   }) {
     try {
@@ -92,14 +92,14 @@ export class ContentsOperation extends IStorage {
         prefix: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/mimeType=${mimeTyp}/${fileName}`,
         maxKeys: maxKeys,
       });
-      console.log("result: ", result);
+      console.log('result: ', result);
 
       return result;
     } catch (e) {
       if (e instanceof Error) {
         throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("client error: Storage");
+        throw new Error('client error: Storage');
       }
     }
   }
@@ -107,7 +107,7 @@ export class ContentsOperation extends IStorage {
   async info({
     userName: userName,
     fileName: fileName,
-    mimeTyp: mimeTyp = "UnKnown",
+    mimeTyp: mimeTyp = 'UnKnown',
     versionId: versionId = undefined,
   }) {
     try {
@@ -115,14 +115,14 @@ export class ContentsOperation extends IStorage {
         key: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/mimeType=${mimeTyp}/${fileName}`,
         versionId: versionId,
       });
-      console.log("result: ", result);
+      console.log('result: ', result);
 
       return result;
     } catch (e) {
       if (e instanceof Error) {
         throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("client error: Storage");
+        throw new Error('client error: Storage');
       }
     }
   }
@@ -130,7 +130,7 @@ export class ContentsOperation extends IStorage {
   async download({
     userName: userName,
     fileName: fileName,
-    mimeTyp: mimeTyp = "UnKnown",
+    mimeTyp: mimeTyp = 'UnKnown',
     versionId: versionId = undefined,
   }) {
     try {
@@ -138,14 +138,14 @@ export class ContentsOperation extends IStorage {
         key: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/mimeType=${mimeTyp}/${fileName}`,
         versionId: versionId,
       });
-      console.log("result: ", result);
+      console.log('result: ', result);
 
       return result;
     } catch (e) {
       if (e instanceof Error) {
         throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("client error: Storage");
+        throw new Error('client error: Storage');
       }
     }
   }
@@ -153,7 +153,7 @@ export class ContentsOperation extends IStorage {
   async delete({
     userName: userName,
     fileName: fileName,
-    mimeTyp: mimeTyp = "UnKnown",
+    mimeTyp: mimeTyp = 'UnKnown',
     versionId: versionId = undefined,
   }) {
     try {
@@ -161,14 +161,14 @@ export class ContentsOperation extends IStorage {
         key: `${process.env.NEXT_PUBLIC_APP_NAME}/userName=${userName}/mimeType=${mimeTyp}/${fileName}`,
         versionId: versionId,
       });
-      console.log("result: ", result);
+      console.log('result: ', result);
 
       return result;
     } catch (e) {
       if (e instanceof Error) {
         throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("client error: Storage");
+        throw new Error('client error: Storage');
       }
     }
   }
@@ -176,7 +176,7 @@ export class ContentsOperation extends IStorage {
   async infoTag({
     userName: userName,
     fileName: fileName,
-    mimeTyp: mimeTyp = "UnKnown",
+    mimeTyp: mimeTyp = 'UnKnown',
     versionId: versionId = undefined,
   }) {
     try {
@@ -190,7 +190,7 @@ export class ContentsOperation extends IStorage {
       if (e instanceof Error) {
         throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("client error: Storage");
+        throw new Error('client error: Storage');
       }
     }
   }

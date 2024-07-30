@@ -1,14 +1,13 @@
-import AppLayoutProvider from "@/ui/components/provider/layout_provider";
-import "@cloudscape-design/global-styles/index.css";
-import { Inter } from "next/font/google";
-import React from "react";
-//import "./globals.css";
+import AppLayoutProvider from '@/ui/components/provider/layout_provider';
+import '@cloudscape-design/global-styles/index.css';
+import { Inter } from 'next/font/google';
+import React from 'react';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: "Foundation Building App",
-  description: "基本基盤アプリ",
+  title: 'Foundation Building App',
+  description: '基本基盤アプリ',
 };
 
 export default function RootLayout({ children }) {

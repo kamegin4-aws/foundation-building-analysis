@@ -1,11 +1,15 @@
-"use client";
+'use client';
 
-import { createContext, useEffect, useState } from "react";
-import { GlobalAuthentication } from "@/library/authentication/global/authentication";
-import { UserInfoCookie } from "@/library/cookies/cognito/user_info";
-import { usePathname, useRouter } from "next/navigation";
-import Loading from "@/app/loading";
-import React from "react";
+import Loading from '@/app/loading';
+import { GetUserInfo } from '@/library/api/cognito/get_user';
+import { GlobalAuthentication } from '@/library/authentication/global/authentication';
+import { CognitoTokensCookie } from '@/library/cookies/cognito/login';
+import log4js from 'log4js';
+import { usePathname, useRouter } from 'next/navigation';
+import React, { createContext, useEffect, useState } from 'react';
+
+const logger = log4js.getLogger();
+logger.level = 'debug';
 
 export const CognitoContext = createContext(null);
 
@@ -23,27 +27,40 @@ export default function CognitoProvider(props) {
   useEffect(() => {
     if (matchResult) {
       const authentication = new GlobalAuthentication();
+      const cognitoTokensCookie = new CognitoTokensCookie();
+      const getUserInfo = new GetUserInfo();
 
       authentication
         .checkSession()
         .then((session) => {
           if (session) {
-            const userInfoCookie = new UserInfoCookie();
-            userInfoCookie
+            cognitoTokensCookie
               .get()
-              .then((userInfo) => {
-                console.log("userInfo", userInfo);
-                setUserAttributes(userInfo);
+              .then((tokens) => {
+                const inputGetUserInfo = {
+                  access_token: tokens.AccessToken,
+                };
+                getUserInfo
+                  .execute({ formData: inputGetUserInfo })
+                  .then((res) => {
+                    if (!res.ok) {
+                      throw new Error('Get User Info Error');
+                    }
+                    res.json().then((user) => {
+                      logger.debug('user: ', user);
+                    });
+                    setUserAttributes(res.data);
+                  });
               })
               .catch((e) => {
                 router.push(
-                  "/login?type=error&message=ユーザーの取得に失敗しました。"
+                  '/login?type=error&message=ユーザーの取得に失敗しました。'
                 );
               });
-          } else router.push("/login?type=info&message=セッションが切れました");
+          } else router.push('/login?type=info&message=セッションが切れました');
         })
         .catch((e) => {
-          router.push("/login?type=info&message=ログインしてください。");
+          router.push('/login?type=info&message=ログインしてください。');
         });
     }
   }, []);

@@ -1,10 +1,13 @@
-import { IValidation } from "@/library/validation/interface/validation";
+import { IValidation } from '@/library/validation/interface/validation';
+import log4js from 'log4js';
 
+const logger = log4js.getLogger();
+logger.level = 'debug';
 export class SignupValidation extends IValidation {
   #validationInstance;
   #validationList = [];
   #errorMessageList = [];
-  #index = ["userName", "email", "password"];
+  #index = ['userName', 'email', 'password'];
 
   constructor({ validationInstance: validationInstance }) {
     super();
@@ -13,7 +16,7 @@ export class SignupValidation extends IValidation {
 
   execute({ formData: formData }) {
     try {
-      console.log("formData", formData);
+      logger.debug('formData', formData);
 
       const userName = this.#validationInstance.userNameValidation({
         userName: formData.user_name,
@@ -43,7 +46,7 @@ export class SignupValidation extends IValidation {
       if (e instanceof Error) {
         throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("client error: Validation");
+        throw new Error('client error: Validation');
       }
     }
   }

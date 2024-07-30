@@ -1,11 +1,11 @@
-import { IApi } from "@/library/api/interface/api";
+import { IApi } from '@/library/api/interface/api';
 
 export class ConfirmSignup extends IApi {
-  #url = "/cognito/signup/confirm";
+  #url = '/cognito/signup/confirm';
   #options = {
-    method: "POST", // *GET, POST, PUT, DELETE, etc.
-    cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-    mode: "cors",
+    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+    mode: 'cors',
   };
   constructor() {
     super();
@@ -17,7 +17,7 @@ export class ConfirmSignup extends IApi {
   } = {}) {
     try {
       this.#options.headers = {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       };
       this.#options.body = JSON.stringify(formData);
 
@@ -29,7 +29,7 @@ export class ConfirmSignup extends IApi {
       if (e instanceof Error) {
         throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("client error: API");
+        throw new Error('client error: API');
       }
     }
   }
