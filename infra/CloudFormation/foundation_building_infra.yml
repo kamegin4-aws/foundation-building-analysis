@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Metadata:
-  AWS::CloudFormation::Designer:
+  'AWS::CloudFormation::Designer':
     350108e5-ca85-47f8-8d29-9a2ad77fceeb:
       size:
         width: 1500
@@ -10,6 +10,9 @@ Metadata:
         'y': 110
       z: 0
       embeds:
+        - 12feec27-08b7-49bb-ad2e-c5d91794edff
+        - f880c388-26e5-45ed-bd6d-0f6b15d7b464
+        - 5a43d249-4eb3-4135-88e1-a6cd6265ee48
         - f81eefea-d3c2-4fc6-8452-9fc5338f6a65
         - 180e2ee1-8578-4629-b20b-4cd47d57f011
         - c43c019d-9ffe-43b3-ae02-d60b4d4bc5d6
@@ -22,20 +25,17 @@ Metadata:
         - b905d21b-a08c-489f-88d5-c1668033a80e
         - 3d63d8d7-768c-4598-a3f7-3dffdbc00411
         - 9384b3df-130b-4b04-8107-2ea01180adfb
-        - ac9c17dc-48e6-4001-abf5-767138f4c670
-        - 5ce5b250-2492-454f-8629-1aa84e7be81e
-        - c9b4d4ee-cfb4-4913-a8b1-6b079f2de24a
-        - c7875a33-6903-4ddb-b14c-970ff5ef58f5
-        - ed43b443-0134-463d-92fa-97721a39eb33
         - 4703e375-3d3c-4cc5-b7ff-fd132e5bc879
         - 09adaace-5635-4afd-a037-758ca6091634
         - 858329c2-e110-4f9a-819e-41d58272fe7c
-        - 5a43d249-4eb3-4135-88e1-a6cd6265ee48
+        - ac9c17dc-48e6-4001-abf5-767138f4c670
+        - 5ce5b250-2492-454f-8629-1aa84e7be81e
         - a6a6320c-95bb-4b75-ad09-804ea053ed8c
-        - 66f7b881-80b6-4a5b-8ecf-6427532dcc24
         - 25d3c3f7-5a53-4737-b2dc-20466b4528da
-        - f880c388-26e5-45ed-bd6d-0f6b15d7b464
-        - 12feec27-08b7-49bb-ad2e-c5d91794edff
+        - 66f7b881-80b6-4a5b-8ecf-6427532dcc24
+        - c9b4d4ee-cfb4-4913-a8b1-6b079f2de24a
+        - c7875a33-6903-4ddb-b14c-970ff5ef58f5
+        - ed43b443-0134-463d-92fa-97721a39eb33
     e616c472-8719-4b09-ade8-958721f4dbfa:
       size:
         width: 130
@@ -343,60 +343,60 @@ Metadata:
       embeds: []
 Resources:
   VPC:
-    Type: AWS::EC2::VPC
+    Type: 'AWS::EC2::VPC'
     Properties:
       EnableDnsSupport: 'true'
       EnableDnsHostnames: 'true'
       CidrBlock: 10.0.0.0/16
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
   PublicSubnet:
-    Type: AWS::EC2::Subnet
+    Type: 'AWS::EC2::Subnet'
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.1.0/24
       AvailabilityZone: ap-northeast-1a
       MapPublicIpOnLaunch: true
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: e616c472-8719-4b09-ade8-958721f4dbfa
   PrivateSubnet:
-    Type: AWS::EC2::Subnet
+    Type: 'AWS::EC2::Subnet'
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.2.0/24
       AvailabilityZone: ap-northeast-1a
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: c172b2b4-1e18-46f4-a9ac-e5feefb27c6d
   PublicRouteTable:
-    Type: AWS::EC2::RouteTable
+    Type: 'AWS::EC2::RouteTable'
     Properties:
       VpcId: !Ref VPC
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: 748cf0da-74e5-43eb-92dd-97b3337f3831
   PrivateRouteTable:
-    Type: AWS::EC2::RouteTable
+    Type: 'AWS::EC2::RouteTable'
     Properties:
       VpcId: !Ref VPC
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: c9011329-7e1f-43cc-aa61-c2c8f7682cb5
   PublicRoute:
-    Type: AWS::EC2::Route
+    Type: 'AWS::EC2::Route'
     Properties:
       DestinationCidrBlock: 0.0.0.0/0
       RouteTableId: !Ref PublicRouteTable
       GatewayId: !Ref InternetGateway
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: 877df7de-303d-41b0-8cde-715149eb0973
     DependsOn:
       - VPCGatewayAttachment
   PublicSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+    Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: Allow access from load balancer and SSH traffic
       SecurityGroupIngress:
@@ -427,10 +427,10 @@ Resources:
           CidrIp: 0.0.0.0/0
       VpcId: !Ref VPC
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: ac9c17dc-48e6-4001-abf5-767138f4c670
   PrivateSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+    Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: Allow access from public subnet and SSH traffic
       SecurityGroupIngress:
@@ -461,12 +461,12 @@ Resources:
           CidrIp: 0.0.0.0/0
       VpcId: !Ref VPC
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: c9b4d4ee-cfb4-4913-a8b1-6b079f2de24a
   ExternalLoadBalancerSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+    Type: 'AWS::EC2::SecurityGroup'
     Properties:
-      GroupDescription: Allow HTTP(s) and app from anywhere
+      GroupDescription: Allow HTTP(s) from anywhere
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
@@ -483,24 +483,24 @@ Resources:
           CidrIp: 0.0.0.0/0
       VpcId: !Ref VPC
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: c43c019d-9ffe-43b3-ae02-d60b4d4bc5d6
   InternetGateway:
-    Type: AWS::EC2::InternetGateway
+    Type: 'AWS::EC2::InternetGateway'
     Properties: {}
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: d77346db-2158-49fd-a44a-cf19413170ab
   VPCGatewayAttachment:
-    Type: AWS::EC2::VPCGatewayAttachment
+    Type: 'AWS::EC2::VPCGatewayAttachment'
     Properties:
       InternetGatewayId: !Ref InternetGateway
       VpcId: !Ref VPC
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: d309ea03-35dc-459a-aea8-5ad31f794575
   DNS:
-    Type: AWS::Route53::RecordSetGroup
+    Type: 'AWS::Route53::RecordSetGroup'
     Properties:
       HostedZoneName: !Ref hostedZoneName
       Comment: Zone apex alias targeted to ExternalLoadBalancer.
@@ -511,12 +511,12 @@ Resources:
             HostedZoneId: !GetAtt ExternalLoadBalancer.CanonicalHostedZoneID
             DNSName: !GetAtt ExternalLoadBalancer.DNSName
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: ae7edc86-2097-4a67-95b3-ed5b0c95017a
   ExternalLoadBalancer:
-    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
     Properties:
-      Name: ExternalLoadBalancer
+      Name: !Sub '${AWS::StackName}-exlb'
       Scheme: internet-facing
       SecurityGroups:
         - !Ref ExternalLoadBalancerSecurityGroup
@@ -525,10 +525,10 @@ Resources:
         - !Ref PublicSubnet2
       Type: application
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: 4703e375-3d3c-4cc5-b7ff-fd132e5bc879
   HTTPListener:
-    Type: AWS::ElasticLoadBalancingV2::Listener
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
     Properties:
       DefaultActions:
         - Type: forward
@@ -536,17 +536,14 @@ Resources:
             TargetGroups:
               - TargetGroupArn: !GetAtt WebTargetGroup.TargetGroupArn
                 Weight: 1
-            TargetGroupStickinessConfig:
-              DurationSeconds: 3600
-              Enabled: true
       LoadBalancerArn: !GetAtt ExternalLoadBalancer.LoadBalancerArn
       Port: 80
       Protocol: HTTP
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: 09adaace-5635-4afd-a037-758ca6091634
   HTTPSListener:
-    Type: AWS::ElasticLoadBalancingV2::Listener
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
     Properties:
       DefaultActions:
         - Type: forward
@@ -554,9 +551,6 @@ Resources:
             TargetGroups:
               - TargetGroupArn: !GetAtt WebTargetGroup.TargetGroupArn
                 Weight: 1
-            TargetGroupStickinessConfig:
-              DurationSeconds: 3600
-              Enabled: true
       LoadBalancerArn: !GetAtt ExternalLoadBalancer.LoadBalancerArn
       Certificates:
         - CertificateArn: !Ref certificateArn
@@ -564,26 +558,26 @@ Resources:
       Protocol: HTTPS
       SslPolicy: ELBSecurityPolicy-2016-08
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: 858329c2-e110-4f9a-819e-41d58272fe7c
     DependsOn:
       - DNS
   PublicSubnet2:
-    Type: AWS::EC2::Subnet
+    Type: 'AWS::EC2::Subnet'
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.3.0/24
       AvailabilityZone: ap-northeast-1c
       MapPublicIpOnLaunch: true
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: 180e2ee1-8578-4629-b20b-4cd47d57f011
   CloudWatchLogsVPCEndpoint:
-    Type: AWS::EC2::VPCEndpoint
+    Type: 'AWS::EC2::VPCEndpoint'
     Properties:
       VpcEndpointType: Interface
       PrivateDnsEnabled: true
-      ServiceName: !Sub com.amazonaws.${AWS::Region}.logs
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.logs'
       VpcId: !Ref VPC
       SubnetIds:
         - !Ref PrivateSubnet
@@ -591,14 +585,14 @@ Resources:
       SecurityGroupIds:
         - !Ref VPCEndpointSecurityGroup
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: 9384b3df-130b-4b04-8107-2ea01180adfb
   SecretsManagerVPCEndpoint:
-    Type: AWS::EC2::VPCEndpoint
+    Type: 'AWS::EC2::VPCEndpoint'
     Properties:
       VpcEndpointType: Interface
       PrivateDnsEnabled: true
-      ServiceName: !Sub com.amazonaws.${AWS::Region}.secretsmanager
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.secretsmanager'
       VpcId: !Ref VPC
       SubnetIds:
         - !Ref PrivateSubnet
@@ -606,10 +600,10 @@ Resources:
       SecurityGroupIds:
         - !Ref VPCEndpointSecurityGroup
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: 3d63d8d7-768c-4598-a3f7-3dffdbc00411
   VPCEndpointSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+    Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: Allow access from VPC and Subnet
       SecurityGroupIngress:
@@ -640,39 +634,39 @@ Resources:
           CidrIp: 0.0.0.0/0
       VpcId: !Ref VPC
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: 98527b75-4047-4ee1-8c9d-f73ea82e84fd
   PublicRouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
       SubnetId: !Ref PublicSubnet
       RouteTableId: !Ref PublicRouteTable
   PublicRouteTableAssociation2:
-    Type: AWS::EC2::SubnetRouteTableAssociation
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
       SubnetId: !Ref PublicSubnet2
       RouteTableId: !Ref PublicRouteTable
   PrivateRouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
       SubnetId: !Ref PrivateSubnet
       RouteTableId: !Ref PrivateRouteTable
   PrivateRouteTableAssociation2:
-    Type: AWS::EC2::SubnetRouteTableAssociation
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
       SubnetId: !Ref PrivateSubnet2
       RouteTableId: !Ref PrivateRouteTable
   PrivateSubnet2:
-    Type: AWS::EC2::Subnet
+    Type: 'AWS::EC2::Subnet'
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.4.0/24
       AvailabilityZone: ap-northeast-1c
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: f81eefea-d3c2-4fc6-8452-9fc5338f6a65
   ElastiCacheSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+    Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: Allow access from public and private
       SecurityGroupIngress:
@@ -691,10 +685,10 @@ Resources:
           CidrIp: 0.0.0.0/0
       VpcId: !Ref VPC
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: ed43b443-0134-463d-92fa-97721a39eb33
   RDSSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+    Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: Allow access from public and private
       SecurityGroupIngress:
@@ -713,10 +707,10 @@ Resources:
           CidrIp: 0.0.0.0/0
       VpcId: !Ref VPC
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: c7875a33-6903-4ddb-b14c-970ff5ef58f5
   SelfRefSecurityGroupIgress:
-    Type: AWS::EC2::SecurityGroupIngress
+    Type: 'AWS::EC2::SecurityGroupIngress'
     Properties:
       GroupId: !GetAtt RDSSecurityGroup.GroupId
       IpProtocol: tcp
@@ -724,10 +718,10 @@ Resources:
       ToPort: 65535
       SourceSecurityGroupId: !GetAtt RDSSecurityGroup.GroupId
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: 4646c1b8-02ba-409a-bdfc-31f6a1f6d621
   WebTargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
     Properties:
       HealthCheckEnabled: true
       HealthCheckIntervalSeconds: 35
@@ -736,41 +730,32 @@ Resources:
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 30
       HealthyThresholdCount: 5
-      Name: WebTargetGroup
+      Name: !Sub '${AWS::StackName}-webtg'
       Port: 80
       Protocol: HTTP
       TargetType: ip
       UnhealthyThresholdCount: 2
       VpcId: !Ref VPC
-      TargetGroupAttributes:
-        - Key: stickiness.enabled
-          Value: 'true'
-        - Key: stickiness.type
-          Value: lb_cookie
-        - Key: stickiness.lb_cookie.duration_seconds
-          Value: '3600'
-        - Key: deregistration_delay.timeout_seconds
-          Value: '300'
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: 5a43d249-4eb3-4135-88e1-a6cd6265ee48
   S3VPCGatewayEndpoint:
-    Type: AWS::EC2::VPCEndpoint
+    Type: 'AWS::EC2::VPCEndpoint'
     Properties:
       VpcEndpointType: Gateway
       VpcId: !Ref VPC
-      ServiceName: !Sub com.amazonaws.${AWS::Region}.s3
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.s3'
       RouteTableIds:
         - !Ref PrivateRouteTable
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: 0b70d9bd-f468-4ad8-a76b-0ed9cbc9bc95
   RDSVPCEndpoint:
-    Type: AWS::EC2::VPCEndpoint
+    Type: 'AWS::EC2::VPCEndpoint'
     Properties:
       VpcEndpointType: Interface
       PrivateDnsEnabled: true
-      ServiceName: !Sub com.amazonaws.${AWS::Region}.rds
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.rds'
       VpcId: !Ref VPC
       SubnetIds:
         - !Ref PrivateSubnet
@@ -778,12 +763,12 @@ Resources:
       SecurityGroupIds:
         - !Ref VPCEndpointSecurityGroup
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: b905d21b-a08c-489f-88d5-c1668033a80e
   InternalLoadBalancer:
-    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
     Properties:
-      Name: InternalLoadBalancer
+      Name: !Sub '${AWS::StackName}-inlb'
       Scheme: internal
       SecurityGroups:
         - !Ref InternalLoadBalancerSecurityGroup
@@ -792,10 +777,10 @@ Resources:
         - !Ref PublicSubnet2
       Type: network
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: a6a6320c-95bb-4b75-ad09-804ea053ed8c
   PresentationListener:
-    Type: AWS::ElasticLoadBalancingV2::Listener
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
     Properties:
       DefaultActions:
         - Type: forward
@@ -806,10 +791,10 @@ Resources:
       Port: 8080
       Protocol: TCP
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: 66f7b881-80b6-4a5b-8ecf-6427532dcc24
   PresentationTargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
     Properties:
       HealthCheckEnabled: true
       HealthCheckIntervalSeconds: 35
@@ -818,17 +803,17 @@ Resources:
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 30
       HealthyThresholdCount: 5
-      Name: PresentationTargetGroup
+      Name: !Sub '${AWS::StackName}-pretg'
       Port: 8080
       Protocol: TCP
       TargetType: ip
       UnhealthyThresholdCount: 2
       VpcId: !Ref VPC
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: f880c388-26e5-45ed-bd6d-0f6b15d7b464
   ApplicationListener:
-    Type: AWS::ElasticLoadBalancingV2::Listener
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
     Properties:
       DefaultActions:
         - Type: forward
@@ -839,10 +824,10 @@ Resources:
       Port: 8081
       Protocol: TCP
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: 25d3c3f7-5a53-4737-b2dc-20466b4528da
   ApplicationTargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
     Properties:
       HealthCheckEnabled: true
       HealthCheckIntervalSeconds: 35
@@ -851,17 +836,17 @@ Resources:
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 30
       HealthyThresholdCount: 5
-      Name: ApplicationTargetGroup
+      Name: !Sub '${AWS::StackName}-apptg'
       Port: 8081
       Protocol: TCP
       TargetType: ip
       UnhealthyThresholdCount: 2
       VpcId: !Ref VPC
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: 12feec27-08b7-49bb-ad2e-c5d91794edff
   InternalLoadBalancerSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+    Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: Allow access from Public
       SecurityGroupIngress:
@@ -876,17 +861,16 @@ Resources:
           CidrIp: 0.0.0.0/0
       VpcId: !Ref VPC
     Metadata:
-      AWS::CloudFormation::Designer:
+      'AWS::CloudFormation::Designer':
         id: 5ce5b250-2492-454f-8629-1aa84e7be81e
 Parameters:
   globalIP:
-    Description: ' The IP address range that can be used to access the web server
-      using SSH.'
+    Description: ' The IP address range that can be used to access the web server using SSH.'
     Type: String
     MinLength: '9'
     MaxLength: '18'
     Default: 0.0.0.0/32
-    AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
+    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
     ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
   hostedZoneName:
     Description: Host Zone(Route53)
@@ -899,14 +883,14 @@ Parameters:
   certificateArn:
     Description: CertificateArn(ACM)
     Type: String
-    Default: arn:aws:acm:ap-northeast-1:XXXXXXXXX:certificate/XXXX
+    Default: 'arn:aws:acm:ap-northeast-1:XXXXXXXXX:certificate/XXXX'
 Outputs:
-  appDomain:
+  AppDomain:
     Value: !GetAtt InternalLoadBalancer.DNSName
     Description: InternalLoadBalancer.DNSName
     Export:
       Name: appDomain
-  vpcId:
+  VPCId:
     Value: !GetAtt VPC.VpcId
     Description: VPC.VpcId
     Export:
@@ -914,24 +898,34 @@ Outputs:
   ELBWebTargetGroupArn:
     Value: !GetAtt WebTargetGroup.TargetGroupArn
     Description: WebTargetGroup.TargetGroupArn
+    Export:
+      Name: elbWebTargetGroupArn
   ELBPresentationTargetGroupArn:
     Value: !GetAtt PresentationTargetGroup.TargetGroupArn
     Description: PresentationTargetGroup.TargetGroupArn
+    Export:
+      Name: elbPresentationTargetGroupArn
   ELBApplicationTargetGroupArn:
     Value: !GetAtt ApplicationTargetGroup.TargetGroupArn
     Description: ApplicationTargetGroup.TargetGroupArn
+    Export:
+      Name: elbApplicationTargetGroupArn
   PublicSubnet1Id:
     Value: !GetAtt PublicSubnet.SubnetId
     Description: PublicSubnet.SubnetId
+    Export:
+      Name: publicSubnet1Id
   PublicSubnet2Id:
     Value: !GetAtt PublicSubnet2.SubnetId
     Description: PublicSubnet2.SubnetId
-  privateSubnet1Id:
+    Export:
+      Name: publicSubnet2Id
+  PrivateSubnet1Id:
     Value: !GetAtt PrivateSubnet.SubnetId
     Description: PrivateSubnet.SubnetId
     Export:
       Name: privateSubnet1Id
-  privateSubnet2Id:
+  PrivateSubnet2Id:
     Value: !GetAtt PrivateSubnet2.SubnetId
     Description: PrivateSubnet2.SubnetId
     Export:
@@ -939,12 +933,14 @@ Outputs:
   PublicSecurityGroupId:
     Value: !GetAtt PublicSecurityGroup.GroupId
     Description: PublicSecurityGroup.GroupId
-  elastiCacheSecurityGroupId:
+    Export:
+      Name: publicSecurityGroupId
+  ElastiCacheSecurityGroupId:
     Value: !GetAtt ElastiCacheSecurityGroup.GroupId
     Description: ElastiCacheSecurityGroup.GroupId
     Export:
       Name: elastiCacheSecurityGroupId
-  rdsSecurityGroupId:
+  RDSSecurityGroupId:
     Value: !GetAtt RDSSecurityGroup.GroupId
     Description: RDSSecurityGroup.GroupId
     Export:
@@ -952,3 +948,6 @@ Outputs:
   InternalELBSecurityGroupId:
     Value: !GetAtt InternalLoadBalancerSecurityGroup.GroupId
     Description: InternalLoadBalancerSecurityGroup.GroupId
+    Export:
+      Name: internalELBSecurityGroupId
+
