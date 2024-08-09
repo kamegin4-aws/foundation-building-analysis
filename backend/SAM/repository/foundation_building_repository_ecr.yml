@@ -1,0 +1,56 @@
+Resources:
+  ImageRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub ${AWS::StackName}-image-repo
+      EmptyOnDelete: true
+      EncryptionConfiguration:
+        EncryptionType: AES256
+      RepositoryPolicyText:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowRoot
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action: ecr:*
+          - Sid: AllowUser
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Sub arn:aws:sts::${AWS::AccountId}:federated-user/${consoleUserName}
+                - !Sub arn:aws:iam::${AWS::AccountId}:user/${terminalUserName}
+            Action: ecr:*
+          - Sid: AllowVPC
+            Effect: Allow
+            Principal: "*"
+            Action: ecr:*
+            Condition:
+              StringEquals:
+                aws:SourceVpc: !ImportValue vpcId
+          - Sid: AllowService
+            Effect: Allow
+            Principal:
+              Service:
+                - ecs.amazonaws.com
+                - ecs-tasks.amazonaws.com
+            Action: ecr:*
+            Condition:
+              StringEquals:
+                aws:ResourceAccount: !Ref AWS::AccountId
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  consoleUserName:
+    Description: Console User Name
+    Type: String
+    Default: XXXX
+  terminalUserName:
+    Description: Terminal User Name
+    Type: String
+    Default: XXXX
+Outputs:
+  ImageRepositoryUri:
+    Value: !GetAtt ImageRepository.RepositoryUri
+    Description: Repository Uri.
+    Export:
+      Name: imageRepositoryUri
