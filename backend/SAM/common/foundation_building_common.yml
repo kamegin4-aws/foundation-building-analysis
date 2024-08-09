@@ -21,12 +21,6 @@ Resources:
             Condition:
               StringEquals:
                 aws:ResourceAccount: !Ref AWS::AccountId
-  DockerHubSecret:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Name: DockerHubSecret
-      Description: DockerHubSecret
-      SecretString: !Ref dockerCredentialsParameter
   Cluster:
     Type: AWS::ECS::Cluster
     Properties:
@@ -35,19 +29,9 @@ Resources:
         - FARGATE
         - FARGATE_SPOT
 Transform: AWS::Serverless-2016-10-31
-Parameters:
-  dockerCredentialsParameter:
-    Type: String
-    Description: DockerHub credentials
-    Default: '{"username":"XXXX","password":"XXXX"}'
 Outputs:
-  clusterArn:
+  ClusterArn:
     Value: !GetAtt Cluster.Arn
     Description: Cluster Arn
     Export:
       Name: clusterArn
-  dockerHubSecretArn:
-    Value: !Ref DockerHubSecret
-    Description: DockerHubSecret ARN
-    Export:
-      Name: dockerHubSecretArn
