@@ -2,12 +2,12 @@
 ' Entities
 entity "User(Cognito)" as user {
   +user_id: uuid: User ID [PK]
-  user_name: varchar: User Name
-  email: varchar: Email
-  plan: varchar: Custom Plan
-  access_token: varchar: AccessToken
-  id_token: varchar: IDToken
-  refresh_token: varchar: RefreshToken
+  user_name: string: User Name
+  email: string: Email
+  plan: string: Custom Plan
+  access_token: string: AccessToken
+  id_token: string: IDToken
+  refresh_token: string: RefreshToken
   created_at: timestamptz: 作成日時
   updated_at : timestamptz: 更新日時
   --
@@ -77,15 +77,15 @@ entity "Analytics(S3)" as analytics {
   user_id: string: ユーザーID
 }
 
-entity "Progress(RDS)" as progress {
-  +progress_id: int: 進捗ID [PK]
+entity "Progress(DynamoDB)" as progress {
+  +progress_id: datetime.service_name_suffix: 進捗ID [PK]
   --
   meta_key: string: メタデータキー
   meta_value: string: メタデータバリュー
   service_name: varchar: サービス名
   status: varchar: ステータス
   created_at: timestamptz: 作成日時
-  user_id: varchar [FK]
+  user_id: varchar [GSI]
 }
 
 ' Relationships
