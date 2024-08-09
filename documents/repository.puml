@@ -1,6 +1,6 @@
 @startuml
 ' Entities
-entity "User(RDS)" as user {
+entity "User(Cognito)" as user {
   +user_id: uuid: User ID [PK]
   user_name: varchar: User Name
   email: varchar: Email
