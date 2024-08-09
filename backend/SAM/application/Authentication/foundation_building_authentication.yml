@@ -1,5 +1,5 @@
 Resources:
-  CloudWatchLogGroup:
+  CognitoLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub /aws/cognito/${AWS::StackName}-UserPool
@@ -12,7 +12,7 @@ Resources:
       AliasAttributes:
         - email
         - preferred_username
-      UserPoolName: !Sub ${AWS::StackName}-UserPool
+      UserPoolName: !Sub ${AWS::StackName}-user-pool
       AutoVerifiedAttributes:
         - email
       Schema:
@@ -32,20 +32,20 @@ Resources:
       CognitoIdentityProviders:
         - ClientId: !GetAtt UserPoolClient.ClientId
           ProviderName: !Sub cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}
-      IdentityPoolName: CognitoIdentityPool
+      IdentityPoolName: cognito-identity-pool
   CognitoUserPoolLogDelivery:
     Type: AWS::Cognito::LogDeliveryConfiguration
     Properties:
       UserPoolId: !Ref UserPool
       LogConfigurations:
         - CloudWatchLogsConfiguration:
-            LogGroupArn: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/cognito/${AWS::StackName}-UserPool
+            LogGroupArn: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${CognitoLogGroup}
           EventSource: userNotification
-          LogLevel: ERROR
+          LogLevel: INFO
   AuthRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub ${AWS::StackName}-AuthRole
+      RoleName: !Sub ${AWS::StackName}-auth-role
       Path: /
       MaxSessionDuration: 3600
       Policies:
@@ -197,22 +197,22 @@ Resources:
                 RoleARN: !GetAtt FreeRole.Arn
 Transform: AWS::Serverless-2016-10-31
 Outputs:
-  userPoolId:
+  UserPoolId:
     Value: !Ref UserPool
     Description: UserPool ID
     Export:
       Name: userPoolId
-  userPoolArn:
+  UserPoolArn:
     Value: !GetAtt UserPool.Arn
     Description: UserPool ARN
     Export:
       Name: userPoolArn
-  userPoolClientId:
+  UserPoolClientId:
     Value: !GetAtt UserPoolClient.ClientId
     Description: UserPoolClient ID
     Export:
       Name: userPoolClientId
-  identityPoolId:
+  IdentityPoolId:
     Value: !Ref IdentityPool
     Description: IdentityPool ID
     Export:
