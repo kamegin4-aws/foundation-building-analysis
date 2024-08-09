@@ -78,7 +78,7 @@ entity "Analytics(S3)" as analytics {
 }
 
 entity "Progress(DynamoDB)" as progress {
-  +'datetime.service_name_suffix': string: 進捗ID [PK]
+  +progress_id: datetime.service_name_suffix: 進捗ID [PK]
   --
   meta_key: string: メタデータキー
   meta_value: string: メタデータバリュー
