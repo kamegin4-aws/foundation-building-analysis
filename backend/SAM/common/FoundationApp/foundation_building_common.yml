@@ -21,17 +21,20 @@ Resources:
             Condition:
               StringEquals:
                 aws:ResourceAccount: !Ref AWS::AccountId
-  Cluster:
+  FargateCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: Cluster
+      ClusterName: !Sub ${AWS::StackName}-fargate-cluster
       CapacityProviders:
         - FARGATE
         - FARGATE_SPOT
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
 Transform: AWS::Serverless-2016-10-31
 Outputs:
-  ClusterArn:
-    Value: !GetAtt Cluster.Arn
-    Description: Cluster Arn
+  FargateClusterArn:
+    Value: !GetAtt FargateCluster.Arn
+    Description: FargateCluster Arn
     Export:
-      Name: clusterArn
+      Name: fargateClusterArn

@@ -950,4 +950,19 @@ Outputs:
     Description: InternalLoadBalancerSecurityGroup.GroupId
     Export:
       Name: internalELBSecurityGroupId
+  VPCCidrBlock:
+    Value: !GetAtt VPC.CidrBlock
+    Description: VPC.CidrBlock
+    Export:
+      Name: vpcCidrBlock
+  PublicSubnet1CidrBlock:
+    Value: !GetAtt PublicSubnet.CidrBlock
+    Description: PublicSubnet.CidrBlock
+    Export:
+      Name: publicSubnet1CidrBlock
+  PublicSubnet2CidrBlock:
+    Value: !GetAtt PublicSubnet2.CidrBlock
+    Description: PublicSubnet2.CidrBlock
+    Export:
+      Name: publicSubnet2CidrBlock
 

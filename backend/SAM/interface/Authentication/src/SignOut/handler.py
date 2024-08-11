@@ -1,12 +1,9 @@
-
-
 import json
 import logging
 import os
 import traceback
 
 import boto3
-from pycognito.aws_srp import AWSSRP
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -17,7 +14,6 @@ def handler(event, context):
     logger.debug(f'Received event: {json.dumps(event, indent=2)}')
 
     try:
-
         if ('body' in event):
             body = json.loads(event['body'])
             # body = event["body"]
@@ -28,25 +24,22 @@ def handler(event, context):
 
         client_secret = os.environ['CLIENT_SECRET']
 
-        user_name = body['user_name']
-        password = body['password']
-
-        aws_srp_wrapper = AWSSRPWrapper(
-            pool_id=user_pool_id,
+        cognitoIdentityProviderWrapper = CognitoIdentityProviderWrapper(
+            user_pool_id=user_pool_id,
             client_id=client_id,
-            client_secret=client_secret,
-        )
+            client_secret=client_secret)
 
-        sign_in = aws_srp_wrapper.sign_in(
-            username=user_name, password=password)
+        access_token = body['access_token']
+
+        cognitoIdentityProviderWrapper.sign_out(
+            access_token=access_token)
 
         return {
-            'statusCode': 200,
+            'statusCode': 204,
             'headers': {
                 'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': '*'},
-            'body': json.dumps(sign_in)}
+                'Access-Control-Allow-Methods': '*'}}
 
     except Exception:
         logger.error(traceback.format_exc())
@@ -60,38 +53,37 @@ def handler(event, context):
                 traceback.format_exc())}
 
 
-class AWSSRPWrapper:
-    """AWSSRPのラッパークラス
-    """
+class CognitoIdentityProviderWrapper:
+    """Encapsulates Amazon Cognito actions"""
 
     def __init__(
             self,
             *,
-            pool_id,
+            user_pool_id,
             client_id,
-            client_secret=None
-    ):
-        self.client = boto3.client('cognito-idp', region_name='ap-northeast-1')
-        self.pool_id = pool_id
+            client_secret=None):
+        """
+        :param cognito_idp_client: A Boto3 Amazon Cognito Identity Provider client.
+        :param user_pool_id: The ID of an existing Amazon Cognito user pool.
+        :param client_id: The ID of a client application registered with the user pool.
+        :param client_secret: The client secret, if the client has a secret.
+        """
+        self.cognito_idp_client = boto3.client(
+            'cognito-idp', region_name='ap-northeast-1')
+        self.user_pool_id = user_pool_id
         self.client_id = client_id
         self.client_secret = client_secret
 
-    def sign_in(self, *, username, password):
+    def sign_out(self, *, access_token):
         try:
             kwargs = {
-                'username': username,
-                'password': password,
-                'pool_id': self.pool_id,
-                'client_id': self.client_id,
-                'client': self.client,
-                'client_secret': self.client_secret,
+                'AccessToken': access_token
             }
-            aws = AWSSRP(**kwargs)
-            tokens = aws.authenticate_user()
-            logger.info(f'sign_in: {tokens}')
+            response = self.cognito_idp_client.global_sign_out(**kwargs)
+            logger.info(f'global_sign_out: {response}')
 
-            return tokens['AuthenticationResult']
+            return True
 
-        except Exception:
+        except Exception as err:
             raise RuntimeError(
-                'cognito server error: Cognito(pycognito.aws_srp) Error')
+                "cognito server error: Couldn't sign out") from err

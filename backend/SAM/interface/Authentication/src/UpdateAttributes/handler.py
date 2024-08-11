@@ -1,3 +1,4 @@
+
 import json
 import logging
 import os
@@ -30,6 +31,11 @@ def handler(event, context):
             client_secret=client_secret)
 
         access_token = body['access_token']
+        email = body['email'] if 'email' in body else None
+        plan = body['plan'] if 'plan' in body else None
+
+        cognitoIdentityProviderWrapper.update_attributes(
+            access_token=access_token, email=email, plan=plan)
 
         get_user = cognitoIdentityProviderWrapper.get_user(
             access_token=access_token)
@@ -76,6 +82,35 @@ class CognitoIdentityProviderWrapper:
         self.user_pool_id = user_pool_id
         self.client_id = client_id
         self.client_secret = client_secret
+
+    def update_attributes(self, *, access_token, email=None, plan=None):
+        try:
+            user_attributes = []
+
+            if email is not None:
+                user_attributes.append({
+                    'Name': 'email',
+                    'Value': email
+                })
+            if plan is not None:
+                user_attributes.append({
+                    'Name': 'custom:plan',
+                    'Value': plan
+                })
+
+            kwargs = {
+                'UserAttributes': user_attributes,
+                'AccessToken': access_token,
+            }
+            response = self.cognito_idp_client.update_user_attributes(
+                **kwargs)
+            logger.info(f'update_attributes: {response}')
+
+            return True
+
+        except Exception as err:
+            raise RuntimeError(
+                "cognito server error: Couldn't update_attributes") from err
 
     def get_user(self, *, access_token):
         try:

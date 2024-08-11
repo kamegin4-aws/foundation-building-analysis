@@ -1,4 +1,3 @@
-
 import json
 import logging
 import os
@@ -15,6 +14,7 @@ def handler(event, context):
     logger.debug(f'Received event: {json.dumps(event, indent=2)}')
 
     try:
+
         if ('body' in event):
             body = json.loads(event['body'])
             # body = event["body"]
@@ -31,9 +31,10 @@ def handler(event, context):
             client_secret=client_secret)
 
         access_token = body['access_token']
+        code = body['code']
 
-        sign_out = cognitoIdentityProviderWrapper.sign_out(
-            access_token=access_token)
+        verify = cognitoIdentityProviderWrapper.verify(
+            access_token=access_token, code=code)
 
         return {
             'statusCode': 200,
@@ -41,7 +42,7 @@ def handler(event, context):
                 'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': '*'},
-            'body': json.dumps(sign_out)}
+            'body': json.dumps(verify)}
 
     except Exception:
         logger.error(traceback.format_exc())
@@ -76,16 +77,19 @@ class CognitoIdentityProviderWrapper:
         self.client_id = client_id
         self.client_secret = client_secret
 
-    def sign_out(self, *, access_token):
+    def verify(self, *, access_token, code):
         try:
             kwargs = {
-                'AccessToken': access_token
+                'AccessToken': access_token,
+                'AttributeName': 'email',
+                'Code': code
             }
-            response = self.cognito_idp_client.global_sign_out(**kwargs)
-            logger.info(f'global_sign_out: {response}')
 
-            return True
+            response = self.cognito_idp_client.verify_user_attribute(**kwargs)
+            logger.info(f'verify_user_attribute: {response}')
 
         except Exception as err:
             raise RuntimeError(
-                "cognito server error: Couldn't sign out") from err
+                "cognito server error: Couldn't confirm verify_user_attribute.") from err
+
+        return True

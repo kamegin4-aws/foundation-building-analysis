@@ -45,12 +45,14 @@ def handler(event, context):
             plan_name=plan_name)
 
         return {
-            'statusCode': 200,
+            'statusCode': 201,
             'headers': {
                 'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': '*'},
-            'body': json.dumps(confirmed)}
+            'body': json.dumps(
+                cognitoIdentityProviderWrapper.toEntity(
+                    response=confirmed))}
 
     except Exception:
         logger.error(traceback.format_exc())
@@ -113,7 +115,6 @@ class CognitoIdentityProviderWrapper:
                 kwargs['SecretHash'] = self.secret_hash(user_name=user_name)
             response = self.cognito_idp_client.sign_up(**kwargs)
             logger.info(f'sign_up: {response}')
-            confirmed = response['UserConfirmed']
 
         except ClientError as err:
             if err.response['Error']['Code'] == 'UsernameExistsException':
@@ -128,7 +129,6 @@ class CognitoIdentityProviderWrapper:
 
                 error_massage = 'User {} exists and is {}.'.format(
                     user_name, response['UserStatus'])
-                confirmed = response['UserStatus'] == 'CONFIRMED'
             else:
                 logger.error(
                     "Couldn't sign up %s. Here's why: %s: %s",
@@ -142,7 +142,7 @@ class CognitoIdentityProviderWrapper:
             raise RuntimeError(
                 f'cognito server error: {error_massage}') from err
 
-        return confirmed
+        return response
 
     def secret_hash(self, *, user_name):
         """_summary_
@@ -162,3 +162,17 @@ class CognitoIdentityProviderWrapper:
                 digestmod=hashlib.sha256).digest()).decode()
 
         return secret_hash
+
+    def toEntity(self, *, response):
+        """_summary_
+        エンティティに変換する
+        Args:
+            response (dict): cognito_idp_clientのレスポンス
+
+        Returns:
+            dict: Userンティティ
+        """
+        entity = {}
+        entity['user_id'] = response['UserSub']
+
+        return entity
