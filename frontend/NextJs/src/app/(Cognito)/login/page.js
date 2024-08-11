@@ -1,46 +1,48 @@
-"use client";
+'use client';
 
-import AlertWrapper from "@/ui/Cloudscape/alert";
-import ContainerWrapper from "@/ui/Cloudscape/container";
-import ContentLayoutWrapper from "@/ui/Cloudscape/content_layout";
-import FormWrapper from "@/ui/Cloudscape/form";
-import HeaderWrapper from "@/ui/Cloudscape/header";
-import LinkWrapper from "@/ui/Cloudscape/link";
-import TabsWrapper from "@/ui/Cloudscape/tabs";
-import ButtonWrapper from "@/ui/Cloudscape/button";
-import FormFieldWrapper from "@/ui/Cloudscape/form_field";
-import InputWrapper from "@/ui/Cloudscape/input";
-import Image from "next/image";
-import { useEffect, useState } from "react";
+import { UserNameLogin } from '@/library/api/cognito/login';
+import { LoginValidation } from '@/library/validation/cognito/login';
+import { ZodWrapper } from '@/library/validation/infrastructure/zod/zod_client';
+import AlertWrapper from '@/ui/Cloudscape/alert';
+import ButtonWrapper from '@/ui/Cloudscape/button';
+import ContainerWrapper from '@/ui/Cloudscape/container';
+import ContentLayoutWrapper from '@/ui/Cloudscape/content_layout';
+import FormWrapper from '@/ui/Cloudscape/form';
+import FormFieldWrapper from '@/ui/Cloudscape/form_field';
+import HeaderWrapper from '@/ui/Cloudscape/header';
+import InputWrapper from '@/ui/Cloudscape/input';
+import LinkWrapper from '@/ui/Cloudscape/link';
+import TabsWrapper from '@/ui/Cloudscape/tabs';
+import TextContentWrapper from '@/ui/Cloudscape/text_content';
+import BreadcrumbProvider from '@/ui/components/provider/bread_crumb';
+import FlashBarProvider from '@/ui/components/provider/flash_bar';
+import log4js from 'log4js';
+import Image from 'next/image';
+import React, { useEffect, useState } from 'react';
 
-import { LoginValidation } from "@/library/validation/cognito/login";
-import { ZodWrapper } from "@/library/validation/infrastructure/zod/zod_client";
-import { UserNameLogin } from "@/library/api/cognito/login";
-import TextContentWrapper from "@/ui/Cloudscape/text_content";
-import BreadcrumbProvider from "@/ui/components/provider/bread_crumb";
-import FlashBarProvider from "@/ui/components/provider/flash_bar";
-import React from "react";
+const logger = log4js.getLogger();
+logger.level = 'debug';
 
 export default function LoginPage() {
   //Alert
   const [alertDisplay, setAlertDisplay] = useState(false);
-  const [alertType, setAlertType] = useState("");
-  const [alertHeader, setAlertHeader] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState('');
+  const [alertHeader, setAlertHeader] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
 
   //Form
-  const [userNameInputValue, setUserNameInputValue] = useState("");
-  const [userNameErrorText, setUserNameErrorText] = useState("");
-  const [passwordInputValue, setPasswordInputValue] = useState("");
-  const [passwordErrorText, setPasswordErrorText] = useState("");
+  const [userNameInputValue, setUserNameInputValue] = useState('');
+  const [userNameErrorText, setUserNameErrorText] = useState('');
+  const [passwordInputValue, setPasswordInputValue] = useState('');
+  const [passwordErrorText, setPasswordErrorText] = useState('');
   const [loginButtonLoading, setLoginButtonLoading] = useState(false);
-  const [loginButtonLoadingText, setLoginButtonLoadingText] = useState("");
+  const [loginButtonLoadingText, setLoginButtonLoadingText] = useState('');
 
   const onSubmit = async (event) => {
     event.preventDefault();
     try {
       setLoginButtonLoading(true);
-      setLoginButtonLoadingText("ログイン中...");
+      setLoginButtonLoadingText('ログイン中...');
 
       const loginValidation = new LoginValidation({
         validationInstance: new ZodWrapper(),
@@ -55,55 +57,53 @@ export default function LoginPage() {
       const validationResult = loginValidation.execute({
         formData: formObject,
       });
-      setUserNameErrorText("");
-      setPasswordErrorText("");
+      setUserNameErrorText('');
+      setPasswordErrorText('');
       setAlertDisplay(false);
 
       if (validationResult == true) {
-        console.log("loginValidation: true");
+        logger.info('loginValidation: true');
         const apiResponse = await userNameLogin.execute({
           formData: formObject,
         });
 
         if (apiResponse.ok) {
           const apiResponseObject = await apiResponse.json();
-          console.log("apiResponseObject", apiResponseObject);
+          logger.debug('apiResponseObject', apiResponseObject);
           setAlertDisplay(true);
-          setAlertType("success");
-          setAlertHeader("ログインしました。");
-          setAlertMessage("");
-          //setCognitoTokens(apiResponseObject);
-          //setAlertMessage(JSON.stringify(apiResponseObject));
+          setAlertType('success');
+          setAlertHeader('ログインしました。');
+          setAlertMessage('');
         } else {
           setAlertDisplay(true);
-          setAlertType("error");
-          setAlertHeader("ログインに失敗しました。");
+          setAlertType('error');
+          setAlertHeader('ログインに失敗しました。');
           setAlertMessage(await apiResponse.json());
         }
       } else {
-        console.log("loginValidation: false: ", validationResult);
+        logger.debug('loginValidation: false: ', validationResult);
         const validationResultObject = validationResult;
         for (let validation of validationResultObject) {
-          if (validation["index"] == "userName")
-            setUserNameErrorText(validation["message"]);
-          else if (validation["index"] == "password")
-            setPasswordErrorText(validation["message"]);
+          if (validation['index'] == 'userName')
+            setUserNameErrorText(validation['message']);
+          else if (validation['index'] == 'password')
+            setPasswordErrorText(validation['message']);
         }
 
         return false;
       }
     } catch (e) {
       if (e instanceof Error) {
-        console.log(e.message);
+        logger.error(e.message);
         setAlertDisplay(true);
-        setAlertType("error");
-        setAlertHeader("エラーが発生しました。");
+        setAlertType('error');
+        setAlertHeader('エラーが発生しました。');
         setAlertMessage(e.message);
       } else {
         setAlertDisplay(true);
-        setAlertType("error");
-        setAlertHeader("エラーが発生しました。");
-        setAlertMessage("Client Error");
+        setAlertType('error');
+        setAlertHeader('エラーが発生しました。');
+        setAlertMessage('Client Error');
       }
     } finally {
       setLoginButtonLoading(false);
@@ -112,11 +112,11 @@ export default function LoginPage() {
 
   const clearOnClick = (event) => {
     event.preventDefault();
-    console.log(event.detail);
-    setUserNameInputValue("");
-    setPasswordInputValue("");
-    setUserNameErrorText("");
-    setPasswordErrorText("");
+    logger.debug(event.detail);
+    setUserNameInputValue('');
+    setPasswordInputValue('');
+    setUserNameErrorText('');
+    setPasswordErrorText('');
   };
 
   useEffect(() => {}, []);
@@ -126,12 +126,12 @@ export default function LoginPage() {
       <FlashBarProvider />
       <BreadcrumbProvider />
       <ContentLayoutWrapper
-        header={<HeaderWrapper title={"Login"} />}
+        header={<HeaderWrapper title={'Login'} />}
         content={
           <ContainerWrapper
             header={
               <HeaderWrapper
-                title={"Login Form"}
+                title={'Login Form'}
                 alert={
                   alertDisplay ? (
                     <AlertWrapper
@@ -144,7 +144,7 @@ export default function LoginPage() {
                 }
               />
             }
-            footer={<LinkWrapper href={"/signup"} alt={"アカウントの作成"} />}
+            footer={<LinkWrapper href={'/signup'} alt={'アカウントの作成'} />}
             media={{
               content: (
                 <Image
@@ -154,33 +154,33 @@ export default function LoginPage() {
                   height={500}
                 />
               ),
-              position: "side",
-              width: "25%",
+              position: 'side',
+              width: '25%',
             }}
             content={
               <TabsWrapper
                 tabs={[
                   {
-                    label: "User Name",
-                    id: "userName",
+                    label: 'User Name',
+                    id: 'userName',
                     content: (
                       <FormWrapper
-                        id={"login_form"}
+                        id={'login_form'}
                         onSubmit={onSubmit}
                         actions={
                           <>
                             <ButtonWrapper
-                              variant={"normal"}
-                              iconName={"refresh"}
-                              iconAlt={"クリア"}
-                              name={"クリア"}
+                              variant={'normal'}
+                              iconName={'refresh'}
+                              iconAlt={'クリア'}
+                              name={'クリア'}
                               onClick={clearOnClick}
                             />
                             <ButtonWrapper
-                              formAction={"submit"}
-                              iconName={"user-profile-active"}
-                              iconAlt={"ログイン"}
-                              name={"ログイン"}
+                              formAction={'submit'}
+                              iconName={'user-profile-active'}
+                              iconAlt={'ログイン'}
+                              name={'ログイン'}
                               loading={loginButtonLoading}
                               loadingText={loginButtonLoadingText}
                             />
@@ -189,9 +189,9 @@ export default function LoginPage() {
                         container={
                           <>
                             <FormFieldWrapper
-                              label={"ユーザー名"}
+                              label={'ユーザー名'}
                               description={
-                                "ユーザー名を入力してください。(例)太郎"
+                                'ユーザー名を入力してください。(例)太郎'
                               }
                               formField={
                                 <InputWrapper
@@ -202,11 +202,11 @@ export default function LoginPage() {
                               errorText={userNameErrorText}
                             />
                             <FormFieldWrapper
-                              label={"パスワード"}
+                              label={'パスワード'}
                               description={
                                 <TextContentWrapper
                                   contents={
-                                    <ul style={{ color: "gray" }}>
+                                    <ul style={{ color: 'gray' }}>
                                       <li>パスワードを入力してください。</li>
                                       <li>パスワードの最小文字数:8 文字。</li>
                                       <li>少なくとも 1 つの数字を含む。</li>
@@ -219,7 +219,7 @@ export default function LoginPage() {
                               }
                               formField={
                                 <InputWrapper
-                                  type={"password"}
+                                  type={'password'}
                                   value={passwordInputValue}
                                   parentSetValue={setPasswordInputValue}
                                 />
@@ -232,19 +232,19 @@ export default function LoginPage() {
                     ),
                   },
                   {
-                    label: "Google",
-                    id: "google",
-                    content: "Google Login content area in preparation",
+                    label: 'Google',
+                    id: 'google',
+                    content: 'Google Login content area in preparation',
                   },
                   {
-                    label: "X(Twitter)",
-                    id: "x_twitter",
-                    content: "X(Twitter) Login content area in preparation",
+                    label: 'X(Twitter)',
+                    id: 'x_twitter',
+                    content: 'X(Twitter) Login content area in preparation',
                   },
                   {
-                    label: "Instagram",
-                    id: "instagram",
-                    content: "Instagram Login content area in preparation",
+                    label: 'Instagram',
+                    id: 'instagram',
+                    content: 'Instagram Login content area in preparation',
                   },
                 ]}
               />

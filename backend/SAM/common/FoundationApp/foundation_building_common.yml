@@ -21,33 +21,20 @@ Resources:
             Condition:
               StringEquals:
                 aws:ResourceAccount: !Ref AWS::AccountId
-  DockerHubSecret:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Name: DockerHubSecret
-      Description: DockerHubSecret
-      SecretString: !Ref dockerCredentialsParameter
-  Cluster:
+  FargateCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: Cluster
+      ClusterName: !Sub ${AWS::StackName}-fargate-cluster
       CapacityProviders:
         - FARGATE
         - FARGATE_SPOT
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
 Transform: AWS::Serverless-2016-10-31
-Parameters:
-  dockerCredentialsParameter:
-    Type: String
-    Description: DockerHub credentials
-    Default: '{"username":"XXXX","password":"XXXX"}'
 Outputs:
-  clusterArn:
-    Value: !GetAtt Cluster.Arn
-    Description: Cluster Arn
+  FargateClusterArn:
+    Value: !GetAtt FargateCluster.Arn
+    Description: FargateCluster Arn
     Export:
-      Name: clusterArn
-  dockerHubSecretArn:
-    Value: !Ref DockerHubSecret
-    Description: DockerHubSecret ARN
-    Export:
-      Name: dockerHubSecretArn
+      Name: fargateClusterArn

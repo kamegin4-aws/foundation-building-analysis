@@ -1,22 +1,100 @@
 @startuml
 ' Entities
-entity "User" as user {
-  +user_id: varchar: Cognito User ID [PK]
+entity "User(Cognito)" as user {
+  +user_id: uuid: User ID [PK]
+  user_name: string: User Name
+  email: string: Email
+  plan: string: Custom Plan
+  access_token: string: AccessToken
+  id_token: string: IDToken
+  refresh_token: string: RefreshToken
+  created_at: timestamptz: 作成日時
+  updated_at : timestamptz: 更新日時
   --
 }
 
-entity "InMemoryData" as in_memory_data {
-  +id: varchar: データID [PK]
+entity "RelationalData(RDS)" as relational_data {
+  +relational_id: uuid: 関係データID [PK]
   --
   key: varchar: キー
   value: varchar: バリュー
   created_at: timestamptz: 作成日時
   updated_at : timestamptz: 更新日時
+  meta_key: varchar: メタデータキー
+  meta_value: varchar: メタデータバリュー
+  comment: varchar: コメント
+  version_id: uuid: バージョンID
   user_id: varchar [FK]
-  unique : [user_id, key] 
+  unique : [user_id, meta_key, meta_value, version_id, key]
+}
+
+entity "ObjectData(S3)" as object_data {
+  +pah: string: user_id/meta_key=meta_value/mimeType=mimeType/fileName?versionId [PK]
+  --
+  meta_key: string: メタデータキー
+  meta_value: string: メタデータバリュー
+  mimeType: string: MIMEタイプ(audio, image, text...)
+  fileName: string: ファイル名
+  comment: varchar: コメント
+  versionId: uuid: バージョンID
+  user_id: string: ユーザーID
+}
+
+entity "ETL(S3)" as etl {
+  +pah: string: user_id/meta_key=meta_value/mimeType=mimeType/name?versionId [PK]
+  --
+  meta_key: string: メタデータキー
+  meta_value: string: メタデータバリュー
+  mimeType: string: MIMEタイプ(audio, image, text...)
+  name: string: ファイル(テーブル)名
+  comment: varchar: コメント
+  versionId: uuid: バージョンID
+  user_id: string: ユーザーID
+}
+
+entity "AI(S3)" as ai {
+  +pah: string: user_id/meta_key=meta_value/aiType=aiType/experimentName/step=step/experimentName?versionId [PK]
+  --
+  meta_key: string: メタデータキー
+  meta_value: string: メタデータバリュー
+  aiType: string: AIタイプ(画像認識, 音声認識, 動画認識...)
+  experimentName: string: 実験名
+  step: string: 実験ステップ((ラベリング), (特徴量), (学習), 推論...)
+  comment: varchar: コメント
+  versionId: uuid: バージョンID
+  user_id: string: ユーザーID
+}
+
+entity "Analytics(S3)" as analytics {
+  +pah: string: user_id/meta_key=meta_value/Category=Category/analysisName?versionId [PK]
+  --
+  meta_key: string: メタデータキー
+  meta_value: string: メタデータバリュー
+  Category: string: カテゴリー(オリジナル, ETL, 画像認識)
+  analysisName: string: 分析名
+  comment: varchar: コメント
+  versionId: uuid: バージョンID
+  user_id: string: ユーザーID
+}
+
+entity "Progress(DynamoDB)" as progress {
+  +progress_id: datetime.service_name_suffix: 進捗ID [PK]
+  --
+  meta_key: string: メタデータキー
+  meta_value: string: メタデータバリュー
+  service_name: varchar: サービス名
+  status: varchar: ステータス
+  created_at: timestamptz: 作成日時
+  user_id: varchar [GSI]
 }
 
 ' Relationships
-user ||--o{ in_memory_data: "Key:Valueデータを保存"
+user ||--o{ relational_data: リレーショナルデータを保存
+user ||--o{ object_data: オブジェクトデータを保存
+relational_data ||--|| etl: データを正規化
+object_data ||--|| etl: データを正規化
+etl ||--o{ ai: ラベリング,学習,推論
+etl ||--o{ analytics: 分析
+ai ||--o{ analytics: 分析
 
 @enduml

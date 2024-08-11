@@ -1,0 +1,81 @@
+Resources:
+  ServerlessCache:
+    Type: AWS::ElastiCache::ServerlessCache
+    Properties:
+      ServerlessCacheName: !Sub ${AWS::StackName}-seless
+      Engine: redis
+      Description: My Serverless memcached Cache
+      KmsKeyId: !Ref ElasticCacheKey
+      CacheUsageLimits:
+        DataStorage:
+          Maximum: 5000
+          Minimum: 0
+          Unit: GB
+        ECPUPerSecond:
+          Maximum: 15000000
+          Minimum: 0
+      SecurityGroupIds:
+        - !ImportValue elastiCacheSecurityGroupId
+      SubnetIds:
+        - !ImportValue privateSubnet1Id
+        - !ImportValue privateSubnet2Id
+  ElasticCacheKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: My Symmetric Encryption Key
+      Enabled: true
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Id: key-default-ElasticCacheKey
+        Statement:
+          - Sid: AllowRoot
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - kms:*
+            Resource: '*'
+          - Sid: AllowUser
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Sub arn:aws:sts::${AWS::AccountId}:federated-user/${userName}
+            Action:
+              - kms:*
+            Resource: '*'
+          - Sid: AllowVPC
+            Effect: Allow
+            Principal: '*'
+            Action:
+              - kms:*
+            Condition:
+              StringEquals:
+                aws:SourceVpc: !ImportValue vpcId
+          - Sid: AllowService
+            Effect: Allow
+            Principal:
+              Service:
+                - elasticache.amazonaws.com
+            Action:
+              - kms:*
+            Condition:
+              StringEquals:
+                aws:ResourceAccount: !Ref AWS::AccountId
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  userName:
+    Description: User Name
+    Type: String
+    Default: XXXX
+Outputs:
+  CacheEndpoint:
+    Value: !GetAtt ServerlessCache.Endpoint.Address
+    Description: ServerlessCache Endpoint
+    Export:
+      Name: cacheEndpoint
+  CachePort:
+    Value: !GetAtt ServerlessCache.Endpoint.Port
+    Description: ServerlessCache Port
+    Export:
+      Name: cachePort

@@ -1,16 +1,13 @@
-"use client";
+'use client';
 
-import TopNavigationWrapper from "@/ui/Cloudscape/top_navigation";
-import SideNavigationWrapper from "@/ui/Cloudscape/side_navigation";
-import AppLayoutWrapper from "@/ui/Cloudscape/app_layout";
-import BreadcrumbGroupWrapper from "@/ui/Cloudscape/breadcrumb_group";
-import FlashBarWrapper from "@/ui/Cloudscape/flashbar";
-import { useState, useContext } from "react";
-import CognitoProvider from "@/ui/components/provider/cognito_provider";
-import AppLayoutProvider, {
-  LayoutContext,
-} from "@/ui/components/provider/layout_provider";
-import React from "react";
+import AppLayoutWrapper from '@/ui/Cloudscape/app_layout';
+import BreadcrumbGroupWrapper from '@/ui/Cloudscape/breadcrumb_group';
+import FlashBarWrapper from '@/ui/Cloudscape/flashbar';
+import SideNavigationWrapper from '@/ui/Cloudscape/side_navigation';
+import TopNavigationWrapper from '@/ui/Cloudscape/top_navigation';
+import CognitoProvider from '@/ui/components/provider/cognito_provider';
+import { LayoutContext } from '@/ui/components/provider/layout_provider';
+import React, { useContext, useState } from 'react';
 
 export default function CognitoLayout({ children, params }) {
   //OpenState

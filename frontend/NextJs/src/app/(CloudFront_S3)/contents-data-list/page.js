@@ -1,28 +1,26 @@
-"use client";
+'use client';
 
-import AlertWrapper from "@/ui/Cloudscape/alert";
-import ContainerWrapper from "@/ui/Cloudscape/container";
-import ContentLayoutWrapper from "@/ui/Cloudscape/content_layout";
-import HeaderWrapper from "@/ui/Cloudscape/header";
-import ButtonWrapper from "@/ui/Cloudscape/button";
-import Image from "next/image";
-import { useContext, useEffect, useState } from "react";
-
-import BreadcrumbProvider from "@/ui/components/provider/bread_crumb";
-import FlashBarProvider from "@/ui/components/provider/flash_bar";
-import TopNavigationProvider from "@/ui/components/provider/top_menu";
-import React from "react";
-import { CognitoContext } from "@/ui/components/provider/cognito_provider";
-import ContentsTable from "@/ui/components/table/contents_data";
-import { S3Context } from "@/ui/components/provider/s3_provider";
-import Loading from "@/app/loading";
+import Loading from '@/app/loading';
+import AlertWrapper from '@/ui/Cloudscape/alert';
+import ButtonWrapper from '@/ui/Cloudscape/button';
+import ContainerWrapper from '@/ui/Cloudscape/container';
+import ContentLayoutWrapper from '@/ui/Cloudscape/content_layout';
+import HeaderWrapper from '@/ui/Cloudscape/header';
+import BreadcrumbProvider from '@/ui/components/provider/bread_crumb';
+import { CognitoContext } from '@/ui/components/provider/cognito_provider';
+import FlashBarProvider from '@/ui/components/provider/flash_bar';
+import { S3Context } from '@/ui/components/provider/s3_provider';
+import TopNavigationProvider from '@/ui/components/provider/top_menu';
+import ContentsTable from '@/ui/components/table/contents_data';
+import Image from 'next/image';
+import { useContext, useEffect, useState } from 'react';
 
 export default function ListPage() {
   //Alert
   const [alertDisplay, setAlertDisplay] = useState(false);
-  const [alertType, setAlertType] = useState("");
-  const [alertHeader, setAlertHeader] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState('');
+  const [alertHeader, setAlertHeader] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
 
   //ContentsTable
   const [contentsTableItems, setContentsTableItems] = useState([]);
@@ -44,8 +42,8 @@ export default function ListPage() {
 
           let items = [];
           for (let i = 0; i < objects.length; i++) {
-            let fileName = objects[i].Key.split("/").slice(-1)[0];
-            let mimeType = objects[i].Key.split("/").slice(-2)[0].split("=")[1];
+            let fileName = objects[i].Key.split('/').slice(-1)[0];
+            let mimeType = objects[i].Key.split('/').slice(-2)[0].split('=')[1];
 
             items.push({
               key: objects[i].Key,
@@ -61,14 +59,14 @@ export default function ListPage() {
         .catch((error) => {
           if (error instanceof Error) {
             setAlertDisplay(true);
-            setAlertType("error");
-            setAlertHeader("データの取得に失敗しました。");
+            setAlertType('error');
+            setAlertHeader('データの取得に失敗しました。');
             setAlertMessage(error.message);
           } else {
             setAlertDisplay(true);
-            setAlertType("error");
-            setAlertHeader("データの取得に失敗しました。");
-            setAlertMessage("CLient Error");
+            setAlertType('error');
+            setAlertHeader('データの取得に失敗しました。');
+            setAlertMessage('CLient Error');
           }
         })
         .finally(() => {
@@ -88,7 +86,7 @@ export default function ListPage() {
         disableOverlap={true}
         header={
           <HeaderWrapper
-            title={"Contents Data List"}
+            title={'Contents Data List'}
             alert={
               alertDisplay ? (
                 <AlertWrapper
@@ -102,18 +100,18 @@ export default function ListPage() {
             actions={
               <>
                 <ButtonWrapper
-                  variant={"normal"}
-                  iconName={"remove"}
-                  iconAlt={"削除"}
-                  name={"削除"}
+                  variant={'normal'}
+                  iconName={'remove'}
+                  iconAlt={'削除'}
+                  name={'削除'}
                   onClick={undefined}
                 />
                 <ButtonWrapper
-                  variant={"link"}
-                  iconName={"edit"}
-                  iconAlt={"編集"}
-                  name={"編集"}
-                  href={"#"}
+                  variant={'link'}
+                  iconName={'edit'}
+                  iconAlt={'編集'}
+                  name={'編集'}
+                  href={'#'}
                 />
               </>
             }
@@ -121,13 +119,13 @@ export default function ListPage() {
         }
         content={
           <ContainerWrapper
-            variant={"embedded"}
+            variant={'embedded'}
             media={{
               content: (
                 <Image src={`/s3.svg`} alt="rds" width={500} height={500} />
               ),
-              position: "side",
-              width: "25%",
+              position: 'side',
+              width: '25%',
             }}
             content={
               <ContentsTable

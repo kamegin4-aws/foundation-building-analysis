@@ -1,5 +1,5 @@
 [project]
-name = "Django_RESTFrameWork"
+name = "Django_RESTFramework"
 version = "0.0.1"
 
 [build-system]

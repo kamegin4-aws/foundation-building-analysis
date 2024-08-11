@@ -1,17 +1,23 @@
 {
-  "extends": ["next", "next/core-web-vitals", "plugin:react/recommended", "prettier","'next/babel"],
-  "plugins": ["react", "prettier"],
+  "extends": ["next", "next/core-web-vitals", "plugin:react/recommended","plugin:react-hooks/recommended", "prettier"],
+  "plugins": ["react", "prettier","complexity"],
   "rules": {
     "prettier/prettier": "error",
     "react/react-in-jsx-scope": "off",
-    "react/prop-types": "off"
+    "react/prop-types": "off",
+    "complexity": ["error", { "max": 20 }]
   },
   "env": {
     "browser": true,
     "node": true,
     "es2023": true
   },
+  "parser": "@babel/eslint-parser",
   "parserOptions": {
+    "requireConfigFile": false,
+    "babelOptions": {
+      "presets": ["next/babel"]
+    },
     "ecmaFeatures": {
       "jsx": true
     },
