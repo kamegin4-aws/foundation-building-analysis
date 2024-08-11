@@ -253,6 +253,20 @@ Resources:
                 type: aws_proxy
                 uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUser.Arn}/invocations
               responses: {}
+          /cognito/user/attributes/edit:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateAttributes.Arn}/invocations
+              responses: {}
+          /cognito/user/attributes/verify:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${VerifyAttribute.Arn}/invocations
+              responses: {}
       EndpointConfiguration: REGIONAL
       TracingEnabled: true
       AccessLogSetting:
@@ -518,6 +532,66 @@ Resources:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub /aws/lambda/${SignOut}
+      RetentionInDays: 7
+  UpdateAttributes:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: UpdateAttributes
+      CodeUri: src/UpdateAttributes
+      Handler: handler.handler
+      Runtime: python3.12
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Role: !GetAtt LambdaCognitoRole.Arn
+      Environment:
+        Variables:
+          USER_POOL_ID: !ImportValue userPoolId
+          CLIENT_ID: !ImportValue userPoolClientId
+          CLIENT_SECRET: !Ref clientSecret
+      Events:
+        CognitoAuthorizedAPIPOSTcognitouserattributesedit:
+          Type: Api
+          Properties:
+            Path: /cognito/user/attributes/edit
+            Method: POST
+            RestApiId: !Ref CognitoAuthorizedAPI
+  UpdateAttributesLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${UpdateAttributes}
+      RetentionInDays: 7
+  VerifyAttribute:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: VerifyAttribute
+      CodeUri: src/VerifyAttribute
+      Handler: handler.handler
+      Runtime: python3.12
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Role: !GetAtt LambdaCognitoRole.Arn
+      Environment:
+        Variables:
+          USER_POOL_ID: !ImportValue userPoolId
+          CLIENT_ID: !ImportValue userPoolClientId
+          CLIENT_SECRET: !Ref clientSecret
+      Events:
+        CognitoAuthorizedAPIPOSTcognitouserattributesverify:
+          Type: Api
+          Properties:
+            Path: /cognito/user/attributes/verify
+            Method: POST
+            RestApiId: !Ref CognitoAuthorizedAPI
+  VerifyAttributeLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${VerifyAttribute}
       RetentionInDays: 7
 Transform: AWS::Serverless-2016-10-31
 Parameters:

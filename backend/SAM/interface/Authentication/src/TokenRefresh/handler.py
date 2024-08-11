@@ -5,8 +5,10 @@ import json
 import logging
 import os
 import traceback
+from datetime import datetime, timedelta
 
 import boto3
+import pytz
 from botocore.exceptions import ClientError
 
 logger = logging.getLogger(__name__)
@@ -46,7 +48,10 @@ def handler(event, context):
                 'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': '*'},
-            'body': json.dumps(refresh_token_result)}
+            'body': json.dumps(
+                cognitoIdentityProviderWrapper.toEntity(
+                    tokens=refresh_token_result['AuthenticationResult'],
+                    refresh_token=refresh_token))}
 
     except Exception:
         logger.error(traceback.format_exc())
@@ -113,7 +118,6 @@ class CognitoIdentityProviderWrapper:
 
             response_init = self.cognito_idp_client.initiate_auth(**kwargs)
             logger.info(f'refresh token: {response_init}')
-            auth_tokens = response_init['AuthenticationResult']
 
         except ClientError as err:
             logger.error(
@@ -125,4 +129,34 @@ class CognitoIdentityProviderWrapper:
             raise RuntimeError(
                 "cognito server error: Couldn't confirm sign up for {}.".format(user_name)) from err
 
-        return auth_tokens
+        return response_init
+
+    def toEntity(self, *, tokens, refresh_token=None):
+        """_summary_
+        エンティティに変換する
+        Args:
+            tokens (dict): cognito_idp_clientのレスポンス
+
+        Returns:
+            dict: Userンティティ
+        """
+        entity = {}
+
+        entity['access_token'] = tokens['AccessToken']
+        entity['refresh_token'] = tokens['RefreshToken'] if 'RefreshToken' in tokens else refresh_token
+        entity['id_token'] = tokens['IdToken']
+
+        # 現在の時間を取得
+        date = datetime.now()
+
+        # 指定された秒数を追加
+        date = date + timedelta(seconds=int(tokens['ExpiresIn']))
+
+        # 日本標準時（JST）に変換
+        jst = pytz.timezone('Asia/Tokyo')
+        date = date.astimezone(jst)
+
+        # 日時を日本のロケール形式で文字列として出力
+        entity['expires'] = date.strftime('%Y/%m/%d %H:%M:%S')
+
+        return entity
