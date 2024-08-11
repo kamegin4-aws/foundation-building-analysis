@@ -1,7 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from mini_aws.filters import InMemoryDataFilter
-from mini_aws.models import InMemoryData, User
-from mini_aws.serializers import InMemoryDataSerializer, UserSerializer
+from foundation_app.filters import InMemoryDataFilter
+from foundation_app.models import InMemoryData, User
+from foundation_app.serializers import InMemoryDataSerializer, UserSerializer
 from rest_framework import filters, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated

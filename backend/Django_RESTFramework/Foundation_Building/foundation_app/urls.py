@@ -1,5 +1,5 @@
 from django.urls import include, path
-from mini_aws.views import InMemoryDataViewSet, UserViewSet
+from foundation_app.views import InMemoryDataViewSet, UserViewSet
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()

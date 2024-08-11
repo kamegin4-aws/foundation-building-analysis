@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_filters',
-    'mini_aws',
+    'foundation_app',
     'corsheaders',
 ]
 
@@ -204,10 +204,10 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.MultiPartParser',
     ],
     'DEFAULT_THROTTLE_CLASSES': [
-        'mini_aws.throttling.CognitoUserRateThrottle',  # Replace with actual path
+        'foundation_app.throttling.CognitoUserRateThrottle',  # Replace with actual path
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'mini_aws.authentication.CognitoAuthentication',  # Replace with actual path
+        'foundation_app.authentication.CognitoAuthentication',  # Replace with actual path
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
