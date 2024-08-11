@@ -52,7 +52,7 @@ class PyJWTWrapper(ITokenInstance):
                 int(decode_token['exp']), datetime.timezone(datetime.timedelta(hours=9)))
 
             if decode_token['token_use'] != 'id' or decode_token['iss'] != self.issuer or dt_jst_aware_token < dt_now_jst_aware:
-                return False
+                return {}
 
             return decode_token
         except Exception:
@@ -74,9 +74,9 @@ class PyJWTWrapper(ITokenInstance):
             )
 
             if decode_token['cognito:username'] != user_name:
-                return False
+                return {}
 
-            return True
+            return decode_token
         except Exception:
             logger.error(traceback.format_exc())
             raise RuntimeError(f'jwt server error: {traceback.format_exc()}')

@@ -8,7 +8,7 @@ class User(models.Model):
     user_id = models.CharField(
         primary_key=True,
         default=uuid.uuid4,
-        editable=False,
+        editable=True,
         max_length=255)
     user_name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)

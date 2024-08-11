@@ -31,4 +31,4 @@ class CognitoUserRateThrottle(UserRateThrottle):
         elif 'Paid' in token_info.get('custom:plan', ''):
             return '100/day'
         else:
-            return '0/day'
+            return '100/day'

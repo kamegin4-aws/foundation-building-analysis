@@ -206,6 +206,9 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_CLASSES': [
         'foundation_app.throttling.CognitoUserRateThrottle',  # Replace with actual path
     ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '10/day',  # デフォルトのスロットルレート（例）
+    },
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'foundation_app.authentication.CognitoAuthentication',  # Replace with actual path
     ],

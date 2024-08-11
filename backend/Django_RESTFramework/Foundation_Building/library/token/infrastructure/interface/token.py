@@ -13,7 +13,7 @@ class ITokenInstance(metaclass=abc.ABCMeta):
             jwt_token (str): JWT形式のトークン
 
         Returns:
-            result (boolean | dict): 検証合格:トークン, 不合格:False。
+            result (dict): デコードトークン
         """
         raise NotImplementedError()
 
@@ -25,6 +25,26 @@ class ITokenInstance(metaclass=abc.ABCMeta):
             user_name (str): ユーザーネーム
 
         Returns:
-            result (boolean): 検証合格:True。
+            result (dict): デコードトークン
         """
         raise NotImplementedError()
+
+    def toEntity(self, *, decode_token={}):
+        """共通エンティティに変換する
+
+        Args:
+            decode_token (dict): デコードトークン
+
+        Returns:
+            entity (dict): JWTエンティティ
+        """
+        if decode_token == {}:
+            return {}
+
+        else:
+            entity = {}
+            entity['user_name'] = decode_token.get('cognito:username')
+            entity['plan'] = decode_token.get('custom:plan')
+            entity['token_info'] = decode_token
+
+            return entity

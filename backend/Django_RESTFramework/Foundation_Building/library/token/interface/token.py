@@ -13,7 +13,7 @@ class IToken(metaclass=abc.ABCMeta):
             id_token (str): IDトークン
 
         Returns:
-            result (boolean | dict): 検証合格:トークン, 不合格:False。
+            result (dict): JWTエンティティ
         """
         raise NotImplementedError()
 
@@ -25,6 +25,6 @@ class IToken(metaclass=abc.ABCMeta):
             user_name (str): ユーザーネーム
 
         Returns:
-            result (boolean): 検証合格:True。
+            result (dict): JWTエンティティ
         """
         raise NotImplementedError()

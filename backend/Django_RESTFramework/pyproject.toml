@@ -30,6 +30,5 @@ djangorestframework = "^3.15.2"
 pygments = "^2.18.0"
 django-filter = "^24.2"
 pyjwt = { extras = ["crypto"], version = "^2.8.0" }
-pymemcache = "^4.0.0"
 django-environ = "^0.11.2"
 django-cors-headers = "^4.4.0"
