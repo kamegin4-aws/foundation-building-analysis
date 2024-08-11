@@ -288,36 +288,36 @@ Resources:
           X-Amz-Security-Token'''
         AllowMethods: '''*'''
         MaxAge: 600
-  SignInVersion:
+  SignInFixVersion:
     Type: AWS::Lambda::Version
     Properties:
       FunctionName: !Ref SignIn
-      Description: v1.0
-  SignUpVersion:
+      Description: v1.2
+  SignUpFixVersion:
     Type: AWS::Lambda::Version
     Properties:
       FunctionName: !Ref SignUp
-      Description: v1.0
-  ConfirmSignUpVersion:
+      Description: v1.2
+  ConfirmSignUpFixVersion:
     Type: AWS::Lambda::Version
     Properties:
       FunctionName: !Ref ConfirmSignUp
-      Description: v1.0
-  SignOutVersion:
+      Description: v1.2
+  SignOutFixVersion:
     Type: AWS::Lambda::Version
     Properties:
       FunctionName: !Ref SignOut
-      Description: v1.0
-  GetUserVersion:
+      Description: v1.2
+  GetUserFixVersion:
     Type: AWS::Lambda::Version
     Properties:
       FunctionName: !Ref GetUser
-      Description: v1.0
+      Description: v1.2
   SignInFreeAlias:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref SignIn
-      FunctionVersion: !GetAtt SignInVersion.Version
+      FunctionVersion: !GetAtt SignInFixVersion.Version
       Name: free
   SignInPaidAlias:
     Type: AWS::Lambda::Alias
@@ -329,7 +329,7 @@ Resources:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref SignUp
-      FunctionVersion: !GetAtt SignUpVersion.Version
+      FunctionVersion: !GetAtt SignUpFixVersion.Version
       Name: free
   SignUpPaidAlias:
     Type: AWS::Lambda::Alias
@@ -341,7 +341,7 @@ Resources:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref ConfirmSignUp
-      FunctionVersion: !GetAtt ConfirmSignUpVersion.Version
+      FunctionVersion: !GetAtt ConfirmSignUpFixVersion.Version
       Name: free
   ConfirmSignUpPaidAlias:
     Type: AWS::Lambda::Alias
@@ -353,7 +353,7 @@ Resources:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref SignOut
-      FunctionVersion: !GetAtt SignOutVersion.Version
+      FunctionVersion: !GetAtt SignOutFixVersion.Version
       Name: free
   SignOutPaidAlias:
     Type: AWS::Lambda::Alias
@@ -365,7 +365,7 @@ Resources:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref GetUser
-      FunctionVersion: !GetAtt GetUserVersion.Version
+      FunctionVersion: !GetAtt GetUserFixVersion.Version
       Name: free
   GetUserPaidAlias:
     Type: AWS::Lambda::Alias
@@ -456,21 +456,55 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${TokenRefresh}
       RetentionInDays: 7
-  TokenRefreshVersion:
+  TokenRefreshFixVersion:
     Type: AWS::Lambda::Version
     Properties:
       FunctionName: !Ref TokenRefresh
-      Description: v1.0
+      Description: v1.2
   TokenRefreshFreeAlias:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref TokenRefresh
-      FunctionVersion: !GetAtt TokenRefreshVersion.Version
+      FunctionVersion: !GetAtt TokenRefreshFixVersion.Version
       Name: free
   TokenRefreshPaidAlias:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref TokenRefresh
+      FunctionVersion: $LATEST
+      Name: paid
+  UpdateAttributesFixVersion:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref UpdateAttributes
+      Description: v1.0
+  UpdateAttributesFreeAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref UpdateAttributes
+      FunctionVersion: !GetAtt UpdateAttributesFixVersion.Version
+      Name: free
+  UpdateAttributesPaidAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref UpdateAttributes
+      FunctionVersion: $LATEST
+      Name: paid
+  VerifyAttributeFixVersion:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref VerifyAttribute
+      Description: v1.0
+  VerifyAttributeFreeAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref VerifyAttribute
+      FunctionVersion: !GetAtt VerifyAttributeFixVersion.Version
+      Name: free
+  VerifyAttributePaidAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref VerifyAttribute
       FunctionVersion: $LATEST
       Name: paid
   SignIn:
