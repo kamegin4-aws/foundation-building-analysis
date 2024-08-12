@@ -6,32 +6,28 @@ services:
       args:
         - HOST_DOMAIN=${HOST_DOMAIN}
         - APP_DOMAIN=${APP_DOMAIN}
-    image: kamegin4/foundation-building:nginx
+    image: ${REPOSITORY_URI}:nginx
     container_name: nginx
     restart: always
     tty: true
     #privileged: true
     depends_on:
-      - presentation
+    #  - presentation
       - application
     #environment:
-    #  - NGINX_HOST=foobar.com
-    #  - NGINX_PORT=80
     expose:
       - 80
       - 443
     ports:
       - '80:80'
       - '443:443'
-    #extra_hosts:
-    #  - local_dev:${HOST_IP}
     #volumes:
     #command:
   presentation:
     build:
       context: ./frontend/NextJs
       dockerfile: Dockerfile
-    image: kamegin4/foundation-building:next_js
+    image: ${REPOSITORY_URI}:next_js
     container_name: next_js
     restart: always
     tty: true
