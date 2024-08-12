@@ -671,12 +671,12 @@ Resources:
       GroupDescription: Allow access from public and private
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: 11211
-          ToPort: 11211
+          FromPort: 6379
+          ToPort: 6379
           SourceSecurityGroupId: !Ref PublicSecurityGroup
         - IpProtocol: tcp
-          FromPort: 11211
-          ToPort: 11211
+          FromPort: 6379
+          ToPort: 6379
           SourceSecurityGroupId: !Ref PrivateSecurityGroup
       SecurityGroupEgress:
         - IpProtocol: '-1'
@@ -831,7 +831,7 @@ Resources:
     Properties:
       HealthCheckEnabled: true
       HealthCheckIntervalSeconds: 35
-      HealthCheckPath: /
+      HealthCheckPath: /health/
       HealthCheckPort: '8081'
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 30

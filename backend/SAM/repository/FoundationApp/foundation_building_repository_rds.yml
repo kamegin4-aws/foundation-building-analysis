@@ -5,6 +5,7 @@ Resources:
       Engine: aurora-postgresql
       EngineMode: provisioned
       DBClusterIdentifier: serverless-v2-aurora-postgresql
+      DatabaseName: !Ref dbName
       MasterUsername: !Ref masterUsername
       ManageMasterUserPassword: true
       MasterUserSecret:
@@ -89,6 +90,10 @@ Parameters:
     Default: XXXX
   masterUsername:
     Description: DB Master Username
+    Type: String
+    Default: foundation_building
+  dbName:
+    Description: DB name
     Type: String
     Default: foundation_building
 Outputs:

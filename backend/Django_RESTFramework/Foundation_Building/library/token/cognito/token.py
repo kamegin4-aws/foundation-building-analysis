@@ -1,5 +1,6 @@
-import traceback
 import logging
+import traceback
+
 from library.token.interface.token import IToken
 
 logger = logging.getLogger(__name__)
@@ -14,17 +15,17 @@ class Cognito(IToken):
         try:
             result = self.instance.token_validation(jwt_token=id_token)
 
-            return result
+            return self.instance.toEntity(decode_token=result)
         except Exception:
             logger.error(traceback.format_exc())
-            raise RuntimeError(f'client error: {traceback.format_exc()}')
+            raise RuntimeError(f'server error: {traceback.format_exc()}')
 
     def id_token_user_validation(self, *, id_token, user_name):
         try:
             result = self.instance.user_validation(
                 jwt_token=id_token, user_name=user_name)
 
-            return result
+            return self.instance.toEntity(decode_token=result)
         except Exception:
             logger.error(traceback.format_exc())
-            raise RuntimeError(f'client error: {traceback.format_exc()}')
+            raise RuntimeError(f'server error: {traceback.format_exc()}')

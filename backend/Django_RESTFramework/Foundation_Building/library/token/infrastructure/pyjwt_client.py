@@ -1,19 +1,15 @@
 import datetime
 import logging
-import os
 import traceback
 
-import environ
 import jwt
-from Foundation_Building.settings import BASE_DIR
+from library.env.env import get_env
 from library.token.infrastructure.interface.token import ITokenInstance
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-env = environ.Env()
-# reading .env file
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+env = get_env()
 
 
 class PyJWTWrapper(ITokenInstance):
@@ -52,7 +48,7 @@ class PyJWTWrapper(ITokenInstance):
                 int(decode_token['exp']), datetime.timezone(datetime.timedelta(hours=9)))
 
             if decode_token['token_use'] != 'id' or decode_token['iss'] != self.issuer or dt_jst_aware_token < dt_now_jst_aware:
-                return False
+                return {}
 
             return decode_token
         except Exception:
@@ -74,9 +70,9 @@ class PyJWTWrapper(ITokenInstance):
             )
 
             if decode_token['cognito:username'] != user_name:
-                return False
+                return {}
 
-            return True
+            return decode_token
         except Exception:
             logger.error(traceback.format_exc())
             raise RuntimeError(f'jwt server error: {traceback.format_exc()}')

@@ -1,5 +1,5 @@
+from foundation_app.models import RelationalData, User
 from rest_framework import serializers
-from mini_aws.models import User, InMemoryData
 
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
@@ -15,13 +15,13 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
                 self.fields.pop(field_name)
 
 
-class InMemoryDataSerializer(DynamicFieldsModelSerializer):
+class RelationalDataSerializer(DynamicFieldsModelSerializer):
     class Meta:
-        model = InMemoryData
-        fields = ['id', 'key', 'value', 'created_at', 'updated_at', 'user']
+        model = RelationalData
+        fields = '__all__'
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['user_id']
+        fields = '__all__'

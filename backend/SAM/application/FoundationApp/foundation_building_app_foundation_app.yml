@@ -1,0 +1,145 @@
+Resources:
+  ExecECSTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+        - arn:aws:iam::aws:policy/SecretsManagerReadWrite
+        - arn:aws:iam::aws:policy/AmazonECS_FullAccess
+        - arn:aws:iam::aws:policy/AmazonRDSFullAccess
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+      MaxSessionDuration: 3600
+      Policies:
+        - PolicyName: AllowKMS
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "kms:Decrypt"
+                  - "kms:GenerateDataKey"
+                Resource:
+                  - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*
+                Condition:
+                  StringEquals:
+                    aws:ResourceAccount: !Ref AWS::AccountId
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs.amazonaws.com
+                - ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:ResourceAccount: !Ref AWS::AccountId
+  FoundationAppTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: foundation-app-task-definition
+      ExecutionRoleArn: !GetAtt ExecECSTaskRole.Arn
+      TaskRoleArn: !GetAtt ExecECSTaskRole.Arn
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: '256'
+      Memory: '512'
+      EphemeralStorage:
+        SizeInGiB: 21
+      ContainerDefinitions:
+        - Name: nginx
+          Image: !Sub
+            - ${uri}:nginx
+            - uri: !ImportValue imageRepositoryUri
+          Essential: true
+          Privileged: false
+          PortMappings:
+            - ContainerPort: 80
+              HostPort: 80
+              Protocol: tcp
+            - ContainerPort: 443
+              HostPort: 443
+              Protocol: tcp
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/NginxTaskDefinition
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+              awslogs-create-group: 'true'
+          DependsOn:
+            #  - Condition: START
+            #    ContainerName: next_js
+            - Condition: START
+              ContainerName: django_rf
+        #- Name: next_js
+        #  Image: kamegin4/foundation-building:next_js
+        #  Essential: true
+        #  PortMappings:
+        #    - ContainerPort: 8080
+        #      HostPort: 8080
+        #      Protocol: tcp
+        #  RepositoryCredentials:
+        #    CredentialsParameter: !Ref DockerHubSecret
+        #  LogConfiguration:
+        #    LogDriver: awslogs
+        #    Options:
+        #      awslogs-group: /ecs/NextJsTaskDefinition
+        #      awslogs-region: !Ref AWS::Region
+        #      awslogs-stream-prefix: ecs
+        #      awslogs-create-group: 'true'
+        - Name: django_rf
+          Image: !Sub
+            - ${uri}:django_rf
+            - uri: !ImportValue imageRepositoryUri
+          Essential: true
+          Privileged: false
+          PortMappings:
+            - ContainerPort: 8081
+              HostPort: 8081
+              Protocol: tcp
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/DjangoRFTaskDefinition
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+              awslogs-create-group: 'true'
+  FoundationAppService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !ImportValue fargateClusterArn
+      TaskDefinition: !Ref FoundationAppTaskDefinition
+      DesiredCount: !Ref desiredCountService
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 50
+      LoadBalancers:
+        - ContainerName: nginx
+          ContainerPort: 80
+          TargetGroupArn: !ImportValue elbWebTargetGroupArn
+        #- ContainerName: next_js
+        #  ContainerPort: 8080
+        #  TargetGroupArn: !Ref elbPresentationTargetGroupArn
+        - ContainerName: django_rf
+          ContainerPort: 8081
+          TargetGroupArn: !ImportValue elbApplicationTargetGroupArn
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !ImportValue publicSecurityGroupId
+            - !ImportValue internalELBSecurityGroupId
+          Subnets:
+            - !ImportValue publicSubnet1Id
+            - !ImportValue publicSubnet2Id
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  desiredCountService:
+    Description: Desired Count Service for FoundationApp
+    Type: Number
+    Default: 1

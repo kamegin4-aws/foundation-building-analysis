@@ -8,6 +8,7 @@ entity "User(Cognito)" as user {
   access_token: string: AccessToken
   id_token: string: IDToken
   refresh_token: string: RefreshToken
+  expires: timestamptz: 有効期限
   created_at: timestamptz: 作成日時
   updated_at : timestamptz: 更新日時
   --

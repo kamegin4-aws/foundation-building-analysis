@@ -1,20 +1,8 @@
-FROM python:3.10
+FROM python:3.12
 
 ENV TZ "Asia/Tokyo"
 
 WORKDIR /usr/src/app
-
-COPY ./requirements.txt .
-COPY ./pyproject.toml .
-COPY ./Foundation_Building/Foundation_Building ./Foundation_Building
-COPY ./Foundation_Building/library ./library
-COPY ./Foundation_Building/mini_aws ./mini_aws
-COPY ./Foundation_Building/manage.py .
-COPY ./Foundation_Building/global-bundle.pem .
-COPY ./Foundation_Building/.env .
-
-RUN pip install --no-cache-dir -r requirements.txt
-RUN poetry install
 
 ARG DJANGO_SUPERUSER_USERNAME
 ENV DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
@@ -22,6 +10,13 @@ ARG DJANGO_SUPERUSER_EMAIL
 ENV DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
 ARG DJANGO_SUPERUSER_PASSWORD
 ENV DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+
+COPY . .
+
+RUN pip install --no-cache-dir -r requirements.txt
+RUN poetry install
+
+WORKDIR /usr/src/app/Foundation_Building
 
 EXPOSE 8081
 
