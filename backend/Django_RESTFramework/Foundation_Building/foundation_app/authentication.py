@@ -17,6 +17,9 @@ env = get_env()
 class CognitoAuthentication(authentication.BaseAuthentication):
     def authenticate(self, request):
         try:
+            # /health/パスの場合は認証をスキップ
+            if request.path == '/health/':
+                return None  # 認証をスキップするためNoneを返す
 
             if str_to_bool(env('DEBUG')) is not True:
                 # トークン検証

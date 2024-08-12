@@ -40,7 +40,7 @@ ALLOWED_HOSTS = ['*']
 
 if DEBUG is not True:
     CSRF_TRUSTED_ORIGINS = [
-        f"https://{env('HOST_DOMEIN')}",
+        f"https://{env('HOST_DOMAIN')}",
         f"http://{env('APP_DOMAIN')}:8080",
     ]
 
@@ -102,14 +102,14 @@ if DEBUG:
         }
     }
 else:
-    rdsSecrets = RDSSecrets(instance=SecretsmanagerWrapper)
+    rdsSecrets = RDSSecrets(instance=SecretsmanagerWrapper())
 
     get_rds_info = rdsSecrets.get_rds_info()
 
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'foundation_building',
+            'NAME': env('DB_NAME'),
             'USER': get_rds_info['username'],
             'PASSWORD': get_rds_info['password'],
             'HOST': env('RDS_HOST'),
@@ -130,7 +130,7 @@ else:
 
 # CORS
 CORS_ALLOWED_ORIGINS = [
-    f"https://{env('HOST_DOMEIN')}",
+    f"https://{env('HOST_DOMAIN')}",
     f"http://{env('APP_DOMAIN')}:8080",
 ]
 
