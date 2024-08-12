@@ -831,7 +831,7 @@ Resources:
     Properties:
       HealthCheckEnabled: true
       HealthCheckIntervalSeconds: 35
-      HealthCheckPath: /
+      HealthCheckPath: /health/
       HealthCheckPort: '8081'
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 30
