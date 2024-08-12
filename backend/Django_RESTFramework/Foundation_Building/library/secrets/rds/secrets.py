@@ -1,17 +1,13 @@
 import logging
-import os
 import traceback
 
-import environ
-from Foundation_Building.settings import BASE_DIR
+from library.env.env import get_env
 from library.secrets.interface.secrets import ISecrets
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-env = environ.Env()
-# reading .env file
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+env = get_env()
 
 
 class RDSSecrets(ISecrets):

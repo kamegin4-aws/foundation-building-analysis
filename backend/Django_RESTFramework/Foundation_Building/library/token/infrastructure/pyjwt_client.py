@@ -1,19 +1,15 @@
 import datetime
 import logging
-import os
 import traceback
 
-import environ
 import jwt
-from Foundation_Building.settings import BASE_DIR
+from library.env.env import get_env
 from library.token.infrastructure.interface.token import ITokenInstance
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-env = environ.Env()
-# reading .env file
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+env = get_env()
 
 
 class PyJWTWrapper(ITokenInstance):

@@ -14,6 +14,10 @@ import os
 from pathlib import Path
 
 import environ
+from library.env.env import str_to_bool
+from library.secrets.infrastructure.secretsmanager_client import \
+    SecretsmanagerWrapper
+from library.secrets.rds.secrets import RDSSecrets
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,10 +25,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
 # reading .env file
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
-
-def str_to_bool(s):
-    return s.lower() in ["true", "t", "yes", "1"]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -102,14 +102,18 @@ if DEBUG:
         }
     }
 else:
+    rdsSecrets = RDSSecrets(instance=SecretsmanagerWrapper)
+
+    get_rds_info = rdsSecrets.get_rds_info()
+
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'foundation_building',
-            'USER': env('RDS_USER'),
-            'PASSWORD': env('RDS_PASSWORD'),
+            'USER': get_rds_info['username'],
+            'PASSWORD': get_rds_info['password'],
             'HOST': env('RDS_HOST'),
-            'PORT': '3306',
+            'PORT': env('RDS_PORT'),
             'OPTIONS': {
                 'sslmode': 'require',
                 'sslrootcert': BASE_DIR / 'global-bundle.pem',
@@ -119,15 +123,15 @@ else:
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-            'LOCATION': env('ELASTICACHE_ENDPOINT'),
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': f'redis://{env('ELASTICACHE_ENDPOINT')}:{env('ELASTICACHE_PORT')}',
         }
     }
 
 # CORS
 CORS_ALLOWED_ORIGINS = [
     f"https://{env('HOST_DOMEIN')}",
-    f"http://{env('APP_DOMAIN')}",
+    f"http://{env('APP_DOMAIN')}:8080",
 ]
 
 CORS_ALLOW_METHODS = (

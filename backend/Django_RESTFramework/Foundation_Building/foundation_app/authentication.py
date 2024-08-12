@@ -1,30 +1,23 @@
 # authentication.py
 import logging
-import os
 import traceback
 
-import environ
 from django.contrib.auth.models import User
-from Foundation_Building.settings import BASE_DIR, str_to_bool
+from library.env.env import get_env, str_to_bool
 from library.token.cognito.token import Cognito
 from library.token.infrastructure.pyjwt_client import PyJWTWrapper
 from rest_framework import authentication, exceptions
 
-env = environ.Env()
-# reading .env file
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-env = environ.Env()
-# reading .env file
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+env = get_env()
 
 
 class CognitoAuthentication(authentication.BaseAuthentication):
     def authenticate(self, request):
         try:
+
             if str_to_bool(env('DEBUG')) is not True:
                 # トークン検証
                 id_token = request.META.get('HTTP_AUTHORIZATION').split()[1]
@@ -45,7 +38,7 @@ class CognitoAuthentication(authentication.BaseAuthentication):
                     raise exceptions.AuthenticationFailed('Invalid token')
             else:
                 # 仮ユーザー
-                user = User.objects.get(username='admin')
+                user = User.objects.get(username=env('DUMMY_USER'))
                 return (user, {})
         except Exception:
             logger.error(f'Failed to authenticate: {traceback.format_exc()}')

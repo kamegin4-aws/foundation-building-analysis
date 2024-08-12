@@ -4,21 +4,17 @@
 # https://aws.amazon.com/developer/language/python/
 
 import logging
-import os
 import traceback
 
 import boto3
-import environ
 from botocore.exceptions import ClientError
-from Foundation_Building.settings import BASE_DIR
+from library.env.env import get_env
 from library.secrets.infrastructure.interface.secrets import ISecretsInstance
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-env = environ.Env()
-# reading .env file
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+env = get_env()
 
 
 class SecretsmanagerWrapper(ISecretsInstance):

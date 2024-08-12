@@ -45,13 +45,13 @@ services:
     #command:
   application:
     build:
-      context: ./backend/Django_RESTFrameWork
+      context: ./backend/Django_RESTFramework
       dockerfile: Dockerfile
       args:
         - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
         - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
         - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
-    image: kamegin4/foundation-building:django_rf
+    image: ${REPOSITORY_URI}:django_rf
     container_name: django_rf
     restart: always
     tty: true
@@ -61,8 +61,6 @@ services:
       - 8081
     ports:
       - '8081:8081'
-    #extra_hosts:
-    #  - local_dev:${HOST_IP}
     volumes:
-      - ./backend/Django_RESTFrameWork/Foundation_Building/db.sqlite3:/usr/src/app/db.sqlite3
+      - ./backend/Django_RESTFramework/Foundation_Building/db.sqlite3:/usr/src/app/Foundation_Building/db.sqlite3
     #command:
