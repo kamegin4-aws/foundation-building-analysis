@@ -341,6 +341,12 @@ Metadata:
       z: 1
       parent: 350108e5-ca85-47f8-8d29-9a2ad77fceeb
       embeds: []
+    922b7646-568d-400b-8aae-377301bd526c:
+      source:
+        id: c7875a33-6903-4ddb-b14c-970ff5ef58f5
+      target:
+        id: c7875a33-6903-4ddb-b14c-970ff5ef58f5
+      z: 1
 Resources:
   VPC:
     Type: 'AWS::EC2::VPC'
@@ -709,7 +715,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: c7875a33-6903-4ddb-b14c-970ff5ef58f5
-  SelfRefSecurityGroupIgress:
+  SelfRefRDSSecurityGroupIgress:
     Type: 'AWS::EC2::SecurityGroupIngress'
     Properties:
       GroupId: !GetAtt RDSSecurityGroup.GroupId
@@ -720,12 +726,23 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 4646c1b8-02ba-409a-bdfc-31f6a1f6d621
+  SelfRefPublicSecurityGroupIgress:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !GetAtt PublicSecurityGroup.GroupId
+      IpProtocol: '-1'
+      FromPort: -1
+      ToPort: -1
+      SourceSecurityGroupId: !Ref InternalLoadBalancerSecurityGroup
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 922b7646-568d-400b-8aae-377301bd526c
   WebTargetGroup:
     Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
     Properties:
       HealthCheckEnabled: true
       HealthCheckIntervalSeconds: 35
-      HealthCheckPath: /
+      HealthCheckPath: /health
       HealthCheckPort: '80'
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 30
@@ -798,7 +815,7 @@ Resources:
     Properties:
       HealthCheckEnabled: true
       HealthCheckIntervalSeconds: 35
-      HealthCheckPath: /
+      HealthCheckPath: /health
       HealthCheckPort: '8080'
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 30
@@ -965,4 +982,3 @@ Outputs:
     Description: PublicSubnet2.CidrBlock
     Export:
       Name: publicSubnet2CidrBlock
-
