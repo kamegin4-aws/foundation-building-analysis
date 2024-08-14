@@ -1,24 +1,23 @@
-"use client";
+'use client';
 
-import { LayoutContext } from "@/ui/components/provider/layout_provider";
-import { usePathname } from "next/navigation";
-import React from "react";
-import { useContext, useEffect } from "react";
+import { LayoutContext } from '@/ui/components/provider/layout_provider';
+import { usePathname } from 'next/navigation';
+import React, { useContext, useEffect } from 'react';
 
 export default function BreadcrumbProvider() {
   //LayoutContext
   const { setBreadcrumbItems } = useContext(LayoutContext);
 
   const pathname = usePathname();
-  const pathArray = pathname.split("/").slice(1);
+  const pathArray = pathname.split('/').slice(1);
 
   useEffect(() => {
-    let breadcrumbItems = [{ text: "Home", href: "/" }];
-    let href = "/";
+    let breadcrumbItems = [{ text: 'Home', href: '/' }];
+    let href = '/';
     for (let path of pathArray) {
       breadcrumbItems.push({
         text: capitalize(path),
-        href: href == "/" ? (href += `${path}`) : (href += `/${path}`),
+        href: href == '/' ? (href += `${path}`) : (href += `/${path}`),
       });
     }
     setBreadcrumbItems(breadcrumbItems);
@@ -33,6 +32,6 @@ export default function BreadcrumbProvider() {
  * @return {string} 変換された文字列を返す
  */
 function capitalize(str) {
-  if (typeof str !== "string" || !str) return str;
+  if (typeof str !== 'string' || !str) return str;
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }

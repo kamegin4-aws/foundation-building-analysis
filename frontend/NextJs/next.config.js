@@ -1,10 +1,25 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    if (!isServer) {
+      // クライアントサイドからlog4jsモジュールを除外
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+      };
+    }
+
+    return config;
+  },
+  experimental: {
+    optimizeFonts: true,
+  },
   transpilePackages: [
-    "@cloudscape-design/components",
-    "@cloudscape-design/component-toolkit",
+    '@cloudscape-design/components',
+    '@cloudscape-design/component-toolkit',
   ],
-  output: "standalone",
+  output: 'standalone',
   experimental: {
     serverActions: {
       allowedOrigins: [
@@ -16,7 +31,7 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "https",
+        protocol: 'https',
         hostname: process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN,
       },
     ],
@@ -24,39 +39,39 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: "/cognito/login",
+        source: '/cognito/login',
         destination: `https://${process.env.NEXT_PUBLIC_UnAUTH_API_ID}.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/login`,
       },
       {
-        source: "/cognito/logout",
+        source: '/cognito/logout',
         destination: `https://${process.env.NEXT_PUBLIC_UnAUTH_API_ID}.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/logout`,
       },
       {
-        source: "/cognito/signup",
+        source: '/cognito/signup',
         destination: `https://${process.env.NEXT_PUBLIC_UnAUTH_API_ID}.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/signup`,
       },
       {
-        source: "/cognito/token/refresh",
+        source: '/cognito/token/refresh',
         destination: `https://${process.env.NEXT_PUBLIC_UnAUTH_API_ID}.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/token/refresh`,
       },
       {
-        source: "/cognito/signup/confirm",
+        source: '/cognito/signup/confirm',
         destination: `https://${process.env.NEXT_PUBLIC_UnAUTH_API_ID}.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/signup/confirm`,
       },
       {
-        source: "/cognito/group/user/list",
+        source: '/cognito/group/user/list',
         destination: `https://${process.env.NEXT_PUBLIC_AUTH_API_ID}.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/group/user/list`,
       },
       {
-        source: "/cognito/group/user/add",
+        source: '/cognito/group/user/add',
         destination: `https://${process.env.NEXT_PUBLIC_AUTH_API_ID}.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/group/user/add`,
       },
       {
-        source: "/cognito/user/info",
+        source: '/cognito/user/info',
         destination: `https://${process.env.NEXT_PUBLIC_AUTH_API_ID}.execute-api.ap-northeast-1.amazonaws.com/prod/cognito/user/info`,
       },
       {
-        source: "/drf/user-contents",
+        source: '/drf/user-contents',
         destination: `${process.env.NEXT_PUBLIC_PROTOCOL}://${process.env.NEXT_PUBLIC_HOST_DOMAIN}/drf/user-contents`,
       },
     ];

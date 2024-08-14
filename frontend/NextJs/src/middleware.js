@@ -1,15 +1,41 @@
 import { NextResponse } from 'next/server';
 
-export function middleware(request, event) {
-  const url = request.nextUrl.pathname;
-  /*
-  if (url == "/") {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-  */
-  //console.log("middleware", request.nextUrl);
+const allowedOrigins = ['*'];
 
-  return NextResponse.next();
+const corsOptions = {
+  'Access-Control-Allow-Methods': '*',
+  'Access-Control-Allow-Headers':
+    'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+};
+
+export function middleware(request) {
+  // Check the origin from the request
+  const origin = request.headers.get('origin') ?? '';
+  const isAllowedOrigin = allowedOrigins.includes(origin);
+
+  // Handle preflighted requests
+  const isPreflight = request.method === 'OPTIONS';
+
+  if (isPreflight) {
+    const preflightHeaders = {
+      ...(isAllowedOrigin && { 'Access-Control-Allow-Origin': origin }),
+      ...corsOptions,
+    };
+    return NextResponse.json({}, { headers: preflightHeaders });
+  }
+
+  // Handle simple requests
+  const response = NextResponse.next();
+
+  if (isAllowedOrigin) {
+    response.headers.set('Access-Control-Allow-Origin', origin);
+  }
+
+  Object.entries(corsOptions).forEach(([key, value]) => {
+    response.headers.set(key, value);
+  });
+
+  return response;
 }
 
 export const config = {
@@ -21,6 +47,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|object-data).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 };

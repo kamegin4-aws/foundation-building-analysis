@@ -1,90 +1,90 @@
-"use client";
+'use client';
 
-import FormWrapper from "@/ui/Cloudscape/form";
+import FormWrapper from '@/ui/Cloudscape/form';
 
-import ButtonWrapper from "@/ui/Cloudscape/button";
-import FormFieldWrapper from "@/ui/Cloudscape/form_field";
-import InputWrapper from "@/ui/Cloudscape/input";
+import ButtonWrapper from '@/ui/Cloudscape/button';
+import FormFieldWrapper from '@/ui/Cloudscape/form_field';
+import InputWrapper from '@/ui/Cloudscape/input';
 
-import { useState } from "react";
+import { useState } from 'react';
 
-import { SignupValidation } from "@/library/validation/cognito/signup";
-import { ZodWrapper } from "@/library/validation/infrastructure/zod/zod_client";
-import { Signup } from "@/library/api/cognito/signup";
+import { Signup } from '@/library/api/cognito/signup';
+import { SignupValidation } from '@/library/validation/cognito/signup';
+import { ZodWrapper } from '@/library/validation/infrastructure/zod/zod_client';
 
-import TextContentWrapper from "@/ui/Cloudscape/text_content";
+import TextContentWrapper from '@/ui/Cloudscape/text_content';
 
-import React from "react";
+import React from 'react';
 
 export default function SignupForm(props) {
   //Form
-  const [userNameInputValue, setUserNameInputValue] = useState("");
-  const [userNameErrorText, setUserNameErrorText] = useState("");
-  const [emailInputValue, setEmailInputValue] = useState("");
-  const [emailErrorText, setEmailErrorText] = useState("");
-  const [passwordInputValue, setPasswordInputValue] = useState("");
-  const [passwordErrorText, setPasswordErrorText] = useState("");
+  const [userNameInputValue, setUserNameInputValue] = useState('');
+  const [userNameErrorText, setUserNameErrorText] = useState('');
+  const [emailInputValue, setEmailInputValue] = useState('');
+  const [emailErrorText, setEmailErrorText] = useState('');
+  const [passwordInputValue, setPasswordInputValue] = useState('');
+  const [passwordErrorText, setPasswordErrorText] = useState('');
   const [signupButtonLoading, setSignupButtonLoading] = useState(false);
-  const [signupButtonLoadingText, setSignupButtonLoadingText] = useState("");
+  const [signupButtonLoadingText, setSignupButtonLoadingText] = useState('');
 
   const onSubmit = async (event) => {
     event.preventDefault();
     try {
       setSignupButtonLoading(true);
-      setSignupButtonLoadingText("サインアップ中...");
+      setSignupButtonLoadingText('サインアップ中...');
 
       const signupValidation = new SignupValidation(new ZodWrapper());
       const signup = new Signup();
 
       const formData = new FormData();
-      formData.append("user_name", userNameInputValue);
-      formData.append("user_email", emailInputValue);
-      formData.append("password", passwordInputValue);
+      formData.append('user_name', userNameInputValue);
+      formData.append('user_email', emailInputValue);
+      formData.append('password', passwordInputValue);
 
       const validationResult = signupValidation.execute(formData);
-      setUserNameErrorText("");
-      setEmailErrorText("");
-      setPasswordErrorText("");
+      setUserNameErrorText('');
+      setEmailErrorText('');
+      setPasswordErrorText('');
       props.parentSetAlertDisplay(false);
 
       if (validationResult == true) {
-        console.log("signupValidation: true");
+        console.log('signupValidation: true');
         const apiResponse = await signup.execute(formData);
 
         if (apiResponse.ok) {
           const apiResponseObject = await apiResponse.json();
-          console.log("apiResponseObject:", apiResponseObject);
+          console.log('apiResponseObject:', apiResponseObject);
           props.parentSetAlertDisplay(true);
-          props.parentSetAlertType("success");
-          props.parentSetAlertHeader("確認番号を送信しました。");
+          props.parentSetAlertType('success');
+          props.parentSetAlertHeader('確認番号を送信しました。');
           props.parentSetAlertMessage(
-            "メールアドレスを確認してください（件名: Your verification code）"
+            'メールアドレスを確認してください（件名: Your verification code）'
           );
           props.parentSetAlertAction(
             <ButtonWrapper
-              variant={"normal"}
-              iconName={"treeview-expand"}
-              iconAlt={"確認コードを入力"}
-              name={"確認コードを入力"}
+              variant={'normal'}
+              iconName={'treeview-expand'}
+              iconAlt={'確認コードを入力'}
+              name={'確認コードを入力'}
               onClick={props.parentOpenConfirmCodeModal}
             />
           );
         } else {
           props.parentSetAlertDisplay(true);
-          props.parentSetAlertType("error");
-          props.parentSetAlertHeader("サインアップに失敗しました。");
+          props.parentSetAlertType('error');
+          props.parentSetAlertHeader('サインアップに失敗しました。');
           props.parentSetAlertMessage(await apiResponse.json());
         }
       } else {
-        console.log("signupValidation: false: ", validationResult);
+        console.log('signupValidation: false: ', validationResult);
         const validationResultObject = validationResult;
         for (const validation of validationResultObject) {
-          if (validation["index"] == "userName")
-            setUserNameErrorText(validation["message"]);
-          else if (validation["index"] == "password")
-            setEmailErrorText(validation["message"]);
-          else if (validation["index"] == "email")
-            setPasswordErrorText(validation["message"]);
+          if (validation['index'] == 'userName')
+            setUserNameErrorText(validation['message']);
+          else if (validation['index'] == 'password')
+            setEmailErrorText(validation['message']);
+          else if (validation['index'] == 'email')
+            setPasswordErrorText(validation['message']);
         }
 
         return false;
@@ -93,14 +93,14 @@ export default function SignupForm(props) {
       if (e instanceof Error) {
         console.log(e.message);
         props.parentSetAlertDisplay(true);
-        props.parentSetAlertType("error");
-        props.parentSetAlertHeader("エラーが発生しました。");
+        props.parentSetAlertType('error');
+        props.parentSetAlertHeader('エラーが発生しました。');
         props.parentSetAlertMessage(e.message);
       } else {
         props.parentSetAlertDisplay(true);
-        props.parentSetAlertType("error");
-        props.parentSetAlertHeader("エラーが発生しました。");
-        props.parentSetAlertMessage("Client Error");
+        props.parentSetAlertType('error');
+        props.parentSetAlertHeader('エラーが発生しました。');
+        props.parentSetAlertMessage('Client Error');
       }
     } finally {
       setSignupButtonLoading(false);
@@ -111,32 +111,32 @@ export default function SignupForm(props) {
     event.preventDefault();
 
     console.log(event.detail);
-    setUserNameInputValue("");
-    setPasswordInputValue("");
-    setEmailInputValue("");
-    setUserNameErrorText("");
-    setEmailErrorText("");
-    setPasswordErrorText("");
+    setUserNameInputValue('');
+    setPasswordInputValue('');
+    setEmailInputValue('');
+    setUserNameErrorText('');
+    setEmailErrorText('');
+    setPasswordErrorText('');
   };
 
   return (
     <FormWrapper
-      id={"login_form"}
+      id={'login_form'}
       onSubmit={onSubmit}
       actions={
         <>
           <ButtonWrapper
-            variant={"normal"}
-            iconName={"refresh"}
-            iconAlt={"クリア"}
-            name={"クリア"}
+            variant={'normal'}
+            iconName={'refresh'}
+            iconAlt={'クリア'}
+            name={'クリア'}
             onClick={clearOnClick}
           />
           <ButtonWrapper
-            formAction={"submit"}
-            iconName={"user-profile"}
-            iconAlt={"サインアップ"}
-            name={"サインアップ"}
+            formAction={'submit'}
+            iconName={'user-profile'}
+            iconAlt={'サインアップ'}
+            name={'サインアップ'}
             loading={signupButtonLoading}
             loadingText={signupButtonLoadingText}
           />
@@ -145,8 +145,8 @@ export default function SignupForm(props) {
       container={
         <>
           <FormFieldWrapper
-            label={"ユーザー名"}
-            description={"ユーザー名を入力してください。(例)太郎"}
+            label={'ユーザー名'}
+            description={'ユーザー名を入力してください。(例)太郎'}
             formField={
               <InputWrapper
                 value={userNameInputValue}
@@ -156,11 +156,11 @@ export default function SignupForm(props) {
             errorText={userNameErrorText}
           />
           <FormFieldWrapper
-            label={"メールアドレス"}
+            label={'メールアドレス'}
             description={
               <TextContentWrapper
                 contents={
-                  <p style={{ color: "gray" }}>
+                  <p style={{ color: 'gray' }}>
                     メースアドレスを入力してください。(例)example@example.com。
                     <br />
                     サインアップに必要な確認番号が送られてきます。
@@ -172,18 +172,18 @@ export default function SignupForm(props) {
               <InputWrapper
                 value={emailInputValue}
                 parentSetValue={setEmailInputValue}
-                type={"email"}
-                inputMode={"email"}
+                type={'email'}
+                inputMode={'email'}
               />
             }
             errorText={emailErrorText}
           />
           <FormFieldWrapper
-            label={"パスワード"}
+            label={'パスワード'}
             description={
               <TextContentWrapper
                 contents={
-                  <ul style={{ color: "gray" }}>
+                  <ul style={{ color: 'gray' }}>
                     <li>パスワードを入力してください。</li>
                     <li>パスワードの最小文字数:8 文字。</li>
                     <li>少なくとも 1 つの数字を含む。</li>
@@ -196,7 +196,7 @@ export default function SignupForm(props) {
             }
             formField={
               <InputWrapper
-                type={"password"}
+                type={'password'}
                 value={passwordInputValue}
                 parentSetValue={setPasswordInputValue}
               />

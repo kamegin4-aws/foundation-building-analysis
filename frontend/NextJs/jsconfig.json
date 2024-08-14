@@ -2,6 +2,10 @@
   "compilerOptions": {
     "jsx": "react",
     "checkJs": true,
+    "skipLibCheck": true,  // 型定義ファイルのチェックをスキップ
+    "moduleResolution": "node",  // Node.jsスタイルのモジュール解決を使用
+    "esModuleInterop": true,  // ESモジュールとの互換性を向上
+    "allowSyntheticDefaultImports": true,  // デフォルトインポートを許可
     "paths": {
       "@/*": ["./src/*"]
     },

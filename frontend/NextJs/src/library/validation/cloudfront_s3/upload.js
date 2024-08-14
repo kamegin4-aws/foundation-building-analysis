@@ -1,4 +1,4 @@
-import { IValidation } from "@/library/validation/interface/validation";
+import { IValidation } from '@/library/validation/interface/validation';
 
 export class ContentsDataUploadValidation extends IValidation {
   #validationInstance;
@@ -12,7 +12,7 @@ export class ContentsDataUploadValidation extends IValidation {
 
   execute({ formData: formData }) {
     try {
-      console.log("formData:", formData);
+      console.log('formData:', formData);
 
       const filesMeta = formData.filesMeta;
       let sumSize = 0;
@@ -23,7 +23,7 @@ export class ContentsDataUploadValidation extends IValidation {
 
       if (filesNumber != true) {
         this.#errorMessageList.push({
-          index: "-1",
+          index: '-1',
           message: filesNumber,
         });
         return this.#errorMessageList;
@@ -52,7 +52,7 @@ export class ContentsDataUploadValidation extends IValidation {
 
       if (filesSize != true) {
         this.#errorMessageList.push({
-          index: "-1",
+          index: '-1',
           message: filesSize,
         });
         return this.#errorMessageList;
@@ -73,7 +73,7 @@ export class ContentsDataUploadValidation extends IValidation {
       if (e instanceof Error) {
         throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("client error: Validation");
+        throw new Error('client error: Validation');
       }
     }
   }

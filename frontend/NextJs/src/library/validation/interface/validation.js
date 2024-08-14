@@ -13,6 +13,6 @@ export class IValidation {
    * @returns {FunctionReturnExecute[] | boolean} 返り値
    */
   execute({ formData: formData }) {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 }

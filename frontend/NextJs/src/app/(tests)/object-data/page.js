@@ -11,11 +11,10 @@ import {
   Header,
   SpaceBetween,
 } from '@cloudscape-design/components';
-import log4js from 'log4js';
+import log from 'loglevel';
 import React, { useEffect, useState } from 'react';
 
-const logger = log4js.getLogger();
-logger.level = 'info';
+log.setLevel('info');
 
 export default function FileUploadWrapper() {
   const [value, setValue] = useState([]);
@@ -23,7 +22,8 @@ export default function FileUploadWrapper() {
 
   const uploadOnClick = async (event) => {
     event.preventDefault();
-    logger.debug(event.detail);
+    log.info(event.detail);
+
     try {
       const file = value[0];
       if (objectData) {
@@ -37,22 +37,22 @@ export default function FileUploadWrapper() {
           body: file,
         });
 
-        logger.info('Image uploaded successfully:', result);
+        log.info(`Image uploaded successfully: ${JSON.stringify(result)}`);
       }
     } catch (e) {
       if (e instanceof Error) {
-        logger.error(e.message);
+        log.error(e.message);
       } else {
-        logger.error('エラー');
+        log.error('エラー');
       }
     } finally {
-      logger.info(() => 'Image upload finished');
+      log.info('Image upload finished');
     }
   };
 
   const multiUploadOnClick = async (event) => {
     event.preventDefault();
-    logger.debug(event.detail);
+    log.info(event.detail);
     try {
       if (objectData) {
         const file = value[0];
@@ -66,22 +66,22 @@ export default function FileUploadWrapper() {
           body: file,
         });
 
-        logger.info('multipartUpload:', result);
+        log.info(`multipartUpload successfully: ${JSON.stringify(result)}`);
       }
     } catch (e) {
       if (e instanceof Error) {
-        logger.error(e.message);
+        log.error(e.message);
       } else {
-        logger.error('エラー');
+        log.error('エラー');
       }
     } finally {
-      logger.info('multipartUpload finished');
+      log.info('multipartUpload finished');
     }
   };
 
   const listOnClick = async (event) => {
     event.preventDefault();
-    logger.debug(event.detail);
+    log.info(event.detail);
     try {
       if (objectData) {
         const result = await objectData.list({
@@ -93,22 +93,22 @@ export default function FileUploadWrapper() {
           orderBy: 'updatedAt',
         });
 
-        logger.info('List:', result);
+        log.info(`List successfully: ${JSON.stringify(result)}`);
       }
     } catch (e) {
       if (e instanceof Error) {
-        logger.error(e.message);
+        log.error(e.message);
       } else {
-        logger.error('エラー');
+        log.error('エラー');
       }
     } finally {
-      logger.info('List finished');
+      log.info('List finished');
     }
   };
 
   const detailOnClick = async (event) => {
     event.preventDefault();
-    logger.debug(event.detail);
+    log.info(event.detail);
     try {
       if (objectData) {
         const file = value[0];
@@ -120,22 +120,22 @@ export default function FileUploadWrapper() {
           fileName: file.name,
         });
 
-        logger.info('Detail:', result);
+        log.info(`Detail successfully: ${JSON.stringify(result)}`);
       }
     } catch (e) {
       if (e instanceof Error) {
-        logger.error(e.message);
+        log.error(e.message);
       } else {
-        logger.error('エラー');
+        log.error('エラー');
       }
     } finally {
-      logger.info('Detail finished');
+      log.info('Detail finished');
     }
   };
 
   const versionListOnClick = async (event) => {
     event.preventDefault();
-    logger.debug(event.detail);
+    log.info(event.detail);
     try {
       if (objectData) {
         const file = value[0];
@@ -147,22 +147,23 @@ export default function FileUploadWrapper() {
           fileName: file.name,
         });
 
-        logger.info('Version list:', result);
+        log.info(`Version list successfully: ${JSON.stringify(result)}`);
       }
     } catch (e) {
       if (e instanceof Error) {
-        logger.error(e.message);
+        log.error(e.message);
       } else {
-        logger.error('エラー');
+        log.error('エラー');
       }
     } finally {
-      logger.info('Version list finished');
+      log.info('Version list finished');
     }
   };
 
   const commentUpdateOnClick = async (event) => {
     event.preventDefault();
-    logger.debug(event.detail);
+    log.info(event.detail);
+
     try {
       if (objectData) {
         const file = value[0];
@@ -175,22 +176,22 @@ export default function FileUploadWrapper() {
           comment: 'commentUpdate',
         });
 
-        logger.info('commentUpdate:', result);
+        log.info(`commentUpdate successfully: ${JSON.stringify(result)}`);
       }
     } catch (e) {
       if (e instanceof Error) {
-        logger.error(e.message);
+        log.error(e.message);
       } else {
-        logger.error('エラー');
+        log.error('エラー');
       }
     } finally {
-      logger.info('commentUpdate finished');
+      log.info('commentUpdate finished');
     }
   };
 
   const deleteOnClick = async (event) => {
     event.preventDefault();
-    logger.debug(event.detail);
+    log.info(event.detail);
     try {
       if (objectData) {
         const file = value[0];
@@ -202,22 +203,23 @@ export default function FileUploadWrapper() {
           fileName: file.name,
         });
 
-        logger.info('Delete:', result);
+        log.info(`Delete successfully: ${JSON.stringify(result)}`);
       }
     } catch (e) {
       if (e instanceof Error) {
-        logger.error(e.message);
+        log.error(e.message);
       } else {
-        logger.error('エラー');
+        log.error('エラー');
       }
     } finally {
-      logger.info('Delete finished');
+      log.info('Delete finished');
     }
   };
 
   const permanentlyDeleteOnClick = async (event) => {
     event.preventDefault();
-    logger.debug(event.detail);
+    log.info(event.detail);
+
     try {
       if (objectData) {
         const file = value[0];
@@ -229,16 +231,16 @@ export default function FileUploadWrapper() {
           fileName: file.name,
         });
 
-        logger.info('Permanently delete:', result);
+        log.info(`Permanently delete successfully: ${JSON.stringify(result)}`);
       }
     } catch (e) {
       if (e instanceof Error) {
-        logger.error(e.message);
+        log.error(e.message);
       } else {
-        logger.error('エラー');
+        log.error('エラー');
       }
     } finally {
-      logger.info('Permanently delete finished');
+      log.info('Permanently delete finished');
     }
   };
 
@@ -265,7 +267,8 @@ export default function FileUploadWrapper() {
           response
             .json()
             .then((data) => {
-              logger.info(`success for login: ${JSON.stringify(data)}`);
+              log.info(`success for login: ${JSON.stringify(data)}`);
+
               setObjectData(
                 new ObjectData({
                   repositoryInstance: new S3Wrapper({
@@ -275,14 +278,14 @@ export default function FileUploadWrapper() {
               );
             })
             .catch((error) => {
-              logger.error(`error for login: ${error.message}`);
+              log.error(`error for login: ${error.message}`);
             });
         } else {
           throw new Error('Network response was not ok.');
         }
       })
       .catch((error) => {
-        logger.error(`error for login: ${error.message}`);
+        log.error(`error for login: ${error.message}`);
       });
   }, []);
 

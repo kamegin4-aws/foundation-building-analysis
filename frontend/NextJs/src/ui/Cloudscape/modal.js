@@ -1,7 +1,7 @@
-import Modal from "@cloudscape-design/components/modal";
-import Box from "@cloudscape-design/components/box";
-import SpaceBetween from "@cloudscape-design/components/space-between";
-import React from "react";
+import Box from '@cloudscape-design/components/box';
+import Modal from '@cloudscape-design/components/modal';
+import SpaceBetween from '@cloudscape-design/components/space-between';
+import React from 'react';
 
 export default function ModalWrapper(props) {
   //const [visible, setVisible] = React.useState(false);

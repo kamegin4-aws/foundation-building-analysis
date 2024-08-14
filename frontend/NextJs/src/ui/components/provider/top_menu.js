@@ -1,12 +1,11 @@
-"use client";
+'use client';
 
-import Loading from "@/app/loading";
-import { LayoutContext } from "@/ui/components/provider/layout_provider";
-import { CognitoContext } from "@/ui/components/provider/cognito_provider";
-import { useContext, useEffect } from "react";
-import { SignOut } from "@/library/api/cognito/sign_out";
-import { useRouter } from "next/navigation";
-import React from "react";
+import Loading from '@/app/loading';
+import { SignOut } from '@/library/api/cognito/sign_out';
+import { CognitoContext } from '@/ui/components/provider/cognito_provider';
+import { LayoutContext } from '@/ui/components/provider/layout_provider';
+import { useRouter } from 'next/navigation';
+import React, { useContext, useEffect } from 'react';
 
 export default function TopNavigationProvider(props) {
   //LayoutContext
@@ -24,16 +23,16 @@ export default function TopNavigationProvider(props) {
       const response = await signOut.execute();
 
       if (response.ok) {
-        router.push("/");
+        router.push('/');
       } else {
-        router.push("?type=error&message=サインアウトに失敗しました。");
+        router.push('?type=error&message=サインアウトに失敗しました。');
       }
     } catch (e) {
       if (e instanceof Error) {
         console.log(e.message);
         router.push(`?type=error&message=${e.message}`);
       } else {
-        router.push("?type=error&message=エラーが発生しました。");
+        router.push('?type=error&message=エラーが発生しました。');
       }
     }
   };
@@ -41,24 +40,24 @@ export default function TopNavigationProvider(props) {
   useEffect(() => {
     const topMenu = [
       {
-        type: "menu-dropdown",
+        type: 'menu-dropdown',
         text: userAttributes.userName,
-        description: "ユーザーメニュー",
-        iconName: "user-profile-active",
+        description: 'ユーザーメニュー',
+        iconName: 'user-profile-active',
         items: [
           {
-            id: "userInfo",
-            text: "ユーザー情報",
-            href: "/user",
+            id: 'userInfo',
+            text: 'ユーザー情報',
+            href: '/user',
           },
         ],
       },
       {
-        type: "button",
-        variant: "primary-button",
-        iconName: "user-profile",
-        text: "サインアウト",
-        ariaLabel: "サインアウト",
+        type: 'button',
+        variant: 'primary-button',
+        iconName: 'user-profile',
+        text: 'サインアウト',
+        ariaLabel: 'サインアウト',
         onClick: signOutOnClick,
       },
     ];
