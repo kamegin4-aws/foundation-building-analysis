@@ -11,9 +11,9 @@ services:
     restart: always
     tty: true
     #privileged: true
-    depends_on:
+    #depends_on:
     #  - presentation
-      - application
+    #  - application
     #environment:
     expose:
       - 80

@@ -9,6 +9,13 @@ const corsOptions = {
 };
 
 export function middleware(request) {
+  const { pathname } = new URL(request.url);
+
+  // ヘルスチェック用のエンドポイント
+  if (pathname === '/health') {
+    return NextResponse.json({ status: 'ok' }, { status: 200 });
+  }
+
   // Check the origin from the request
   const origin = request.headers.get('origin') ?? '';
   const isAllowedOrigin = allowedOrigins.includes(origin);
@@ -47,6 +54,14 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    {
+      source: '/((?!api|_next/static|_next/image|favicon.ico).*)',
+      /*
+      missing: [
+        { type: 'header', key: 'Authorization' },
+        { type: 'header', key: 'x-api-key' },
+      ],
+      */
+    },
   ],
 };

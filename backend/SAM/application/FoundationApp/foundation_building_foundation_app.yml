@@ -1,5 +1,5 @@
 Resources:
-  ExecECSTaskRole:
+  ExecFoundationAppTaskRole:
     Type: AWS::IAM::Role
     Properties:
       Path: /
@@ -13,12 +13,12 @@ Resources:
       Policies:
         - PolicyName: AllowKMS
           PolicyDocument:
-            Version: "2012-10-17"
+            Version: '2012-10-17'
             Statement:
               - Effect: Allow
                 Action:
-                  - "kms:Decrypt"
-                  - "kms:GenerateDataKey"
+                  - kms:Decrypt
+                  - kms:GenerateDataKey
                 Resource:
                   - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*
                 Condition:
@@ -40,8 +40,8 @@ Resources:
     Type: AWS::ECS::TaskDefinition
     Properties:
       Family: foundation-app-task-definition
-      ExecutionRoleArn: !GetAtt ExecECSTaskRole.Arn
-      TaskRoleArn: !GetAtt ExecECSTaskRole.Arn
+      ExecutionRoleArn: !GetAtt ExecFoundationAppTaskRole.Arn
+      TaskRoleArn: !GetAtt ExecFoundationAppTaskRole.Arn
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
@@ -50,47 +50,23 @@ Resources:
       EphemeralStorage:
         SizeInGiB: 21
       ContainerDefinitions:
-        - Name: nginx
+        - Name: next_js
           Image: !Sub
-            - ${uri}:nginx
+            - ${uri}:next_js
             - uri: !ImportValue imageRepositoryUri
           Essential: true
           Privileged: false
           PortMappings:
-            - ContainerPort: 80
-              HostPort: 80
-              Protocol: tcp
-            - ContainerPort: 443
-              HostPort: 443
+            - ContainerPort: 8080
+              HostPort: 8080
               Protocol: tcp
           LogConfiguration:
             LogDriver: awslogs
             Options:
-              awslogs-group: /ecs/NginxTaskDefinition
+              awslogs-group: /ecs/NextJsTaskDefinition
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: ecs
               awslogs-create-group: 'true'
-          DependsOn:
-            #  - Condition: START
-            #    ContainerName: next_js
-            - Condition: START
-              ContainerName: django_rf
-        #- Name: next_js
-        #  Image: kamegin4/foundation-building:next_js
-        #  Essential: true
-        #  PortMappings:
-        #    - ContainerPort: 8080
-        #      HostPort: 8080
-        #      Protocol: tcp
-        #  RepositoryCredentials:
-        #    CredentialsParameter: !Ref DockerHubSecret
-        #  LogConfiguration:
-        #    LogDriver: awslogs
-        #    Options:
-        #      awslogs-group: /ecs/NextJsTaskDefinition
-        #      awslogs-region: !Ref AWS::Region
-        #      awslogs-stream-prefix: ecs
-        #      awslogs-create-group: 'true'
         - Name: django_rf
           Image: !Sub
             - ${uri}:django_rf
@@ -118,12 +94,9 @@ Resources:
         MaximumPercent: 200
         MinimumHealthyPercent: 50
       LoadBalancers:
-        - ContainerName: nginx
-          ContainerPort: 80
-          TargetGroupArn: !ImportValue elbWebTargetGroupArn
-        #- ContainerName: next_js
-        #  ContainerPort: 8080
-        #  TargetGroupArn: !Ref elbPresentationTargetGroupArn
+        - ContainerName: next_js
+          ContainerPort: 8080
+          TargetGroupArn: !ImportValue elbPresentationTargetGroupArn
         - ContainerName: django_rf
           ContainerPort: 8081
           TargetGroupArn: !ImportValue elbApplicationTargetGroupArn
@@ -133,7 +106,6 @@ Resources:
           AssignPublicIp: ENABLED
           SecurityGroups:
             - !ImportValue publicSecurityGroupId
-            - !ImportValue internalELBSecurityGroupId
           Subnets:
             - !ImportValue publicSubnet1Id
             - !ImportValue publicSubnet2Id
