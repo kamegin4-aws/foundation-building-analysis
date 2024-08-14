@@ -1,4 +1,4 @@
-import { MIME_TYPE } from "@/library/common/constant/mimeType_check";
+import { MIME_TYPE } from '@/library/common/constant/mimeType_check';
 
 /**
  * MIMETypeの判定

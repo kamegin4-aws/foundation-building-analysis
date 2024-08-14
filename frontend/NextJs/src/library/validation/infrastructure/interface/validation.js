@@ -10,7 +10,7 @@ export class IValidationInstance {
    * @returns {boolean | string} 成功時:true, 失敗時:エラーメッセージ
    */
   userNameValidation({ userName: userName }) {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   /**
@@ -21,7 +21,7 @@ export class IValidationInstance {
    * @returns {boolean | string} 成功時:true, 失敗時:エラーメッセージ
    */
   passwordValidation({ password: password }) {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   /**
@@ -32,7 +32,7 @@ export class IValidationInstance {
    * @returns {boolean | string} 成功時:true, 失敗時:エラーメッセージ
    */
   emailValidation({ email: email }) {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   /**
@@ -43,7 +43,7 @@ export class IValidationInstance {
    * @returns {boolean | string} 成功時:true, 失敗時:エラーメッセージ
    */
   codeValidation({ code: code }) {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   /**
@@ -54,7 +54,7 @@ export class IValidationInstance {
    * @returns {boolean | string} 成功時:true, 失敗時:エラーメッセージ
    */
   keyValidation({ key: key }) {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   /**
@@ -65,7 +65,7 @@ export class IValidationInstance {
    * @returns {boolean | string} 成功時:true, 失敗時:エラーメッセージ
    */
   valueValidation({ value: value }) {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   /**
@@ -76,7 +76,7 @@ export class IValidationInstance {
    * @returns {boolean|string} 成功時:true, 失敗時:エラーメッセージ
    */
   fileMIMETypeValidation({ mimeType: mimeType }) {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   /**
@@ -87,7 +87,7 @@ export class IValidationInstance {
    * @returns {boolean|string} 成功時:true, 失敗時:エラーメッセージ
    */
   fileSizeValidation({ fileSize: fileSize }) {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   /**
@@ -98,7 +98,7 @@ export class IValidationInstance {
    * @returns {boolean|string} 成功時:true, 失敗時:エラーメッセージ
    */
   fileNameValidation({ fileName: fileName }) {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   /**
@@ -109,7 +109,7 @@ export class IValidationInstance {
    * @returns {boolean|string} 成功時:true, 失敗時:エラーメッセージ
    */
   filesNumberValidation({ filesNumber: filesNumber }) {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   /**
@@ -120,6 +120,27 @@ export class IValidationInstance {
    * @returns {boolean | string} 成功時:true, 失敗時:エラーメッセージ
    */
   filesSizeValidation({ filesSize: filesSize }) {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
+  }
+
+  /**
+   * 共通エンティティに変換
+   * @typedef {Object} InputObjectToEntity
+   * @property {boolean|string} response validation結果
+   * @param {InputObjectToEntity} InputObjectToEntity
+   * @returns {Object} validationエンティティ
+   */
+  toEntity({ response: response }) {
+    if (response == true) {
+      return {
+        status: true,
+        message: 'Success',
+      };
+    } else {
+      return {
+        status: false,
+        message: response,
+      };
+    }
   }
 }
