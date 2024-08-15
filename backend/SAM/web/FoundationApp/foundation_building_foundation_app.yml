@@ -52,7 +52,7 @@ Resources:
       ContainerDefinitions:
         - Name: nginx
           Image: !Sub
-            - ${uri}:nginx
+            - ${uri}@sha256:f9ef610d8bacb5f1846506468ae78ef6b45b10c6ef2c776fc94ec913794b5068 #:nginx
             - uri: !ImportValue imageRepositoryUri
           Essential: true
           Privileged: false

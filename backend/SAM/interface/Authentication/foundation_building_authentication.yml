@@ -18,17 +18,17 @@ Resources:
             Condition:
               StringEquals:
                 aws:ResourceAccount: !Ref AWS::AccountId
-  CognitoAPILogsGroup:
+  UserAPILogsGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /aws/lambda/${CognitoAPI}
+      LogGroupName: !Sub /aws/api-gateway/${UserAPI}
       RetentionInDays: 7
-  CognitoAPI:
+  UserAPI:
     Type: AWS::Serverless::Api
     Properties:
       Name: !Sub
         - ${ResourceName} From Stack ${AWS::StackName}
-        - ResourceName: CognitoAPI
+        - ResourceName: UserAPI
       StageName: paid
       Variables:
         alias: paid
@@ -75,62 +75,16 @@ Resources:
       EndpointConfiguration: REGIONAL
       TracingEnabled: true
       AccessLogSetting:
-        DestinationArn: !GetAtt CognitoAPILogsGroup.Arn
+        DestinationArn: !GetAtt UserAPILogsGroup.Arn
         Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp",
           "caller":"$context.identity.caller", "user":"$context.identity.user",
           "requestTime":"$context.requestTime",
           "httpMethod":"$context.httpMethod",
           "resourcePath":"$context.resourcePath", "status":"$context.status",
           "responseLength":"$context.responseLength" }'
+      ApiKeySourceType: HEADER
       Auth:
-        ResourcePolicy:
-          CustomStatements:
-            - Sid: AllowGlobalIPForFree
-              Effect: Allow
-              Principal: '*'
-              Action: execute-api:Invoke
-              Resource:
-                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/free/*/*
-              Condition:
-                IpAddress:
-                  aws:SourceIp:
-                    - !Ref globalIP
-                    - !ImportValue vpcCidrBlock
-                    - !ImportValue publicSubnet1CidrBlock
-                    - !ImportValue publicSubnet2CidrBlock
-            - Sid: AllowVPCForFree
-              Effect: Allow
-              Principal: '*'
-              Action: execute-api:Invoke
-              Resource:
-                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/free/*/*
-              Condition:
-                StringEquals:
-                  aws:SourceVpc:
-                    - !ImportValue vpcId
-            - Sid: AllowGlobalIPForPaid
-              Effect: Allow
-              Principal: '*'
-              Action: execute-api:Invoke
-              Resource:
-                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/paid/*/*
-              Condition:
-                IpAddress:
-                  aws:SourceIp:
-                    - !Ref globalIP
-                    - !ImportValue vpcCidrBlock
-                    - !ImportValue publicSubnet1CidrBlock
-                    - !ImportValue publicSubnet2CidrBlock
-            - Sid: AllowVPCForPaid
-              Effect: Allow
-              Principal: '*'
-              Action: execute-api:Invoke
-              Resource:
-                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/paid/*/*
-              Condition:
-                StringEquals:
-                  aws:SourceVpc:
-                    - !ImportValue vpcId
+        ApiKeyRequired: true
       Cors:
         AllowOrigin: '''*'''
         AllowHeaders: '''Content-Type, X-Amz-Date, Authorization, X-Api-Key,
@@ -151,12 +105,12 @@ Resources:
       Tracing: Active
       Role: !GetAtt LambdaCognitoRole.Arn
       Events:
-        CognitoPOSTcognitosignup:
+        UserAPIPOSTcognitosignup:
           Type: Api
           Properties:
             Path: /cognito/signup
             Method: POST
-            RestApiId: !Ref CognitoAPI
+            RestApiId: !Ref UserAPI
       Environment:
         Variables:
           USER_POOL_ID: !ImportValue userPoolId
@@ -186,12 +140,12 @@ Resources:
           CLIENT_ID: !ImportValue userPoolClientId
           CLIENT_SECRET: !Ref clientSecret
       Events:
-        CognitoPOSTcognitosignupconfirm:
+        UserAPIPOSTcognitosignupconfirm:
           Type: Api
           Properties:
             Path: /cognito/signup/confirm
             Method: POST
-            RestApiId: !Ref CognitoAPI
+            RestApiId: !Ref UserAPI
   ConfirmSignUpLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -216,28 +170,28 @@ Resources:
           CLIENT_ID: !ImportValue userPoolClientId
           CLIENT_SECRET: !Ref clientSecret
       Events:
-        CognitoAuthorizedAPIPOSTcognitouserdetail:
+        UserAuthorizedAPIPOSTcognitouserdetail:
           Type: Api
           Properties:
             Path: /cognito/user/detail
             Method: POST
-            RestApiId: !Ref CognitoAuthorizedAPI
+            RestApiId: !Ref UserAuthorizedAPI
   GetUserLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub /aws/lambda/${GetUser}
       RetentionInDays: 7
-  CognitoAuthorizedAPILogsGroup:
+  UserAuthorizedAPILogsGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /aws/lambda/${CognitoAuthorizedAPI}
+      LogGroupName: !Sub /aws/api-gateway/${UserAuthorizedAPI}
       RetentionInDays: 7
-  CognitoAuthorizedAPI:
+  UserAuthorizedAPI:
     Type: AWS::Serverless::Api
     Properties:
       Name: !Sub
         - ${ResourceName} From Stack ${AWS::StackName}
-        - ResourceName: CognitoAuthorizedAPI
+        - ResourceName: UserAuthorizedAPI
       StageName: paid
       Variables:
         alias: paid
@@ -270,7 +224,7 @@ Resources:
       EndpointConfiguration: REGIONAL
       TracingEnabled: true
       AccessLogSetting:
-        DestinationArn: !GetAtt CognitoAuthorizedAPILogsGroup.Arn
+        DestinationArn: !GetAtt UserAuthorizedAPILogsGroup.Arn
         Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp",
           "caller":"$context.identity.caller", "user":"$context.identity.user",
           "requestTime":"$context.requestTime",
@@ -373,27 +327,27 @@ Resources:
       FunctionName: !Ref GetUser
       FunctionVersion: $LATEST
       Name: paid
-  CognitoAPIDeployment:
+  UserAPIDeployment:
     Type: AWS::ApiGateway::Deployment
     Properties:
-      RestApiId: !Ref CognitoAPI
-      Description: Cognito deployment
-  CognitoAuthorizedAPIDeployment:
+      RestApiId: !Ref UserAPI
+      Description: UserAPI deployment
+  UserAuthorizedAPIDeployment:
     Type: AWS::ApiGateway::Deployment
     Properties:
-      RestApiId: !Ref CognitoAuthorizedAPI
-      Description: CognitoAuthorized deployment
-  CognitoAPIFreeStage:
+      RestApiId: !Ref UserAuthorizedAPI
+      Description: UserAuthorizedAPI deployment
+  UserAPIFreeStage:
     Type: AWS::ApiGateway::Stage
     Properties:
-      RestApiId: !Ref CognitoAPI
+      RestApiId: !Ref UserAPI
       StageName: free
       Description: Free stage
-      DeploymentId: !GetAtt CognitoAPIDeployment.DeploymentId
+      DeploymentId: !GetAtt UserAPIDeployment.DeploymentId
       Variables:
         alias: free
       AccessLogSetting:
-        DestinationArn: !GetAtt CognitoAPILogsGroup.Arn
+        DestinationArn: !GetAtt UserAPILogsGroup.Arn
         Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp",
           "caller":"$context.identity.caller", "user":"$context.identity.user",
           "requestTime":"$context.requestTime",
@@ -405,17 +359,17 @@ Resources:
           HttpMethod: '*'
           DataTraceEnabled: true
           LoggingLevel: INFO
-  CognitoAuthorizedAPIFreeStage:
+  UserAuthorizedAPIFreeStage:
     Type: AWS::ApiGateway::Stage
     Properties:
-      RestApiId: !Ref CognitoAuthorizedAPI
+      RestApiId: !Ref UserAuthorizedAPI
       StageName: free
       Description: Free stage
-      DeploymentId: !GetAtt CognitoAuthorizedAPIDeployment.DeploymentId
+      DeploymentId: !GetAtt UserAuthorizedAPIDeployment.DeploymentId
       Variables:
         alias: free
       AccessLogSetting:
-        DestinationArn: !GetAtt CognitoAuthorizedAPILogsGroup.Arn
+        DestinationArn: !GetAtt UserAuthorizedAPILogsGroup.Arn
         Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp",
           "caller":"$context.identity.caller", "user":"$context.identity.user",
           "requestTime":"$context.requestTime",
@@ -445,12 +399,12 @@ Resources:
           CLIENT_ID: !ImportValue userPoolClientId
           CLIENT_SECRET: !Ref clientSecret
       Events:
-        CognitoPOSTcognitotokenrefresh:
+        UserAPIPOSTcognitotokenrefresh:
           Type: Api
           Properties:
             Path: /cognito/token/refresh
             Method: POST
-            RestApiId: !Ref CognitoAPI
+            RestApiId: !Ref UserAPI
   TokenRefreshLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -526,12 +480,12 @@ Resources:
           CLIENT_ID: !ImportValue userPoolClientId
           CLIENT_SECRET: !Ref clientSecret
       Events:
-        CognitoAPIPOSTcognitosignin:
+        UserAPIPOSTcognitosignin:
           Type: Api
           Properties:
             Path: /cognito/sign-in
             Method: POST
-            RestApiId: !Ref CognitoAPI
+            RestApiId: !Ref UserAPI
   SignInLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -556,12 +510,12 @@ Resources:
           CLIENT_ID: !ImportValue userPoolClientId
           CLIENT_SECRET: !Ref clientSecret
       Events:
-        CognitoAPIPOSTcognitosignout:
+        UserAPIPOSTcognitosignout:
           Type: Api
           Properties:
             Path: /cognito/sign-out
             Method: POST
-            RestApiId: !Ref CognitoAPI
+            RestApiId: !Ref UserAPI
   SignOutLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -586,12 +540,12 @@ Resources:
           CLIENT_ID: !ImportValue userPoolClientId
           CLIENT_SECRET: !Ref clientSecret
       Events:
-        CognitoAuthorizedAPIPOSTcognitouserattributesedit:
+        UserAuthorizedAPIPOSTcognitouserattributesedit:
           Type: Api
           Properties:
             Path: /cognito/user/attributes/edit
             Method: POST
-            RestApiId: !Ref CognitoAuthorizedAPI
+            RestApiId: !Ref UserAuthorizedAPI
   UpdateAttributesLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -616,12 +570,12 @@ Resources:
           CLIENT_ID: !ImportValue userPoolClientId
           CLIENT_SECRET: !Ref clientSecret
       Events:
-        CognitoAuthorizedAPIPOSTcognitouserattributesverify:
+        UserAuthorizedAPIPOSTcognitouserattributesverify:
           Type: Api
           Properties:
             Path: /cognito/user/attributes/verify
             Method: POST
-            RestApiId: !Ref CognitoAuthorizedAPI
+            RestApiId: !Ref UserAuthorizedAPI
   VerifyAttributeLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -629,11 +583,18 @@ Resources:
       RetentionInDays: 7
 Transform: AWS::Serverless-2016-10-31
 Parameters:
-  globalIP:
-    Type: String
-    Description: Global IP
-    Default: 0.0.0.0
   clientSecret:
     Type: String
     Description: UserPoolClient secret
     Default: XXXX
+Outputs:
+  UserAPIId:
+    Value: !Ref UserAPI
+    Description: UserAPI ID
+    Export:
+      Name: userAPIId
+  UserAuthorizedAPIId:
+    Value: !Ref UserAuthorizedAPI
+    Description: UserAuthorizedAPI ID
+    Export:
+      Name: userAuthorizedAPIId
