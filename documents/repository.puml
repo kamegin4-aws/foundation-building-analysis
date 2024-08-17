@@ -1,13 +1,13 @@
 @startuml
 ' Entities
 entity "User(Cognito)" as user {
-  +user_id: uuid: User ID [PK]
-  user_name: string: User Name
-  email: string: Email
-  plan: string: Custom Plan
-  access_token: string: AccessToken
-  id_token: string: IDToken
-  refresh_token: string: RefreshToken
+  +user_id: uuid: ユーザーID [PK]
+  user_name: string: ユーザー名
+  email: string: Eメール
+  plan: string: プラン名
+  access_token: string: アクセストークン
+  id_token: string: IDトークン
+  refresh_token: string: リフレッシュトークン
   expires: timestamptz: 有効期限
   created_at: timestamptz: 作成日時
   updated_at : timestamptz: 更新日時
@@ -17,14 +17,14 @@ entity "User(Cognito)" as user {
 entity "RelationalData(RDS)" as relational_data {
   +relational_id: uuid: 関係データID [PK]
   --
-  key: varchar: キー
-  value: varchar: バリュー
-  created_at: timestamptz: 作成日時
-  updated_at : timestamptz: 更新日時
   meta_key: varchar: メタデータキー
   meta_value: varchar: メタデータバリュー
-  comment: varchar: コメント
   version_id: uuid: バージョンID
+  key: varchar: キー
+  value: varchar: バリュー
+  comment: varchar: コメント
+  created_at: timestamptz: 作成日時
+  updated_at : timestamptz: 更新日時
   user_id: varchar [FK]
   unique : [user_id, meta_key, meta_value, version_id, key]
 }
@@ -37,6 +37,7 @@ entity "ObjectData(S3)" as object_data {
   mime_type: string: MIMEタイプ(audio, image, text...)
   fileName: string: ファイル名
   comment: string: コメント
+  signed_uri: string: 署名済みURI
   versionId: uuid: バージョンID
   updated_at : string: 更新日時
   user_id: string: ユーザーID
@@ -49,7 +50,6 @@ entity "ETL(S3)" as etl {
   meta_value: string: メタデータバリュー
   mime_type: string: MIMEタイプ(audio, image, text...)
   name: string: ファイル(テーブル)名
-  comment: string: コメント
   versionId: uuid: バージョンID
   user_id: string: ユーザーID
 }
