@@ -1,0 +1,91 @@
+Resources:
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        SigningBehavior: always
+        OriginAccessControlOriginType: s3
+        SigningProtocol: sigv4
+        Name: !Sub ${AWS::StackName}-oac
+  KeyGroup:
+    Type: AWS::CloudFront::KeyGroup
+    Properties:
+      KeyGroupConfig:
+        Items:
+          - !Ref PublicKey
+        Name: !Sub ${AWS::StackName}-cloudfront-keygroup
+  PublicKey:
+    Type: AWS::CloudFront::PublicKey
+    Properties:
+      PublicKeyConfig:
+        CallerReference: !Sub ${AWS::StackName}-caller-reference
+        Name: !Sub ${AWS::StackName}-cloudfront-public-key
+        EncodedKey: |
+          -----BEGIN PUBLIC KEY-----
+          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuy2KReIfzuzsBqun166z
+          9N6vmzIi8hRC3uYG7RLKKpAMKmQ4bRSThMX6xdhKWyqXpEvcsrVnpwIOTO2pI2HD
+          HQpaicfsD+5Q+qfsfRDGpK/YBOxueQLegqKLLuLydRAdlFF7DDeLB/Ek+kHYT3Pd
+          J/eeUZZ6/dRbvOENHCgXvTSit+Sc5dN8VP+bIzmYsblBNpI3rg3oQdFHhgVHdpYK
+          6d5nspC2nphKkxW9RtzP+gUpm+4JsQ3ImHd4oDfcdi1+lbF6t8Flnd3WZQZsDrCv
+          8sE1jBdGkBY1dQMmP7zMq/VKYnmHmVpYXE34iPWaMWPNsJmplJCYMUhfZY/Auar5
+          QQIDAQAB
+          -----END PUBLIC KEY-----
+  Distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: https-only
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          CachedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          CachePolicyId: !GetAtt CachePolicy.Id
+          TrustedKeyGroups:
+            - !Ref KeyGroup
+        Enabled: true
+        Origins:
+          - Id: S3Origin
+            DomainName: !ImportValue objectStorageDomainName
+            OriginAccessControlId: !GetAtt OriginAccessControl.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+        PriceClass: PriceClass_100
+        Logging:
+          Bucket: !ImportValue loggingBucketDomainName
+          Prefix: !Sub ${AWS::StackName}-cloudfront
+  CachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        MinTTL: 300
+        MaxTTL: 31536000
+        ParametersInCacheKeyAndForwardedToOrigin:
+          HeadersConfig:
+            HeaderBehavior: none
+          CookiesConfig:
+            CookieBehavior: none
+          EnableAcceptEncodingGzip: true
+          QueryStringsConfig:
+            QueryStringBehavior: none
+        DefaultTTL: 86400
+        Name: !Sub ${AWS::StackName}-cache-policy
+Transform: AWS::Serverless-2016-10-31
+Outputs:
+  DistributionDomain:
+    Value: !GetAtt Distribution.DomainName
+    Description: Distribution DomainName
+    Export:
+      Name: distributionDomain
+  DistributionId:
+    Value: !Ref Distribution
+    Description: Distribution ID
+    Export:
+      Name: distributionId

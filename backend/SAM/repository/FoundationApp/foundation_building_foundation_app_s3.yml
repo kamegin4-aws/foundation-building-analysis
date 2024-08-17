@@ -70,6 +70,7 @@ Resources:
             Condition:
               StringEquals:
                 aws:ResourceAccount: !Ref AWS::AccountId
+                aws:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${distributionId}
           - Sid: AllowGlueService
             Effect: Allow
             Principal:
@@ -95,10 +96,13 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       PublicAccessBlockConfiguration:
-        IgnorePublicAcls: true
+        IgnorePublicAcls: true  # ACLを許可
         RestrictPublicBuckets: true
-        BlockPublicAcls: true
+        BlockPublicAcls: true  # ACLを許可
         BlockPublicPolicy: true
+      OwnershipControls:
+        Rules:
+        - ObjectOwnership: BucketOwnerPreferred
       ObjectLockEnabled: false
       VersioningConfiguration:
         Status: Enabled
@@ -113,7 +117,8 @@ Resources:
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
-          - Effect: Allow
+          - Sid: AllowS3
+            Effect: Allow
             Principal:
               Service: logging.s3.amazonaws.com
             Action:
@@ -128,15 +133,45 @@ Resources:
                 aws:SourceArn: !Join ['', ['arn:aws:s3:::', !Ref ObjectStorage]]
               StringEquals:
                 aws:SourceAccount: !Ref AWS::AccountId
+          - Sid: AllowCloudFront
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action:
+              - s3:PutObject
+            Resource: !Join
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref LoggingBucket
+                - /*
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/*
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
 Transform: AWS::Serverless-2016-10-31
 Parameters:
   hostDomain:
     Description: HOST Domain
     Type: String
     Default: foundation-building.XXXX.com
+  distributionId:
+    Description: Distribution Id
+    Type: String
+    Default: XXXX
 Outputs:
   ObjectStorageName:
     Value: !Ref ObjectStorage
     Description: ObjectStorage Name
     Export:
       Name: objectStorageName
+  ObjectStorageDomainName:
+    Value: !GetAtt ObjectStorage.RegionalDomainName
+    Description: ObjectStorage RegionalDomainName
+    Export:
+      Name: objectStorageDomainName
+  LoggingBucketDomainName:
+    Value: !GetAtt LoggingBucket.DomainName
+    Description: LoggingBucket DomainName
+    Export:
+      Name: loggingBucketDomainName
