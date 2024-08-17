@@ -19,14 +19,18 @@ Resources:
           - AllowedHeaders:
               - '*'
             AllowedMethods:
-              - HEAD
               - GET
               - PUT
               - POST
               - DELETE
+              - HEAD
             AllowedOrigins:
+              - !Sub https://${hostDomain}
               - !Sub
-                - http://${AppDomain}
+                - http://${AppDomain}:8080
+                - AppDomain: !ImportValue appDomain
+              - !Sub
+                - http://${AppDomain}:8081
                 - AppDomain: !ImportValue appDomain
             ExposedHeaders:
               - ETag
@@ -124,6 +128,12 @@ Resources:
                 aws:SourceArn: !Join ['', ['arn:aws:s3:::', !Ref ObjectStorage]]
               StringEquals:
                 aws:SourceAccount: !Ref AWS::AccountId
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  hostDomain:
+    Description: HOST Domain
+    Type: String
+    Default: foundation-building.XXXX.com
 Outputs:
   ObjectStorageName:
     Value: !Ref ObjectStorage

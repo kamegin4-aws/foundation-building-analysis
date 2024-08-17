@@ -1,3 +1,4 @@
+import logger from '@/library/logging/logger';
 import { IRepositoryInstance } from '@/library/repository/infrastructure/interface/repository';
 import {
   CompleteMultipartUploadCommand,
@@ -14,10 +15,6 @@ import {
   UploadPartCommand,
 } from '@aws-sdk/client-s3';
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-providers';
-import log4js from 'log4js';
-
-const logger = log4js.getLogger();
-logger.level = 'info';
 
 export class S3Wrapper extends IRepositoryInstance {
   #s3Client;
@@ -26,7 +23,7 @@ export class S3Wrapper extends IRepositoryInstance {
     [this.#cognitoId]: '',
   };
 
-  constructor({ idToken: idToken }) {
+  constructor({ idToken }) {
     super();
     this.#loginData[this.#cognitoId] = idToken;
 
@@ -40,7 +37,7 @@ export class S3Wrapper extends IRepositoryInstance {
     });
   }
 
-  async uploadObject({ body: body, key: key, tagging: tagging = undefined }) {
+  async uploadObject({ body, key, tagging = undefined }) {
     try {
       const input = {
         Body: body,
@@ -60,12 +57,12 @@ export class S3Wrapper extends IRepositoryInstance {
       if (e instanceof Error) {
         throw new Error(`s3 server error: ${e.message}`);
       } else {
-        throw new Error('server error: S3');
+        throw new Error('s3 server error');
       }
     }
   }
 
-  async createMultipartObject({ key: key, tagging: tagging = undefined }) {
+  async createMultipartObject({ key, tagging = undefined }) {
     try {
       const input = {
         Bucket: process.env.NEXT_PUBLIC_BUCKET,
@@ -82,17 +79,12 @@ export class S3Wrapper extends IRepositoryInstance {
       if (e instanceof Error) {
         throw new Error(`s3 server error: ${e.message}`);
       } else {
-        throw new Error('server error: S3');
+        throw new Error('s3 server error');
       }
     }
   }
 
-  async uploadMultipartObject({
-    body: body,
-    key: key,
-    uploadId: uploadId,
-    partNumber: partNumber = 0,
-  }) {
+  async uploadMultipartObject({ body, key, uploadId, partNumber = 0 }) {
     try {
       const input = {
         Body: body,
@@ -111,12 +103,12 @@ export class S3Wrapper extends IRepositoryInstance {
       if (e instanceof Error) {
         throw new Error(`s3 server error: ${e.message}`);
       } else {
-        throw new Error('server error: S3');
+        throw new Error('s3 server error');
       }
     }
   }
 
-  async multipartUploadObject({ key: key, uploadId: uploadId, parts: parts }) {
+  async multipartUploadObject({ key, uploadId, parts }) {
     try {
       const input = {
         Bucket: process.env.NEXT_PUBLIC_BUCKET,
@@ -134,16 +126,16 @@ export class S3Wrapper extends IRepositoryInstance {
       if (e instanceof Error) {
         throw new Error(`s3 server error: ${e.message}`);
       } else {
-        throw new Error('server error: S3');
+        throw new Error('s3 server error');
       }
     }
   }
 
   async listObjects({
-    prefix: prefix = undefined,
-    maxKeys: maxKeys = 1000,
-    startAfter: startAfter = undefined,
-    continuationToken: continuationToken = undefined,
+    maxKeys = 1000,
+    prefix = undefined,
+    startAfter = undefined,
+    continuationToken = undefined,
   }) {
     try {
       const input = {
@@ -163,16 +155,16 @@ export class S3Wrapper extends IRepositoryInstance {
       if (e instanceof Error) {
         throw new Error(`s3 server error: ${e.message}`);
       } else {
-        throw new Error('server error: S3');
+        throw new Error('s3 server error');
       }
     }
   }
 
   async listObjectVersions({
-    prefix: prefix = undefined,
-    maxKeys: maxKeys = 1000,
-    keyMarker: keyMarker = undefined,
-    versionIdMarker: versionIdMarker = undefined,
+    maxKeys = 1000,
+    prefix = undefined,
+    keyMarker = undefined,
+    versionIdMarker = undefined,
   }) {
     try {
       const input = {
@@ -191,12 +183,12 @@ export class S3Wrapper extends IRepositoryInstance {
       if (e instanceof Error) {
         throw new Error(`s3 server error: ${e.message}`);
       } else {
-        throw new Error('server error: S3');
+        throw new Error('s3 server error');
       }
     }
   }
 
-  async detailObject({ key: key, versionId: versionId = undefined }) {
+  async detailObject({ key, versionId = undefined }) {
     try {
       const input = {
         // GetObjectAttributesRequest
@@ -223,16 +215,12 @@ export class S3Wrapper extends IRepositoryInstance {
       if (e instanceof Error) {
         throw new Error(`s3 server error: ${e.message}`);
       } else {
-        throw new Error('server error: S3');
+        throw new Error('s3 server error');
       }
     }
   }
 
-  async downloadObject({
-    key: key,
-    range: range = 'bytes=0-9',
-    versionId: versionId = undefined,
-  }) {
+  async downloadObject({ key, range = 'bytes=0-9', versionId = undefined }) {
     try {
       const input = {
         Bucket: process.env.NEXT_PUBLIC_BUCKET,
@@ -249,12 +237,12 @@ export class S3Wrapper extends IRepositoryInstance {
       if (e instanceof Error) {
         throw new Error(`s3 server error: ${e.message}`);
       } else {
-        throw new Error('server error: S3');
+        throw new Error('s3 server error');
       }
     }
   }
 
-  async deleteObject({ key: key, versionId: versionId = undefined }) {
+  async deleteObject({ key, versionId = undefined }) {
     try {
       const input = {
         Bucket: process.env.NEXT_PUBLIC_BUCKET,
@@ -270,12 +258,12 @@ export class S3Wrapper extends IRepositoryInstance {
       if (e instanceof Error) {
         throw new Error(`s3 server error: ${e.message}`);
       } else {
-        throw new Error('server error: S3');
+        throw new Error('s3 server error');
       }
     }
   }
 
-  async objectTagDetail({ key: key, versionId: versionId = undefined }) {
+  async objectTagDetail({ key, versionId = undefined }) {
     try {
       const input = {
         Bucket: process.env.NEXT_PUBLIC_BUCKET,
@@ -291,16 +279,12 @@ export class S3Wrapper extends IRepositoryInstance {
       if (e instanceof Error) {
         throw new Error(`s3 server error: ${e.message}`);
       } else {
-        throw new Error('server error: S3');
+        throw new Error('s3 server error');
       }
     }
   }
 
-  async objectTagUpdate({
-    key: key,
-    tagSet: tagSet,
-    versionId: versionId = undefined,
-  }) {
+  async objectTagUpdate({ key, tagSet, versionId = undefined }) {
     try {
       const input = {
         Bucket: process.env.NEXT_PUBLIC_BUCKET,
@@ -319,7 +303,7 @@ export class S3Wrapper extends IRepositoryInstance {
       if (e instanceof Error) {
         throw new Error(`s3 server error: ${e.message}`);
       } else {
-        throw new Error('server error: S3');
+        throw new Error('s3 server error');
       }
     }
   }

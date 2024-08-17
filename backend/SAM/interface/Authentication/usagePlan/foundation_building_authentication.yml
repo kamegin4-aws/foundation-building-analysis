@@ -1,0 +1,83 @@
+Resources:
+  UserAPIFreeUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Properties:
+      UsagePlanName: !Sub ${AWS::StackName}-userapi-free-plan
+      Description: Usage free plan for UserAPIUsagePlan
+      Quota:
+        Limit: !Ref limitUserAPIFreeUsagePlan
+        Period: MONTH
+      Throttle:
+        BurstLimit: !Ref burstLimitUserAPIFreeUsagePlan
+        RateLimit: !Ref rateLimitUserAPIFreeUsagePlan
+      ApiStages:
+        - ApiId: !ImportValue userAPIId
+          Stage: free
+        - ApiId: !ImportValue userAuthorizedAPIId
+          Stage: free
+  UserAPIFreeApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Description: API key for UserAPIFreeApiKey
+      Enabled: true
+      Name: !Sub ${AWS::StackName}-userapi-free-apikey
+  UserAPIFreeUsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyType: API_KEY
+      UsagePlanId: !Ref UserAPIFreeUsagePlan
+      KeyId: !Ref UserAPIFreeApiKey
+  UserAPIPaidUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Properties:
+      UsagePlanName: !Sub ${AWS::StackName}-userapi-paid-plan
+      Description: Usage free plan for UserAPIUsagePlan
+      Quota:
+        Limit: !Ref limitUserAPIPaidUsagePlan
+        Period: MONTH
+      Throttle:
+        BurstLimit: !Ref burstLimitUserAPIPaidUsagePlan
+        RateLimit: !Ref rateLimitUserAPIPaidUsagePlan
+      ApiStages:
+        - ApiId: !ImportValue userAPIId
+          Stage: paid
+        - ApiId: !ImportValue userAuthorizedAPIId
+          Stage: paid
+  UserAPIPaidApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Description: API key for UserAPIFreeApiKey
+      Enabled: true
+      Name: !Sub ${AWS::StackName}-userapi-paid-apikey
+  UserAPIPaidUsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyType: API_KEY
+      UsagePlanId: !Ref UserAPIPaidUsagePlan
+      KeyId: !Ref UserAPIPaidApiKey
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  limitUserAPIFreeUsagePlan:
+    Type: Number
+    Description: maximum number of requests
+    Default: 500
+  burstLimitUserAPIFreeUsagePlan:
+    Type: Number
+    Description: allows more requests through for a period of time
+    Default: 20
+  rateLimitUserAPIFreeUsagePlan:
+    Type: Number
+    Description: request rate limit.
+    Default: 10
+  limitUserAPIPaidUsagePlan:
+    Type: Number
+    Description: maximum number of requests
+    Default: 5000
+  burstLimitUserAPIPaidUsagePlan:
+    Type: Number
+    Description: allows more requests through for a period of time
+    Default: 200
+  rateLimitUserAPIPaidUsagePlan:
+    Type: Number
+    Description: request rate limit.
+    Default: 100

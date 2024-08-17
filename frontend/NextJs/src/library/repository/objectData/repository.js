@@ -1,26 +1,23 @@
+import logger from '@/library/logging/logger';
 import { Service_Name } from '@/library/repository/constant/repository';
 import { IRepository } from '@/library/repository/interface/repository';
-import log4js from 'log4js';
-
-const logger = log4js.getLogger();
-logger.level = 'info';
 
 export class ObjectData extends IRepository {
   #repositoryInstance;
 
-  constructor({ repositoryInstance: repositoryInstance }) {
+  constructor({ repositoryInstance }) {
     super();
     this.#repositoryInstance = repositoryInstance;
   }
 
   async upload({
-    userId: userId,
-    metaKey: metaKey,
-    metaValue: metaValue,
-    mimeType: mimeType,
-    fileName: fileName,
-    comment: comment = undefined,
-    body: body,
+    userId,
+    metaKey,
+    metaValue,
+    mimeType,
+    fileName,
+    body,
+    comment = undefined,
   }) {
     try {
       const uploadObject = await this.#repositoryInstance.uploadObject({
@@ -36,21 +33,21 @@ export class ObjectData extends IRepository {
       });
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(`client error: ${e.message}`);
+        throw new Error(`server error: ${e.message}`);
       } else {
-        throw new Error('client error: Repository');
+        throw new Error('server error');
       }
     }
   }
 
   async multipartUpload({
-    userId: userId,
-    metaKey: metaKey,
-    metaValue: metaValue,
-    mimeType: mimeType,
-    fileName: fileName,
-    comment: comment = undefined,
-    body: body,
+    userId,
+    metaKey,
+    metaValue,
+    mimeType,
+    fileName,
+    body,
+    comment = undefined,
   }) {
     try {
       const createMultipartObject =
@@ -103,20 +100,20 @@ export class ObjectData extends IRepository {
       });
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(`client error: ${e.message}`);
+        throw new Error(`server error: ${e.message}`);
       } else {
-        throw new Error('client error: Storage');
+        throw new Error('server error');
       }
     }
   }
 
   async list({
-    userId = undefined,
-    metaKey = undefined,
     limit = 20,
     offset = 0,
-    searchValue = undefined,
     orderBy = 'updatedAt',
+    searchValue = undefined,
+    userId = undefined,
+    metaKey = undefined,
   }) {
     try {
       let prefix = '';
@@ -181,9 +178,9 @@ export class ObjectData extends IRepository {
       });
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(`client error: ${e.message}`);
+        throw new Error(`server error: ${e.message}`);
       } else {
-        throw new Error('client error: Storage');
+        throw new Error('server error');
       }
     }
   }
@@ -205,8 +202,8 @@ export class ObjectData extends IRepository {
     }
 
     return {
-      filteredObjects,
-      offset,
+      filteredObjects: filteredObjects,
+      offset: offset,
     };
   }
 
@@ -278,13 +275,7 @@ export class ObjectData extends IRepository {
     return objects;
   }
 
-  async listVersions({
-    userId: userId,
-    metaKey: metaKey,
-    metaValue: metaValue,
-    mimeType: mimeType,
-    fileName: fileName,
-  }) {
+  async listVersions({ userId, metaKey, metaValue, mimeType, fileName }) {
     try {
       let listObjectVersions =
         await this.#repositoryInstance.listObjectVersions({
@@ -315,21 +306,14 @@ export class ObjectData extends IRepository {
       });
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(`client error: ${e.message}`);
+        throw new Error(`server error: ${e.message}`);
       } else {
-        throw new Error('client error: Repository');
+        throw new Error('server error');
       }
     }
   }
 
-  async detail({
-    userId: userId,
-    metaKey: metaKey,
-    metaValue: metaValue,
-    mimeType: mimeType,
-    fileName: fileName,
-    versionId: versionId,
-  }) {
+  async detail({ userId, metaKey, metaValue, mimeType, fileName, versionId }) {
     try {
       const key = `userId=${userId}/metaKey=${metaKey}/metaValue=${metaValue}/mimeType=${mimeType}/${fileName}`;
 
@@ -346,27 +330,27 @@ export class ObjectData extends IRepository {
       return this.#repositoryInstance.toEntity({
         serviceName: Service_Name[0],
         response1: detailObject,
-        type: 'delete',
+        type: 'detail',
         response2: objectTagDetail,
         key: key,
       });
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(`client error: ${e.message}`);
+        throw new Error(`server error: ${e.message}`);
       } else {
-        throw new Error('client error: Repository');
+        throw new Error('server error');
       }
     }
   }
 
   async commentUpdate({
-    userId: userId,
-    metaKey: metaKey,
-    metaValue: metaValue,
-    mimeType: mimeType,
-    fileName: fileName,
-    versionId: versionId,
-    comment: comment,
+    userId,
+    metaKey,
+    metaValue,
+    mimeType,
+    fileName,
+    versionId,
+    comment,
   }) {
     try {
       const tagSet = [
@@ -389,21 +373,14 @@ export class ObjectData extends IRepository {
       });
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(`client error: ${e.message}`);
+        throw new Error(`server error: ${e.message}`);
       } else {
-        throw new Error('client error: Repository');
+        throw new Error('server error');
       }
     }
   }
 
-  async delete({
-    userId: userId,
-    metaKey: metaKey,
-    metaValue: metaValue,
-    mimeType: mimeType,
-    fileName: fileName,
-    versionId: versionId,
-  }) {
+  async delete({ userId, metaKey, metaValue, mimeType, fileName, versionId }) {
     try {
       const deleteObject = await this.#repositoryInstance.deleteObject({
         key: `userId=${userId}/metaKey=${metaKey}/metaValue=${metaValue}/mimeType=${mimeType}/${fileName}`,
@@ -417,20 +394,14 @@ export class ObjectData extends IRepository {
       });
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(`client error: ${e.message}`);
+        throw new Error(`server error: ${e.message}`);
       } else {
-        throw new Error('client error: Repository');
+        throw new Error('server error');
       }
     }
   }
 
-  async permanentlyDelete({
-    userId: userId,
-    metaKey: metaKey,
-    metaValue: metaValue,
-    mimeType: mimeType,
-    fileName: fileName,
-  }) {
+  async permanentlyDelete({ userId, metaKey, metaValue, mimeType, fileName }) {
     try {
       let listObjectVersions =
         await this.#repositoryInstance.listObjectVersions({
@@ -476,9 +447,9 @@ export class ObjectData extends IRepository {
       return response;
     } catch (e) {
       if (e instanceof Error) {
-        throw new Error(`s3 server error: ${e.message}`);
+        throw new Error(`server error: ${e.message}`);
       } else {
-        throw new Error('server error: S3');
+        throw new Error('server error');
       }
     }
   }

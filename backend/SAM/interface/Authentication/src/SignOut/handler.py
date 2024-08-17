@@ -37,17 +37,18 @@ def handler(event, context):
         return {
             'statusCode': 204,
             'headers': {
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': '*'}}
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': os.environ['AllOW_ORIGIN'],
+                'Access-Control-Allow-Methods': '*'},
+        }
 
     except Exception:
         logger.error(traceback.format_exc())
         return {
             'statusCode': 500,
             'headers': {
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': os.environ['AllOW_ORIGIN'],
                 'Access-Control-Allow-Methods': '*'},
             'body': json.dumps(
                 traceback.format_exc())}

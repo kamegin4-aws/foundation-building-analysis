@@ -422,10 +422,6 @@ Resources:
           FromPort: -1
           ToPort: -1
           CidrIp: !GetAtt PublicSubnet2.CidrBlock
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: !Ref globalIP
       SecurityGroupEgress:
         - IpProtocol: '-1'
           FromPort: -1
@@ -456,10 +452,6 @@ Resources:
           FromPort: -1
           ToPort: -1
           CidrIp: !GetAtt PrivateSubnet2.CidrBlock
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: !Ref globalIP
       SecurityGroupEgress:
         - IpProtocol: '-1'
           FromPort: -1
@@ -815,7 +807,7 @@ Resources:
     Properties:
       HealthCheckEnabled: true
       HealthCheckIntervalSeconds: 35
-      HealthCheckPath: /health
+      HealthCheckPath: /foundation-frontend/health
       HealthCheckPort: '8080'
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 30
@@ -881,14 +873,6 @@ Resources:
       'AWS::CloudFormation::Designer':
         id: 5ce5b250-2492-454f-8629-1aa84e7be81e
 Parameters:
-  globalIP:
-    Description: ' The IP address range that can be used to access the web server using SSH.'
-    Type: String
-    MinLength: '9'
-    MaxLength: '18'
-    Default: 0.0.0.0/32
-    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
-    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
   hostedZoneName:
     Description: Host Zone(Route53)
     Type: String

@@ -16,13 +16,13 @@ export class IRepository {
    * @returns {Promise<Object>} Repositoryエンティティ
    */
   async upload({
-    userId: userId,
-    metaKey: metaKey,
-    metaValue: metaValue,
-    mimeType: mimeType,
-    fileName: fileName,
-    comment: comment = undefined,
-    body: body,
+    userId,
+    metaKey,
+    metaValue,
+    mimeType,
+    fileName,
+    body,
+    comment = undefined,
   }) {
     throw new Error('Not implemented');
   }
@@ -41,13 +41,13 @@ export class IRepository {
    * @returns {Promise<Object>} Repositoryエンティティ
    */
   async multipartUpload({
-    userId: userId,
-    metaKey: metaKey,
-    metaValue: metaValue,
-    mimeType: mimeType,
-    fileName: fileName,
-    comment: comment = undefined,
-    body: body,
+    userId,
+    metaKey,
+    metaValue,
+    mimeType,
+    fileName,
+    body,
+    comment = undefined,
   }) {
     throw new Error('Not implemented');
   }
@@ -65,12 +65,12 @@ export class IRepository {
    * @returns {Promise<Object[]>} Repositoryエンティティ
    */
   async list({
-    userId = undefined,
-    metaKey = undefined,
     limit = 20,
     offset = 0,
-    searchValue = undefined,
     orderBy = 'updatedAt',
+    userId = undefined,
+    metaKey = undefined,
+    searchValue = undefined,
   }) {
     throw new Error('Not implemented');
   }
@@ -86,13 +86,7 @@ export class IRepository {
    * @param {InputObjectListVersions} InputObjectListVersions
    * @returns {Promise<Object[]>} Repositoryエンティティ
    */
-  async listVersions({
-    userId: userId,
-    metaKey: metaKey,
-    metaValue: metaValue,
-    mimeType: mimeType,
-    fileName: fileName,
-  }) {
+  async listVersions({ userId, metaKey, metaValue, mimeType, fileName }) {
     throw new Error('Not implemented');
   }
 
@@ -108,14 +102,7 @@ export class IRepository {
    * @param {InputObjectDetail} InputObjectDetail
    * @returns {Promise<Object>} Repositoryエンティティ
    */
-  async detail({
-    userId: userId,
-    metaKey: metaKey,
-    metaValue: metaValue,
-    mimeType: mimeType,
-    fileName: fileName,
-    versionId: versionId,
-  }) {
+  async detail({ userId, metaKey, metaValue, mimeType, fileName, versionId }) {
     throw new Error('Not implemented');
   }
 
@@ -133,13 +120,13 @@ export class IRepository {
    * @returns {Promise<Object>} Repositoryエンティティ
    */
   async commentUpdate({
-    userId: userId,
-    metaKey: metaKey,
-    metaValue: metaValue,
-    mimeType: mimeType,
-    fileName: fileName,
-    versionId: versionId,
-    comment: comment,
+    userId,
+    metaKey,
+    metaValue,
+    mimeType,
+    fileName,
+    versionId,
+    comment,
   }) {
     throw new Error('Not implemented');
   }
@@ -156,14 +143,7 @@ export class IRepository {
    * @param {InputObjectDelete} InputObjectDelete
    *@returns {Promise<Object>} Repositoryエンティティ
    */
-  async delete({
-    userId: userId,
-    metaKey: metaKey,
-    metaValue: metaValue,
-    mimeType: mimeType,
-    fileName: fileName,
-    versionId: versionId,
-  }) {
+  async delete({ userId, metaKey, metaValue, mimeType, fileName, versionId }) {
     throw new Error('Not implemented');
   }
 
@@ -178,13 +158,7 @@ export class IRepository {
    * @param {InputObjectPermanentlyDelete} InputObjectPermanentlyDelete
    * @return {Promise<boolean>}
    */
-  async permanentlyDelete({
-    userId: userId,
-    metaKey: metaKey,
-    metaValue: metaValue,
-    mimeType: mimeType,
-    fileName: fileName,
-  }) {
+  async permanentlyDelete({ userId, metaKey, metaValue, mimeType, fileName }) {
     throw new Error('Not implemented');
   }
 }

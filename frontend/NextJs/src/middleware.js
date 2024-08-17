@@ -1,22 +1,36 @@
 import { NextResponse } from 'next/server';
 
-const allowedOrigins = ['*'];
+const allowedOrigins = [
+  `https://${process.env.NEXT_PUBLIC_HOST_DOMAIN}`,
+  `http://${process.env.NEXT_PUBLIC_APP_DOMAIN}:8080`,
+];
 
 const corsOptions = {
   'Access-Control-Allow-Methods': '*',
-  'Access-Control-Allow-Headers':
-    'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+  'Access-Control-Allow-Headers': '*',
 };
 
 export function middleware(request) {
+  // Check the origin from the request
+
+  const { method, url } = request;
+
+  // Get the current timestamp in JST (Japan Standard Time)
+  const timestamp = new Date().toLocaleString('ja-JP', {
+    timeZone: 'Asia/Tokyo',
+  });
+
+  console.log(`[${timestamp}] ${method} ${url}`);
+
   const { pathname } = new URL(request.url);
 
+  const basePath = request.nextUrl.basePath || '';
+
   // ヘルスチェック用のエンドポイント
-  if (pathname === '/health') {
+  if (pathname === `${basePath}/health`) {
     return NextResponse.json({ status: 'ok' }, { status: 200 });
   }
 
-  // Check the origin from the request
   const origin = request.headers.get('origin') ?? '';
   const isAllowedOrigin = allowedOrigins.includes(origin);
 
@@ -49,19 +63,12 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
     {
-      source: '/((?!api|_next/static|_next/image|favicon.ico).*)',
-      /*
-      missing: [
-        { type: 'header', key: 'Authorization' },
-        { type: 'header', key: 'x-api-key' },
-      ],
-      */
+      source: '/((?!_next/static|_next/image|favicon.ico).*)',
     },
   ],
 };

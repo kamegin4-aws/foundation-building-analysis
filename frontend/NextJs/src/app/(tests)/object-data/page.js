@@ -1,5 +1,6 @@
 'use client';
 
+import logger from '@/library/logging/logger';
 import { S3Wrapper } from '@/library/repository/infrastructure/s3/s3_client';
 import { ObjectData } from '@/library/repository/objectData/repository';
 import {
@@ -11,10 +12,7 @@ import {
   Header,
   SpaceBetween,
 } from '@cloudscape-design/components';
-import log from 'loglevel';
 import React, { useEffect, useState } from 'react';
-
-log.setLevel('info');
 
 export default function FileUploadWrapper() {
   const [value, setValue] = useState([]);
@@ -22,11 +20,23 @@ export default function FileUploadWrapper() {
 
   const uploadOnClick = async (event) => {
     event.preventDefault();
-    log.info(event.detail);
+    logger.info(event.detail);
 
     try {
       const file = value[0];
       if (objectData) {
+        logger.info(
+          `input: ${JSON.stringify({
+            userId: 'userId',
+            metaKey: 'metaKey',
+            metaValue: 'metaValue',
+            mimeType: 'mimeType',
+            fileName: file.name,
+            comment: 'comment',
+            body: file,
+          })}`
+        );
+
         const result = await objectData.upload({
           userId: 'userId',
           metaKey: 'metaKey',
@@ -37,25 +47,36 @@ export default function FileUploadWrapper() {
           body: file,
         });
 
-        log.info(`Image uploaded successfully: ${JSON.stringify(result)}`);
+        logger.info(`Image uploaded successfully: ${JSON.stringify(result)}`);
       }
     } catch (e) {
       if (e instanceof Error) {
-        log.error(e.message);
+        logger.error(e.message);
       } else {
-        log.error('エラー');
+        logger.error('エラー');
       }
     } finally {
-      log.info('Image upload finished');
+      logger.info('Image upload finished');
     }
   };
 
   const multiUploadOnClick = async (event) => {
     event.preventDefault();
-    log.info(event.detail);
+    logger.info(event.detail);
     try {
       if (objectData) {
         const file = value[0];
+        logger.info(
+          `input: ${JSON.stringify({
+            userId: 'userId',
+            metaKey: 'metaKey',
+            metaValue: 'metaValue',
+            mimeType: 'mimeType',
+            fileName: file.name,
+            comment: 'comment',
+            body: file,
+          })}`
+        );
         const result = await objectData.multipartUpload({
           userId: 'userId',
           metaKey: 'metaKey',
@@ -66,24 +87,34 @@ export default function FileUploadWrapper() {
           body: file,
         });
 
-        log.info(`multipartUpload successfully: ${JSON.stringify(result)}`);
+        logger.info(`multipartUpload successfully: ${JSON.stringify(result)}`);
       }
     } catch (e) {
       if (e instanceof Error) {
-        log.error(e.message);
+        logger.error(e.message);
       } else {
-        log.error('エラー');
+        logger.error('エラー');
       }
     } finally {
-      log.info('multipartUpload finished');
+      logger.info('multipartUpload finished');
     }
   };
 
   const listOnClick = async (event) => {
     event.preventDefault();
-    log.info(event.detail);
+    logger.info(event.detail);
     try {
       if (objectData) {
+        logger.info(
+          `input: ${JSON.stringify({
+            userId: 'userId',
+            metaKey: 'metaKey',
+            limit: 3,
+            offset: 1,
+            searchValue: 'metaValue',
+            orderBy: 'updatedAt',
+          })}`
+        );
         const result = await objectData.list({
           userId: 'userId',
           metaKey: 'metaKey',
@@ -93,25 +124,34 @@ export default function FileUploadWrapper() {
           orderBy: 'updatedAt',
         });
 
-        log.info(`List successfully: ${JSON.stringify(result)}`);
+        logger.info(`List successfully: ${JSON.stringify(result)}`);
       }
     } catch (e) {
       if (e instanceof Error) {
-        log.error(e.message);
+        logger.error(e.message);
       } else {
-        log.error('エラー');
+        logger.error('エラー');
       }
     } finally {
-      log.info('List finished');
+      logger.info('List finished');
     }
   };
 
   const detailOnClick = async (event) => {
     event.preventDefault();
-    log.info(event.detail);
+    logger.info(event.detail);
     try {
       if (objectData) {
         const file = value[0];
+        logger.info(
+          `input: ${JSON.stringify({
+            userId: 'userId',
+            metaKey: 'metaKey',
+            metaValue: 'metaValue',
+            mimeType: 'mimeType',
+            fileName: file.name,
+          })}`
+        );
         const result = await objectData.detail({
           userId: 'userId',
           metaKey: 'metaKey',
@@ -120,25 +160,34 @@ export default function FileUploadWrapper() {
           fileName: file.name,
         });
 
-        log.info(`Detail successfully: ${JSON.stringify(result)}`);
+        logger.info(`Detail successfully: ${JSON.stringify(result)}`);
       }
     } catch (e) {
       if (e instanceof Error) {
-        log.error(e.message);
+        logger.error(e.message);
       } else {
-        log.error('エラー');
+        logger.error('エラー');
       }
     } finally {
-      log.info('Detail finished');
+      logger.info('Detail finished');
     }
   };
 
   const versionListOnClick = async (event) => {
     event.preventDefault();
-    log.info(event.detail);
+    logger.info(event.detail);
     try {
       if (objectData) {
         const file = value[0];
+        logger.info(
+          `input: ${JSON.stringify({
+            userId: 'userId',
+            metaKey: 'metaKey',
+            metaValue: 'metaValue',
+            mimeType: 'mimeType',
+            fileName: file.name,
+          })}`
+        );
         const result = await objectData.listVersions({
           userId: 'userId',
           metaKey: 'metaKey',
@@ -147,26 +196,36 @@ export default function FileUploadWrapper() {
           fileName: file.name,
         });
 
-        log.info(`Version list successfully: ${JSON.stringify(result)}`);
+        logger.info(`Version list successfully: ${JSON.stringify(result)}`);
       }
     } catch (e) {
       if (e instanceof Error) {
-        log.error(e.message);
+        logger.error(e.message);
       } else {
-        log.error('エラー');
+        logger.error('エラー');
       }
     } finally {
-      log.info('Version list finished');
+      logger.info('Version list finished');
     }
   };
 
   const commentUpdateOnClick = async (event) => {
     event.preventDefault();
-    log.info(event.detail);
+    logger.info(event.detail);
 
     try {
       if (objectData) {
         const file = value[0];
+        logger.info(
+          `input: ${JSON.stringify({
+            userId: 'userId',
+            metaKey: 'metaKey',
+            metaValue: 'metaValue',
+            mimeType: 'mimeType',
+            fileName: file.name,
+            comment: 'commentUpdate',
+          })}`
+        );
         const result = await objectData.commentUpdate({
           userId: 'userId',
           metaKey: 'metaKey',
@@ -176,25 +235,34 @@ export default function FileUploadWrapper() {
           comment: 'commentUpdate',
         });
 
-        log.info(`commentUpdate successfully: ${JSON.stringify(result)}`);
+        logger.info(`commentUpdate successfully: ${JSON.stringify(result)}`);
       }
     } catch (e) {
       if (e instanceof Error) {
-        log.error(e.message);
+        logger.error(e.message);
       } else {
-        log.error('エラー');
+        logger.error('エラー');
       }
     } finally {
-      log.info('commentUpdate finished');
+      logger.info('commentUpdate finished');
     }
   };
 
   const deleteOnClick = async (event) => {
     event.preventDefault();
-    log.info(event.detail);
+    logger.info(event.detail);
     try {
       if (objectData) {
         const file = value[0];
+        logger.info(
+          `input: ${JSON.stringify({
+            userId: 'userId',
+            metaKey: 'metaKey',
+            metaValue: 'metaValue',
+            mimeType: 'mimeType',
+            fileName: file.name,
+          })}`
+        );
         const result = await objectData.delete({
           userId: 'userId',
           metaKey: 'metaKey',
@@ -203,26 +271,35 @@ export default function FileUploadWrapper() {
           fileName: file.name,
         });
 
-        log.info(`Delete successfully: ${JSON.stringify(result)}`);
+        logger.info(`Delete successfully: ${JSON.stringify(result)}`);
       }
     } catch (e) {
       if (e instanceof Error) {
-        log.error(e.message);
+        logger.error(e.message);
       } else {
-        log.error('エラー');
+        logger.error('エラー');
       }
     } finally {
-      log.info('Delete finished');
+      logger.info('Delete finished');
     }
   };
 
   const permanentlyDeleteOnClick = async (event) => {
     event.preventDefault();
-    log.info(event.detail);
+    logger.info(event.detail);
 
     try {
       if (objectData) {
         const file = value[0];
+        logger.info(
+          `input: ${JSON.stringify({
+            userId: 'userId',
+            metaKey: 'metaKey',
+            metaValue: 'metaValue',
+            mimeType: 'mimeType',
+            fileName: file.name,
+          })}`
+        );
         const result = await objectData.permanentlyDelete({
           userId: 'userId',
           metaKey: 'metaKey',
@@ -231,28 +308,30 @@ export default function FileUploadWrapper() {
           fileName: file.name,
         });
 
-        log.info(`Permanently delete successfully: ${JSON.stringify(result)}`);
+        logger.info(
+          `Permanently delete successfully: ${JSON.stringify(result)}`
+        );
       }
     } catch (e) {
       if (e instanceof Error) {
-        log.error(e.message);
+        logger.error(e.message);
       } else {
-        log.error('エラー');
+        logger.error('エラー');
       }
     } finally {
-      log.info('Permanently delete finished');
+      logger.info('Permanently delete finished');
     }
   };
 
   useEffect(() => {
-    const url =
-      'https://voj233ukpl.execute-api.ap-northeast-1.amazonaws.com/paid/cognito/sign-in';
+    const url = `${process.env.NEXT_PUBLIC_BASE_PATH}/api/user/sign-in`;
     const options = {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
       cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
       mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
+        'X-Api-Key': process.env.NEXT_PUBLIC_USER_API_KEY,
       },
       body: JSON.stringify({
         user_name: process.env.NEXT_PUBLIC_USER_NAME,
@@ -267,7 +346,7 @@ export default function FileUploadWrapper() {
           response
             .json()
             .then((data) => {
-              log.info(`success for login: ${JSON.stringify(data)}`);
+              logger.info(`success for login: ${JSON.stringify(data)}`);
 
               setObjectData(
                 new ObjectData({
@@ -278,14 +357,14 @@ export default function FileUploadWrapper() {
               );
             })
             .catch((error) => {
-              log.error(`error for login: ${error.message}`);
+              logger.error(`error for login: ${error.message}`);
             });
         } else {
           throw new Error('Network response was not ok.');
         }
       })
       .catch((error) => {
-        log.error(`error for login: ${error.message}`);
+        logger.error(`error for login: ${error.message}`);
       });
   }, []);
 
