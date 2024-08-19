@@ -1,24 +1,24 @@
-import React from "react";
-import TableWrapper from "@/ui/Cloudscape/table";
-import Link from "next/link";
-import AudioIcon from "@/ui/React_icons/audio";
-import ImageIcon from "@/ui/React_icons/image";
-import TextIcon from "@/ui/React_icons/text";
-import VideoIcon from "@/ui/React_icons/video";
-import JSONIcon from "@/ui/React_icons/json_icon";
-import PDFIcon from "@/ui/React_icons/pdf";
-import ZipIcon from "@/ui/React_icons/zip";
-import WordIcon from "@/ui/React_icons/word";
-import PowerPointIcon from "@/ui/React_icons/power_point";
-import ExcelIcon from "@/ui/React_icons/excel";
-import { mimeTypeCheck } from "@/library/common/mimeType_check";
-import { MIME_TYPE } from "@/library/common/constant/mimeType_check";
+import { MIME_TYPE } from '@/library/common/constant/mimeType_check';
+import { mimeTypeCheck } from '@/library/common/mimeType_check';
+import TableWrapper from '@/ui/Cloudscape/table';
+import AudioIcon from '@/ui/React_icons/audio';
+import ExcelIcon from '@/ui/React_icons/excel';
+import ImageIcon from '@/ui/React_icons/image';
+import JSONIcon from '@/ui/React_icons/json_icon';
+import PDFIcon from '@/ui/React_icons/pdf';
+import PowerPointIcon from '@/ui/React_icons/power_point';
+import TextIcon from '@/ui/React_icons/text';
+import VideoIcon from '@/ui/React_icons/video';
+import WordIcon from '@/ui/React_icons/word';
+import ZipIcon from '@/ui/React_icons/zip';
+import Link from 'next/link';
+import React from 'react';
 
 export default function ContentsTable(props) {
   const columnDefinitions = [
     {
-      id: "fileName",
-      header: "File Name",
+      id: 'fileName',
+      header: 'File Name',
       cell: (item) => (
         <Link
           href={`https://${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${item.key}`}
@@ -26,12 +26,12 @@ export default function ContentsTable(props) {
           {item.fileName}
         </Link>
       ),
-      sortingField: "fileName",
+      sortingField: 'fileName',
       isRowHeader: true,
     },
     {
-      id: "mimeType",
-      header: "MIME Type",
+      id: 'mimeType',
+      header: 'MIME Type',
       cell: (item) => {
         let mimeTypeForApp = item.mimeType;
         if (mimeTypeForApp == MIME_TYPE[0]) return <AudioIcon />;
@@ -47,34 +47,34 @@ export default function ContentsTable(props) {
       },
     },
     {
-      id: "size",
-      header: "Size(Byte)",
+      id: 'size',
+      header: 'Size(Byte)',
       cell: (item) => item.size,
-      sortingField: "size",
+      sortingField: 'size',
     },
     {
-      id: "updated_at",
-      header: "Updated at",
+      id: 'updated_at',
+      header: 'Updated at',
       cell: (item) => item.lastModified,
-      sortingField: "updated_at",
+      sortingField: 'updated_at',
     },
   ];
 
   const columnDisplay = [
-    { id: "fileName", visible: true },
-    { id: "mimeType", visible: true },
-    { id: "size", visible: true },
-    { id: "updated_at", visible: true },
+    { id: 'fileName', visible: true },
+    { id: 'mimeType', visible: true },
+    { id: 'size', visible: true },
+    { id: 'updated_at', visible: true },
   ];
 
   return (
     <TableWrapper
-      variant={"borderless"}
+      variant={'borderless'}
       columnDefinitions={columnDefinitions}
       columnDisplay={columnDisplay}
       items={props.items}
       loading={props.loading}
-      trackBy={"key"}
+      trackBy={'key'}
     />
   );
 }

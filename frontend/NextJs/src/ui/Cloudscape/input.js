@@ -1,5 +1,5 @@
-import Input from "@cloudscape-design/components/input";
-import React from "react";
+import Input from '@cloudscape-design/components/input';
+import React from 'react';
 
 export default function InputWrapper(props) {
   //const [value, setValue] = React.useState("");
@@ -10,9 +10,9 @@ export default function InputWrapper(props) {
         //setValue(detail.value);
         props.parentSetValue(detail.value);
       }}
-      value={props.value ? props.value : ""}
-      type={props.type ? props.type : "text"}
-      inputMode={props.inputMode ? props.inputMode : "text"}
+      value={props.value ? props.value : ''}
+      type={props.type ? props.type : 'text'}
+      inputMode={props.inputMode ? props.inputMode : 'text'}
       invalid={props.invalid ? props.invalid : false}
     />
   );

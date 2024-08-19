@@ -1,14 +1,14 @@
-import { CognitoTokensCookie } from "@/library/cookies/cognito/login";
-import { IApi } from "@/library/api/interface/api";
-import { UserContentsCreate } from "@/library/api/user_contents/create";
-import { UserContentsList } from "@/library/api/user_contents/list";
+import { IApi } from '@/library/api/interface/api';
+import { UserContentsCreate } from '@/library/api/user_contents/create';
+import { UserContentsList } from '@/library/api/user_contents/list';
+import { CognitoTokensCookie } from '@/library/cookies/cognito/login';
 
 export class RelationalDataUpdate extends IApi {
-  #url = "/drf/user-contents";
+  #url = '/drf/user-contents';
   #options = {
-    method: "PUT", // *GET, POST, PUT, DELETE, etc.
-    cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-    mode: "cors",
+    method: 'PUT', // *GET, POST, PUT, DELETE, etc.
+    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+    mode: 'cors',
   };
   constructor({ userName: userName }) {
     super();
@@ -25,7 +25,7 @@ export class RelationalDataUpdate extends IApi {
 
       const cognitoTokens = await cognitoTokensCookie.get();
       if (!cognitoTokens) {
-        throw new Error("Not Cognito Tokens");
+        throw new Error('Not Cognito Tokens');
       }
 
       let elasticacheList = [];
@@ -43,14 +43,14 @@ export class RelationalDataUpdate extends IApi {
           });
 
           if (!userContentsCreateResponse.ok)
-            throw new Error("ユーザーコンテンツの作成に失敗しました。");
+            throw new Error('ユーザーコンテンツの作成に失敗しました。');
         } else {
           elasticacheList = userContentsListResponseObject[0].elasticache;
         }
-      } else throw new Error("ユーザーコンテンツの取得に失敗しました。");
+      } else throw new Error('ユーザーコンテンツの取得に失敗しました。');
 
       this.#options.headers = {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `${cognitoTokens.TokenType} ${cognitoTokens.IdToken}`,
       };
 
@@ -65,7 +65,7 @@ export class RelationalDataUpdate extends IApi {
       if (e instanceof Error) {
         throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("client error: API");
+        throw new Error('client error: API');
       }
     }
   }

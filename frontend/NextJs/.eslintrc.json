@@ -1,6 +1,6 @@
 {
-  "extends": ["next", "next/core-web-vitals", "plugin:react/recommended","plugin:react-hooks/recommended", "prettier"],
-  "plugins": ["react", "prettier","complexity"],
+  "extends": ["next", "next/core-web-vitals", "plugin:react/recommended", "plugin:react-hooks/recommended", "prettier"],
+  "plugins": ["react", "prettier", "complexity"],
   "rules": {
     "prettier/prettier": "error",
     "react/react-in-jsx-scope": "off",
@@ -21,7 +21,7 @@
     "ecmaFeatures": {
       "jsx": true
     },
-    "ecmaVersion": 12,
+    "ecmaVersion": 2023,
     "sourceType": "module"
   }
 }

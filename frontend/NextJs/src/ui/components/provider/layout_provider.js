@@ -1,7 +1,6 @@
-"use client";
+'use client';
 
-import { createContext, useState } from "react";
-import React from "react";
+import React, { createContext, useState } from 'react';
 
 export const LayoutContext = createContext(null);
 

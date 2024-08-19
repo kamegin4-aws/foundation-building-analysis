@@ -1,20 +1,20 @@
-import TopNavigation from "@cloudscape-design/components/top-navigation";
 import {
   LOGO_SRC,
   SETTINGS_ITEMS,
   USER_PROFILE_ITEMS,
-} from "@/ui/Cloudscape/constant/top_navigation";
-import React from "react";
+} from '@/ui/Cloudscape/constant/top_navigation';
+import TopNavigation from '@cloudscape-design/components/top-navigation';
+import React from 'react';
 
 export default function TopNavigationWrapper(props) {
   return (
     <TopNavigation
       identity={{
-        href: "#",
-        title: "基本基盤アプリ",
+        href: '#',
+        title: '基本基盤アプリ',
         logo: {
           src: LOGO_SRC,
-          alt: "Foundation Building App",
+          alt: 'Foundation Building App',
         },
       }}
       utilities={

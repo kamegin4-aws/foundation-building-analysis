@@ -1,0 +1,100 @@
+Resources:
+  ExecFoundationAppWebTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+        - arn:aws:iam::aws:policy/SecretsManagerReadWrite
+        - arn:aws:iam::aws:policy/AmazonECS_FullAccess
+        - arn:aws:iam::aws:policy/AmazonRDSFullAccess
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+      MaxSessionDuration: 3600
+      Policies:
+        - PolicyName: AllowKMS
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                  - kms:GenerateDataKey
+                Resource:
+                  - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*
+                Condition:
+                  StringEquals:
+                    aws:ResourceAccount: !Ref AWS::AccountId
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs.amazonaws.com
+                - ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:ResourceAccount: !Ref AWS::AccountId
+  FoundationAppWebTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: foundation-app-web-task-definition
+      ExecutionRoleArn: !GetAtt ExecFoundationAppWebTaskRole.Arn
+      TaskRoleArn: !GetAtt ExecFoundationAppWebTaskRole.Arn
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: '256'
+      Memory: '512'
+      EphemeralStorage:
+        SizeInGiB: 21
+      ContainerDefinitions:
+        - Name: nginx
+          Image: !Sub
+            - ${uri}@sha256:6ecccfa5d588a4789ad1ec2c6d0628ff38032fb8132513cf0ade4c180643aef4 #:nginx
+            - uri: !ImportValue imageRepositoryUri
+          Essential: true
+          Privileged: false
+          PortMappings:
+            - ContainerPort: 80
+              HostPort: 80
+              Protocol: tcp
+            - ContainerPort: 443
+              HostPort: 443
+              Protocol: tcp
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/NginxTaskDefinition
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+              awslogs-create-group: 'true'
+  FoundationAppWebService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !ImportValue fargateClusterArn
+      TaskDefinition: !Ref FoundationAppWebTaskDefinition
+      DesiredCount: !Ref desiredCountService
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 50
+      LoadBalancers:
+        - ContainerName: nginx
+          ContainerPort: 80
+          TargetGroupArn: !ImportValue elbWebTargetGroupArn
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !ImportValue publicSecurityGroupId
+          Subnets:
+            - !ImportValue publicSubnet1Id
+            - !ImportValue publicSubnet2Id
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  desiredCountService:
+    Description: Desired Count Service for FoundationApp
+    Type: Number
+    Default: 1

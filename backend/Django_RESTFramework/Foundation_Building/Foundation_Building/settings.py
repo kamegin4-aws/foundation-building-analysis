@@ -42,6 +42,7 @@ if DEBUG is not True:
     CSRF_TRUSTED_ORIGINS = [
         f"https://{env('HOST_DOMAIN')}",
         f"http://{env('APP_DOMAIN')}:8080",
+        f"http://{env('APP_DOMAIN')}:8081",
     ]
 
 # Application definition
@@ -132,6 +133,7 @@ else:
 CORS_ALLOWED_ORIGINS = [
     f"https://{env('HOST_DOMAIN')}",
     f"http://{env('APP_DOMAIN')}:8080",
+    f"http://{env('APP_DOMAIN')}:8081",
 ]
 
 CORS_ALLOW_METHODS = (

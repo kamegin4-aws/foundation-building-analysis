@@ -1,11 +1,10 @@
-"use client";
+'use client';
 
-import { createContext, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import React from "react";
-import { CognitoTokensCookie } from "@/library/cookies/cognito/login";
-import { ContentsOperation } from "@/library/storage/cloudfront_s3/storage";
-import { S3Wrapper } from "@/library/storage/infrastructure/s3/s3_client";
+import { CognitoTokensCookie } from '@/library/cookies/cognito/login';
+import { ContentsOperation } from '@/library/storage/cloudfront_s3/storage';
+import { S3Wrapper } from '@/library/storage/infrastructure/s3/s3_client';
+import { useRouter } from 'next/navigation';
+import React, { createContext, useEffect, useState } from 'react';
 
 export const S3Context = createContext(null);
 
@@ -22,7 +21,7 @@ export default function S3Provider(props) {
       .then((tokens) => {
         if (!tokens)
           router.push(
-            "/login?type=error&message=セッションを取得できませんでした。"
+            '/login?type=error&message=セッションを取得できませんでした。'
           );
         else {
           const contentsOperation = new ContentsOperation({
@@ -33,7 +32,7 @@ export default function S3Provider(props) {
         }
       })
       .catch((error) => {
-        router.push("/login?type=info&message=ログインしてください。");
+        router.push('/login?type=info&message=ログインしてください。');
       });
   }, []);
 

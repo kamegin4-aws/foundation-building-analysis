@@ -62,9 +62,13 @@ Resources:
                 Effect: Allow
                 Action:
                   - s3:*
-                Resource: !Sub
-                  - arn:aws:s3:::${ObjectStorage}/free/*
-                  - ObjectStorage: !ImportValue objectStorageName
+                Resource:
+                  - !Sub
+                    - arn:aws:s3:::${ObjectStorageName}
+                    - ObjectStorageName: !ImportValue objectStorageName
+                  - !Sub
+                    - arn:aws:s3:::${ObjectStorageName}/*
+                    - ObjectStorageName: !ImportValue objectStorageName
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -117,9 +121,13 @@ Resources:
                 Effect: Allow
                 Action:
                   - s3:*
-                Resource: !Sub
-                  - arn:aws:s3:::${ObjectStorage}/free/*
-                  - ObjectStorage: !ImportValue objectStorageName
+                Resource:
+                  - !Sub
+                    - arn:aws:s3:::${ObjectStorageName}
+                    - ObjectStorageName: !ImportValue objectStorageName
+                  - !Sub
+                    - arn:aws:s3:::${ObjectStorageName}/*
+                    - ObjectStorageName: !ImportValue objectStorageName
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -156,11 +164,11 @@ Resources:
                   - s3:*
                 Resource:
                   - !Sub
-                    - arn:aws:s3:::${ObjectStorage}/paid/*
-                    - ObjectStorage: !ImportValue objectStorageName
+                    - arn:aws:s3:::${ObjectStorageName}
+                    - ObjectStorageName: !ImportValue objectStorageName
                   - !Sub
-                    - arn:aws:s3:::${ObjectStorage}/free/*
-                    - ObjectStorage: !ImportValue objectStorageName
+                    - arn:aws:s3:::${ObjectStorageName}/*
+                    - ObjectStorageName: !ImportValue objectStorageName
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:

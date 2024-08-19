@@ -7,6 +7,6 @@ export class IGlobalAuthentication {
    * @returns {Promise<boolean>} 成功時:true 失敗時:false
    */
   async checkSession() {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 }

@@ -1,6 +1,6 @@
-import Form from "@cloudscape-design/components/form";
-import SpaceBetween from "@cloudscape-design/components/space-between";
-import React from "react";
+import Form from '@cloudscape-design/components/form';
+import SpaceBetween from '@cloudscape-design/components/space-between';
+import React from 'react';
 
 export default function FormWrapper(props) {
   return (

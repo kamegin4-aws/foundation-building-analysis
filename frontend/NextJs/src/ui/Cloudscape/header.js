@@ -1,6 +1,6 @@
-import Header from "@cloudscape-design/components/header";
-import SpaceBetween from "@cloudscape-design/components/space-between";
-import React from "react";
+import Header from '@cloudscape-design/components/header';
+import SpaceBetween from '@cloudscape-design/components/space-between';
+import React from 'react';
 
 export default function HeaderWrapper(props) {
   return (

@@ -14,6 +14,6 @@ export class IApi {
     formData: formData = undefined,
     query: query = undefined,
   } = {}) {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 }

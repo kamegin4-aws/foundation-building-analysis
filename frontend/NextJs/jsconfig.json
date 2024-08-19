@@ -2,11 +2,15 @@
   "compilerOptions": {
     "jsx": "react",
     "checkJs": true,
+    "skipLibCheck": true,  // 型定義ファイルのチェックをスキップ
+    "moduleResolution": "node",  // Node.jsスタイルのモジュール解決を使用
+    "esModuleInterop": true,  // ESモジュールとの互換性を向上
+    "allowSyntheticDefaultImports": true,  // デフォルトインポートを許可
     "paths": {
       "@/*": ["./src/*"]
     },
     "module": "CommonJS",
-    "target": "ES6"
+    "target": "ES6",
   },
   "exclude": ["node_modules", "**/node_modules/*"],
   "include": ["src/**/*"]

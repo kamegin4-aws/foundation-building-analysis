@@ -78,6 +78,9 @@ db.sqlite3-journal
 .aws-sam
 samconfig.toml
 
-# Temp
+###### Data ######
+private_key.pem
+
+###### Temp ######
 
 temp/

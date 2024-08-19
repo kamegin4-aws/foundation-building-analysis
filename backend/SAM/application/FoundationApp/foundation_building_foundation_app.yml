@@ -1,0 +1,117 @@
+Resources:
+  ExecFoundationAppTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+        - arn:aws:iam::aws:policy/SecretsManagerReadWrite
+        - arn:aws:iam::aws:policy/AmazonECS_FullAccess
+        - arn:aws:iam::aws:policy/AmazonRDSFullAccess
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+      MaxSessionDuration: 3600
+      Policies:
+        - PolicyName: AllowKMS
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                  - kms:GenerateDataKey
+                Resource:
+                  - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*
+                Condition:
+                  StringEquals:
+                    aws:ResourceAccount: !Ref AWS::AccountId
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs.amazonaws.com
+                - ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:ResourceAccount: !Ref AWS::AccountId
+  FoundationAppTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: foundation-app-task-definition
+      ExecutionRoleArn: !GetAtt ExecFoundationAppTaskRole.Arn
+      TaskRoleArn: !GetAtt ExecFoundationAppTaskRole.Arn
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: '256'
+      Memory: '512'
+      EphemeralStorage:
+        SizeInGiB: 21
+      ContainerDefinitions:
+        - Name: next_js
+          Image: !Sub
+            - ${uri}@sha256:fc2c8ec1badbe4310055e41f073588111cdd5807e43eb7cec3cfed008e564a6b #:next_js
+            - uri: !ImportValue imageRepositoryUri
+          Essential: true
+          Privileged: false
+          PortMappings:
+            - ContainerPort: 8080
+              HostPort: 8080
+              Protocol: tcp
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/NextJsTaskDefinition
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+              awslogs-create-group: 'true'
+        - Name: django_rf
+          Image: !Sub
+            - ${uri}@sha256:9d57a42e3f6bb5fe46e465db4e9f42fadcd0f93ecdabb137687080ef72377e33  #:django_rf
+            - uri: !ImportValue imageRepositoryUri
+          Essential: true
+          Privileged: false
+          PortMappings:
+            - ContainerPort: 8081
+              HostPort: 8081
+              Protocol: tcp
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/DjangoRFTaskDefinition
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+              awslogs-create-group: 'true'
+  FoundationAppService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !ImportValue fargateClusterArn
+      TaskDefinition: !Ref FoundationAppTaskDefinition
+      DesiredCount: !Ref desiredCountService
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 50
+      LoadBalancers:
+        - ContainerName: next_js
+          ContainerPort: 8080
+          TargetGroupArn: !ImportValue elbPresentationTargetGroupArn
+        - ContainerName: django_rf
+          ContainerPort: 8081
+          TargetGroupArn: !ImportValue elbApplicationTargetGroupArn
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !ImportValue publicSecurityGroupId
+          Subnets:
+            - !ImportValue publicSubnet1Id
+            - !ImportValue publicSubnet2Id
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  desiredCountService:
+    Description: Desired Count Service for FoundationApp
+    Type: Number
+    Default: 1

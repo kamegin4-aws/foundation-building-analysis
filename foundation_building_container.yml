@@ -11,9 +11,9 @@ services:
     restart: always
     tty: true
     #privileged: true
-    depends_on:
+    #depends_on:
     #  - presentation
-      - application
+    #  - application
     #environment:
     expose:
       - 80
@@ -36,8 +36,6 @@ services:
       - 8080
     ports:
       - '8080:8080'
-    #extra_hosts:
-    #  - local_dev:${HOST_IP}
     #command:
   application:
     build:

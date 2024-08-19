@@ -1,10 +1,10 @@
-import { IValidation } from "@/library/validation/interface/validation";
+import { IValidation } from '@/library/validation/interface/validation';
 
 export class RelationalDataCreateValidation extends IValidation {
   #validationInstance;
   #validationList = [];
   #errorMessageList = [];
-  #index = ["key", "value", "userName"];
+  #index = ['key', 'value', 'userName'];
 
   constructor({ validationInstance: validationInstance }) {
     super();
@@ -13,7 +13,7 @@ export class RelationalDataCreateValidation extends IValidation {
 
   execute({ formData: formData }) {
     try {
-      console.log("formData:", formData);
+      console.log('formData:', formData);
 
       const formDataObjectArray = formData.elasticache;
 
@@ -45,7 +45,7 @@ export class RelationalDataCreateValidation extends IValidation {
       if (e instanceof Error) {
         throw new Error(`client error: ${e.message}`);
       } else {
-        throw new Error("client error: Validation");
+        throw new Error('client error: Validation');
       }
     }
   }

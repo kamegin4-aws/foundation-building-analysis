@@ -47,8 +47,8 @@ def handler(event, context):
         return {
             'statusCode': 200,
             'headers': {
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': os.environ['AllOW_ORIGIN'],
                 'Access-Control-Allow-Methods': '*'},
             'body': json.dumps(
                 aws_srp_wrapper.toEntity(
@@ -60,8 +60,8 @@ def handler(event, context):
         return {
             'statusCode': 500,
             'headers': {
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': os.environ['AllOW_ORIGIN'],
                 'Access-Control-Allow-Methods': '*'},
             'body': json.dumps(
                 traceback.format_exc())}
@@ -78,12 +78,29 @@ class AWSSRPWrapper:
             client_id,
             client_secret=None
     ):
-        self.client = boto3.client('cognito-idp', region_name='ap-northeast-1')
+        """初期化
+
+        Args:
+            user_pool_id (str): User Pool Id
+            client_id (str): User Pool Application Client Id
+            client_secret (str, optional): Application Client Secrets
+        """
+        self.client = boto3.client('cognito-idp')
         self.pool_id = pool_id
         self.client_id = client_id
         self.client_secret = client_secret
 
     def sign_in(self, *, username, password):
+        """サインイン
+
+        Args:
+            username (str): ユーザー名
+            password (str): パスワード
+
+
+        Returns:
+            dict: AWSSRPのレスポンス
+        """
         try:
             kwargs = {
                 'username': username,
@@ -101,9 +118,18 @@ class AWSSRPWrapper:
 
         except Exception:
             raise RuntimeError(
-                'cognito server error: Cognito(pycognito.aws_srp) Error')
+                'cognito server error: {}'.format(traceback.format_exc()))
 
     def get_user(self, *, access_token):
+        """ユーザー情報の取得
+
+        Args:
+            access_token (str): アクセストークン
+
+
+        Returns:
+            dict: cognito-idpのレスポンス
+        """
         try:
             kwargs = {
                 'AccessToken': access_token,
@@ -116,7 +142,8 @@ class AWSSRPWrapper:
 
         except Exception as err:
             raise RuntimeError(
-                "cognito server error: Couldn't get user") from err
+                "cognito server error: {}".format(
+                    traceback.format_exc())) from err
 
     def toEntity(self, *, tokens, user_attributes):
         """_summary_

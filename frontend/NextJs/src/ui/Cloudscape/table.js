@@ -1,28 +1,28 @@
-"use client";
+'use client';
 
-import Table from "@cloudscape-design/components/table";
-import Box from "@cloudscape-design/components/box";
-import SpaceBetween from "@cloudscape-design/components/space-between";
-import Button from "@cloudscape-design/components/button";
-import TextFilter from "@cloudscape-design/components/text-filter";
-import Header from "@cloudscape-design/components/header";
-import Pagination from "@cloudscape-design/components/pagination";
-import CollectionPreferences from "@cloudscape-design/components/collection-preferences";
-import React, { useState } from "react";
+import Box from '@cloudscape-design/components/box';
+import Button from '@cloudscape-design/components/button';
+import CollectionPreferences from '@cloudscape-design/components/collection-preferences';
+import Header from '@cloudscape-design/components/header';
+import Pagination from '@cloudscape-design/components/pagination';
+import SpaceBetween from '@cloudscape-design/components/space-between';
+import Table from '@cloudscape-design/components/table';
+import TextFilter from '@cloudscape-design/components/text-filter';
+import React, { useState } from 'react';
 
 export default function TableWrapper(props) {
   const [selectedItems, setSelectedItems] = useState([]);
 
   return (
     <Table
-      variant={props.variant ? props.variant : "container"} //container| borderles | stacked | full-page
+      variant={props.variant ? props.variant : 'container'} //container| borderles | stacked | full-page
       onSelectionChange={({ detail }) => setSelectedItems(detail.selectedItems)}
       selectedItems={selectedItems}
       ariaLabels={{
-        selectionGroupLabel: "Items selection",
+        selectionGroupLabel: 'Items selection',
         allItemsSelectionLabel: ({ selectedItems }) =>
           `${selectedItems.length} ${
-            selectedItems.length === 1 ? "item" : "items"
+            selectedItems.length === 1 ? 'item' : 'items'
           } selected`,
         itemSelectionLabel: ({ selectedItems }, item) => item.name,
       }}
@@ -37,7 +37,7 @@ export default function TableWrapper(props) {
       selectionType="multi"
       trackBy={props.trackBy ? props.trackBy : undefined}
       empty={
-        <Box margin={{ vertical: "xs" }} textAlign="center" color="inherit">
+        <Box margin={{ vertical: 'xs' }} textAlign="center" color="inherit">
           <SpaceBetween size="m">
             <b>No resources</b>
           </SpaceBetween>

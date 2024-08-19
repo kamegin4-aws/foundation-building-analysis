@@ -1,0 +1,177 @@
+Resources:
+  ObjectStorage:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AWS::StackName}-object-storage
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+      VersioningConfiguration:
+        Status: Enabled
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - '*'
+            AllowedMethods:
+              - GET
+              - PUT
+              - POST
+              - DELETE
+              - HEAD
+            AllowedOrigins:
+              - !Sub https://${hostDomain}
+              - !Sub
+                - http://${AppDomain}:8080
+                - AppDomain: !ImportValue appDomain
+              - !Sub
+                - http://${AppDomain}:8081
+                - AppDomain: !ImportValue appDomain
+            ExposedHeaders:
+              - ETag
+              - x-amz-meta-custom-header
+            Id: myCORSRuleId1
+            MaxAge: 3600
+      LoggingConfiguration:
+        DestinationBucketName: !Ref LoggingBucket
+        LogFilePrefix: foundation-building
+      ObjectLockEnabled: false
+  ObjectStorageBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ObjectStorage
+      PolicyDocument:
+        Id: RequireEncryptionInTransit
+        Version: '2012-10-17'
+        Statement:
+          - Sid: RequireSecureTransport
+            Effect: Deny
+            Action: '*'
+            Principal: '*'
+            Resource:
+              - !Join ['', ['arn:aws:s3:::', !Ref ObjectStorage]]
+              - !Join ['', ['arn:aws:s3:::', !Ref ObjectStorage, '/*']]
+            Condition:
+              Bool:
+                aws:SecureTransport: 'false'
+          - Sid: AllowCloudFront
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource:
+              - !Join ['', ['arn:aws:s3:::', !Ref ObjectStorage]]
+              - !Join ['', ['arn:aws:s3:::', !Ref ObjectStorage, '/*']]
+            Condition:
+              StringEquals:
+                aws:ResourceAccount: !Ref AWS::AccountId
+                aws:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${distributionId}
+          - Sid: AllowGlueService
+            Effect: Allow
+            Principal:
+              Service: glue.amazonaws.com
+            Action: s3:*
+            Resource:
+              - !Join ['', ['arn:aws:s3:::', !Ref ObjectStorage]]
+              - !Join ['', ['arn:aws:s3:::', !Ref ObjectStorage, '/*']]
+            Condition:
+              StringEquals:
+                aws:ResourceAccount: !Ref AWS::AccountId
+          - Sid: AllowVPC
+            Effect: Allow
+            Principal: '*'
+            Action: s3:*
+            Resource:
+              - !Join ['', ['arn:aws:s3:::', !Ref ObjectStorage]]
+              - !Join ['', ['arn:aws:s3:::', !Ref ObjectStorage, '/*']]
+            Condition:
+              StringEquals:
+                aws:SourceVpc: !ImportValue vpcId
+  LoggingBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration:
+        IgnorePublicAcls: true  # ACLを許可
+        RestrictPublicBuckets: true
+        BlockPublicAcls: true  # ACLを許可
+        BlockPublicPolicy: true
+      OwnershipControls:
+        Rules:
+        - ObjectOwnership: BucketOwnerPreferred
+      ObjectLockEnabled: false
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+  LoggingBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref LoggingBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowS3
+            Effect: Allow
+            Principal:
+              Service: logging.s3.amazonaws.com
+            Action:
+              - s3:PutObject
+            Resource: !Join
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref LoggingBucket
+                - /*
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Join ['', ['arn:aws:s3:::', !Ref ObjectStorage]]
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+          - Sid: AllowCloudFront
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action:
+              - s3:PutObject
+            Resource: !Join
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref LoggingBucket
+                - /*
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/*
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  hostDomain:
+    Description: HOST Domain
+    Type: String
+    Default: foundation-building.XXXX.com
+  distributionId:
+    Description: Distribution Id
+    Type: String
+    Default: XXXX
+Outputs:
+  ObjectStorageName:
+    Value: !Ref ObjectStorage
+    Description: ObjectStorage Name
+    Export:
+      Name: objectStorageName
+  ObjectStorageDomainName:
+    Value: !GetAtt ObjectStorage.RegionalDomainName
+    Description: ObjectStorage RegionalDomainName
+    Export:
+      Name: objectStorageDomainName
+  LoggingBucketDomainName:
+    Value: !GetAtt LoggingBucket.DomainName
+    Description: LoggingBucket DomainName
+    Export:
+      Name: loggingBucketDomainName

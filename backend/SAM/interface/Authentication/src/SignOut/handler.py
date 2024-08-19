@@ -37,24 +37,26 @@ def handler(event, context):
         return {
             'statusCode': 204,
             'headers': {
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': '*'}}
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': os.environ['AllOW_ORIGIN'],
+                'Access-Control-Allow-Methods': '*'},
+        }
 
     except Exception:
         logger.error(traceback.format_exc())
         return {
             'statusCode': 500,
             'headers': {
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Origin': os.environ['AllOW_ORIGIN'],
                 'Access-Control-Allow-Methods': '*'},
             'body': json.dumps(
                 traceback.format_exc())}
 
 
 class CognitoIdentityProviderWrapper:
-    """Encapsulates Amazon Cognito actions"""
+    """Cognitoのラッパークラス
+    """
 
     def __init__(
             self,
@@ -62,19 +64,28 @@ class CognitoIdentityProviderWrapper:
             user_pool_id,
             client_id,
             client_secret=None):
+        """初期化
+
+        Args:
+            user_pool_id (str): User Pool Id
+            client_id (str): User Pool Application Client Id
+            client_secret (str, optional): Application Client Secrets
         """
-        :param cognito_idp_client: A Boto3 Amazon Cognito Identity Provider client.
-        :param user_pool_id: The ID of an existing Amazon Cognito user pool.
-        :param client_id: The ID of a client application registered with the user pool.
-        :param client_secret: The client secret, if the client has a secret.
-        """
-        self.cognito_idp_client = boto3.client(
-            'cognito-idp', region_name='ap-northeast-1')
+        self.cognito_idp_client = boto3.client('cognito-idp')
         self.user_pool_id = user_pool_id
         self.client_id = client_id
         self.client_secret = client_secret
 
     def sign_out(self, *, access_token):
+        """サインアウト
+
+        Args:
+            access_token (str): アクセストークン
+
+
+        Returns:
+            bool: True
+        """
         try:
             kwargs = {
                 'AccessToken': access_token
@@ -86,4 +97,5 @@ class CognitoIdentityProviderWrapper:
 
         except Exception as err:
             raise RuntimeError(
-                "cognito server error: Couldn't sign out") from err
+                "cognito server error: {}".format(
+                    traceback.format_exc())) from err

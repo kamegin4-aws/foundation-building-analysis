@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { IValidationInstance } from "@/library/validation/infrastructure/interface/validation";
+import { IValidationInstance } from '@/library/validation/infrastructure/interface/validation';
+import { z } from 'zod';
 
 export class ZodWrapper extends IValidationInstance {
   userNameValidation({ userName: userName }) {
@@ -16,7 +16,7 @@ export class ZodWrapper extends IValidationInstance {
       if (e instanceof Error) {
         throw new Error(`zod server error: ${e.message}`);
       } else {
-        throw new Error("server error: Zod");
+        throw new Error('server error: Zod');
       }
     }
   }
@@ -37,7 +37,7 @@ export class ZodWrapper extends IValidationInstance {
       if (e instanceof Error) {
         throw new Error(`zod server error: ${e.message}`);
       } else {
-        throw new Error("server error: Zod");
+        throw new Error('server error: Zod');
       }
     }
   }
@@ -56,7 +56,7 @@ export class ZodWrapper extends IValidationInstance {
       if (e instanceof Error) {
         throw new Error(`zod server error: ${e.message}`);
       } else {
-        throw new Error("server error: Zod");
+        throw new Error('server error: Zod');
       }
     }
   }
@@ -76,7 +76,7 @@ export class ZodWrapper extends IValidationInstance {
       if (e instanceof Error) {
         throw new Error(`zod server error: ${e.message}`);
       } else {
-        throw new Error("server error: Zod");
+        throw new Error('server error: Zod');
       }
     }
   }
@@ -95,7 +95,7 @@ export class ZodWrapper extends IValidationInstance {
       if (e instanceof Error) {
         throw new Error(`zod server error: ${e.message}`);
       } else {
-        throw new Error("server error: Zod");
+        throw new Error('server error: Zod');
       }
     }
   }
@@ -114,7 +114,7 @@ export class ZodWrapper extends IValidationInstance {
       if (e instanceof Error) {
         throw new Error(`zod server error: ${e.message}`);
       } else {
-        throw new Error("server error: Zod");
+        throw new Error('server error: Zod');
       }
     }
   }
@@ -135,7 +135,7 @@ export class ZodWrapper extends IValidationInstance {
       if (e instanceof Error) {
         throw new Error(`zod server error: ${e.message}`);
       } else {
-        throw new Error("server error: Zod");
+        throw new Error('server error: Zod');
       }
     }
   }
@@ -158,7 +158,7 @@ export class ZodWrapper extends IValidationInstance {
       if (e instanceof Error) {
         throw new Error(`zod server error: ${e.message}`);
       } else {
-        throw new Error("server error: Zod");
+        throw new Error('server error: Zod');
       }
     }
   }
@@ -177,7 +177,7 @@ export class ZodWrapper extends IValidationInstance {
       if (e instanceof Error) {
         throw new Error(`zod server error: ${e.message}`);
       } else {
-        throw new Error("server error: Zod");
+        throw new Error('server error: Zod');
       }
     }
   }
@@ -196,7 +196,7 @@ export class ZodWrapper extends IValidationInstance {
       if (e instanceof Error) {
         throw new Error(`zod server error: ${e.message}`);
       } else {
-        throw new Error("server error: Zod");
+        throw new Error('server error: Zod');
       }
     }
   }
@@ -219,7 +219,7 @@ export class ZodWrapper extends IValidationInstance {
       if (e instanceof Error) {
         throw new Error(`zod server error: ${e.message}`);
       } else {
-        throw new Error("server error: Zod");
+        throw new Error('server error: Zod');
       }
     }
   }
