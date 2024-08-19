@@ -67,7 +67,8 @@ def handler(event, context):
 
 
 class CognitoIdentityProviderWrapper:
-    """Encapsulates Amazon Cognito actions"""
+    """Cognitoのラッパークラス
+    """
 
     def __init__(
             self,
@@ -75,11 +76,12 @@ class CognitoIdentityProviderWrapper:
             user_pool_id,
             client_id,
             client_secret=None):
-        """
-        :param cognito_idp_client: A Boto3 Amazon Cognito Identity Provider client.
-        :param user_pool_id: The ID of an existing Amazon Cognito user pool.
-        :param client_id: The ID of a client application registered with the user pool.
-        :param client_secret: The client secret, if the client has a secret.
+        """初期化
+
+        Args:
+            user_pool_id (str): User Pool Id
+            client_id (str): User Pool Application Client Id
+            client_secret (str, optional): Application Client Secrets
         """
         self.cognito_idp_client = boto3.client(
             'cognito-idp', region_name='ap-northeast-1')
@@ -88,19 +90,17 @@ class CognitoIdentityProviderWrapper:
         self.client_secret = client_secret
 
     def sign_up_user(self, *, user_name, password, user_email, plan_name):
-        """
-        Signs up a new user with Amazon Cognito. This action prompts Amazon Cognito
-        to send an email to the specified email address. The email contains a code that
-        can be used to confirm the user.
+        """サインアップ
 
-        When the user already exists, the user status is checked to determine whether
-        the user has been confirmed.
+        Args:
+            user_name (str): ユーザー名
+            password (str): パスワード
+            user_email (str): Eメール
+            plan_name (str): プラン名
 
-        :param user_name: The user name that identifies the new user.
-        :param password: The password for the new user.
-        :param user_email: The email address for the new user.
-        :return: True when the user is already confirmed with Amazon Cognito.
-                 Otherwise, false.
+
+        Returns:
+            dict: cognito-idpのレスポンス
         """
         try:
             kwargs = {'ClientId': self.client_id,

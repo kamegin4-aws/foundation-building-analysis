@@ -55,7 +55,8 @@ def handler(event, context):
 
 
 class CognitoIdentityProviderWrapper:
-    """Encapsulates Amazon Cognito actions"""
+    """Cognitoのラッパークラス
+    """
 
     def __init__(
             self,
@@ -63,11 +64,12 @@ class CognitoIdentityProviderWrapper:
             user_pool_id,
             client_id,
             client_secret=None):
-        """
-        :param cognito_idp_client: A Boto3 Amazon Cognito Identity Provider client.
-        :param user_pool_id: The ID of an existing Amazon Cognito user pool.
-        :param client_id: The ID of a client application registered with the user pool.
-        :param client_secret: The client secret, if the client has a secret.
+        """初期化
+
+        Args:
+            user_pool_id (str): User Pool Id
+            client_id (str): User Pool Application Client Id
+            client_secret (str, optional): Application Client Secrets
         """
         self.cognito_idp_client = boto3.client(
             'cognito-idp', region_name='ap-northeast-1')
@@ -76,6 +78,15 @@ class CognitoIdentityProviderWrapper:
         self.client_secret = client_secret
 
     def sign_out(self, *, access_token):
+        """サインアウト
+
+        Args:
+            access_token (str): アクセストークン
+
+
+        Returns:
+            bool: True
+        """
         try:
             kwargs = {
                 'AccessToken': access_token
@@ -87,4 +98,5 @@ class CognitoIdentityProviderWrapper:
 
         except Exception as err:
             raise RuntimeError(
-                "cognito server error: Couldn't sign out") from err
+                "cognito server error: {}".format(
+                    traceback.format_exc())) from err
