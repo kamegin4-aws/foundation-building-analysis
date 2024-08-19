@@ -79,13 +79,18 @@ Resources:
         Name: !Sub ${AWS::StackName}-cache-policy
 Transform: AWS::Serverless-2016-10-31
 Outputs:
-  DistributionDomain:
-    Value: !GetAtt Distribution.DomainName
-    Description: Distribution DomainName
-    Export:
-      Name: distributionDomain
   DistributionId:
     Value: !Ref Distribution
     Description: Distribution ID
     Export:
       Name: distributionId
+  DistributionDomain:
+    Value: !GetAtt Distribution.DomainName
+    Description: Distribution DomainName
+    Export:
+      Name: distributionDomain
+  PublicKeyId:
+    Value: !Ref PublicKey
+    Description: PublicKey ID
+    Export:
+      Name: publicKeyId

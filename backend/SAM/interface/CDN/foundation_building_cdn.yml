@@ -1,0 +1,167 @@
+Resources:
+  LambdaCDNRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AWS::StackName}-lambda-cdn-role
+      Path: /
+      MaxSessionDuration: 3600
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AmazonSSMFullAccess
+        - arn:aws:iam::aws:policy/CloudFrontFullAccess
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:ResourceAccount: !Ref AWS::AccountId
+  GetSignedURL:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: GetSignedURL
+      CodeUri: src/GetSignedURL
+      Handler: handler.handler
+      Runtime: python3.12
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Role: !GetAtt LambdaCDNRole.Arn
+      Events:
+        ObjectAPIPOSTcloudfronturlsigned:
+          Type: Api
+          Properties:
+            Path: /cloudfront/url/signed
+            Method: POST
+            RestApiId: !Ref ObjectAPI
+      Environment:
+        Variables:
+          PARAMETER_NAME: !Ref parameterName
+          DISTRIBUTION_DOMAIN: !ImportValue distributionDomain
+          KEY_ID: !ImportValue publicKeyId
+          AllOW_ORIGIN: !Ref allowOrigin
+  GetSignedURLLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${GetSignedURL}
+      RetentionInDays: 7
+  GetSignedURLForFreeInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Sub ${GetSignedURL.Arn}:free
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ObjectAPI}/*/POST/cloudfront/url/signed
+  GetSignedURLForPaidInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Sub ${GetSignedURL.Arn}:paid
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ObjectAPI}/*/POST/cloudfront/url/signed
+  GetSignedURLVersion:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref GetSignedURL
+      Description: v1.0
+  GetSignedURLPaidAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref GetSignedURL
+      FunctionVersion: $LATEST
+      Name: paid
+  GetSignedURLFreeAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref GetSignedURL
+      FunctionVersion: !GetAtt GetSignedURLVersion.Version
+      Name: free
+  ObjectAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub
+        - ${ResourceName} From Stack ${AWS::StackName}
+        - ResourceName: ObjectAPI
+      StageName: paid
+      Variables:
+        alias: paid
+      OpenApiVersion: 3.1.0
+      DefinitionBody:
+        openapi: '3.0'
+        info: {}
+        paths:
+          /cloudfront/url/signed:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetSignedURL.Arn}:${!stageVariables.alias}/invocations
+              responses: {}
+      EndpointConfiguration: REGIONAL
+      TracingEnabled: true
+      AccessLogSetting:
+        DestinationArn: !GetAtt ObjectAPILogsGroup.Arn
+        Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp",
+          "caller":"$context.identity.caller", "user":"$context.identity.user",
+          "requestTime":"$context.requestTime",
+          "httpMethod":"$context.httpMethod",
+          "resourcePath":"$context.resourcePath", "status":"$context.status",
+          "responseLength":"$context.responseLength" }'
+      Auth:
+        Authorizers:
+          Cognito:
+            UserPoolArn: !ImportValue userPoolArn
+        DefaultAuthorizer: Cognito
+      Cors:
+        AllowOrigin: !Sub '''${allowOrigin}'''
+        AllowHeaders: '''*'''
+        AllowMethods: '''*'''
+        MaxAge: 600
+  ObjectAPILogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/api-gateway/${ObjectAPI}
+      RetentionInDays: 7
+  ObjectAPIDeployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref ObjectAPI
+      Description: ObjectAPI deployment
+  ObjectAPIFreeStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref ObjectAPI
+      StageName: free
+      Description: Free stage
+      DeploymentId: !GetAtt ObjectAPIDeployment.DeploymentId
+      Variables:
+        alias: free
+      AccessLogSetting:
+        DestinationArn: !GetAtt ObjectAPILogsGroup.Arn
+        Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp",
+          "caller":"$context.identity.caller", "user":"$context.identity.user",
+          "requestTime":"$context.requestTime",
+          "httpMethod":"$context.httpMethod",
+          "resourcePath":"$context.resourcePath", "status":"$context.status",
+          "responseLength":"$context.responseLength" }'
+      MethodSettings:
+        - ResourcePath: /*
+          HttpMethod: '*'
+          DataTraceEnabled: true
+          LoggingLevel: INFO
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  parameterName:
+    Type: String
+    Description: Parameter Store name
+    Default: cloudfront-private-key
+  allowOrigin:
+    Type: String
+    Description: allowOrigin
+    Default: https://foundation-building.XXXX.com,
+      http://foundation-building-infra-inlb-XXXX.elb.ap-northeast-1.amazonaws.com
