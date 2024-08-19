@@ -42,35 +42,35 @@ Resources:
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 type: aws_proxy
-                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SignUp.Arn}/invocations
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SignUp.Arn}:${!stageVariables.alias}/invocations
               responses: {}
           /cognito/signup/confirm:
             post:
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 type: aws_proxy
-                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConfirmSignUp.Arn}/invocations
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConfirmSignUp.Arn}:${!stageVariables.alias}/invocations
               responses: {}
           /cognito/token/refresh:
             post:
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 type: aws_proxy
-                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TokenRefresh.Arn}/invocations
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TokenRefresh.Arn}:${!stageVariables.alias}/invocations
               responses: {}
           /cognito/sign-in:
             post:
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 type: aws_proxy
-                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SignIn.Arn}/invocations
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SignIn.Arn}:${!stageVariables.alias}/invocations
               responses: {}
           /cognito/sign-out:
             post:
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 type: aws_proxy
-                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SignOut.Arn}/invocations
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SignOut.Arn}:${!stageVariables.alias}/invocations
               responses: {}
       EndpointConfiguration: REGIONAL
       TracingEnabled: true
@@ -121,6 +121,20 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${SignUp}
       RetentionInDays: 7
+  SignUpForFreeInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Sub ${SignUp.Arn}:free
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/POST/cognito/signup
+  SignUpForPaidInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Sub ${SignUp.Arn}:paid
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/POST/cognito/signup
   ConfirmSignUp:
     Type: AWS::Serverless::Function
     Properties:
@@ -152,6 +166,20 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${ConfirmSignUp}
       RetentionInDays: 7
+  ConfirmSignUpForFreeInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Sub ${ConfirmSignUp.Arn}:free
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/POST/cognito/signup/confirm
+  ConfirmSignUpForPaidInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Sub ${ConfirmSignUp.Arn}:paid
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/POST/cognito/signup/confirm
   GetUser:
     Type: AWS::Serverless::Function
     Properties:
@@ -183,6 +211,20 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${GetUser}
       RetentionInDays: 7
+  GetUserForFreeInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Sub ${GetUser.Arn}:free
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAuthorizedAPI}/*/POST/cognito/user/detail
+  GetUserForPaidInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Sub ${GetUser.Arn}:paid
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAuthorizedAPI}/*/POST/cognito/user/detail
   UserAuthorizedAPILogsGroup:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -207,21 +249,21 @@ Resources:
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 type: aws_proxy
-                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUser.Arn}/invocations
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUser.Arn}:${!stageVariables.alias}/invocations
               responses: {}
           /cognito/user/attributes/edit:
             post:
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 type: aws_proxy
-                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateAttributes.Arn}/invocations
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateAttributes.Arn}:${!stageVariables.alias}/invocations
               responses: {}
           /cognito/user/attributes/verify:
             post:
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 type: aws_proxy
-                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${VerifyAttribute.Arn}/invocations
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${VerifyAttribute.Arn}:${!stageVariables.alias}/invocations
               responses: {}
       EndpointConfiguration: REGIONAL
       TracingEnabled: true
@@ -412,6 +454,20 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${TokenRefresh}
       RetentionInDays: 7
+  TokenRefreshForFreeInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Sub ${TokenRefresh.Arn}:free
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/POST/cognito/token/refresh
+  TokenRefreshForPaidInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Sub ${TokenRefresh.Arn}:paid
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/POST/cognito/token/refresh
   TokenRefreshFixVersion:
     Type: AWS::Lambda::Version
     Properties:
@@ -494,6 +550,20 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${SignIn}
       RetentionInDays: 7
+  SignInForFreeInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Sub ${SignIn.Arn}:free
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/POST/cognito/sign-in
+  SignInForPaidInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Sub ${SignIn.Arn}:paid
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/POST/cognito/sign-in
   SignOut:
     Type: AWS::Serverless::Function
     Properties:
@@ -525,6 +595,20 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${SignOut}
       RetentionInDays: 7
+  SignOutForFreeInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Sub ${SignOut.Arn}:free
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/POST/cognito/sign-out
+  SignOutForPaidInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Sub ${SignOut.Arn}:paid
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/POST/cognito/sign-out
   UpdateAttributes:
     Type: AWS::Serverless::Function
     Properties:
@@ -556,6 +640,20 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${UpdateAttributes}
       RetentionInDays: 7
+  UpdateAttributesForFreeInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Sub ${UpdateAttributes.Arn}:free
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAuthorizedAPI}/*/POST/cognito/user/attributes/edit
+  UpdateAttributesForPaidInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Sub ${UpdateAttributes.Arn}:paid
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAuthorizedAPI}/*/POST/cognito/user/attributes/edit
   VerifyAttribute:
     Type: AWS::Serverless::Function
     Properties:
@@ -587,6 +685,20 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${VerifyAttribute}
       RetentionInDays: 7
+  VerifyAttributeForFreeInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Sub ${VerifyAttribute.Arn}:free
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAuthorizedAPI}/*/POST/cognito/user/attributes/verify
+  VerifyAttributeForPaidInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Sub ${VerifyAttribute.Arn}:paid
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAuthorizedAPI}/*/POST/cognito/user/attributes/verify
 Transform: AWS::Serverless-2016-10-31
 Parameters:
   clientSecret:

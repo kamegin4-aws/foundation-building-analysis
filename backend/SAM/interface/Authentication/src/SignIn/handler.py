@@ -85,7 +85,7 @@ class AWSSRPWrapper:
             client_id (str): User Pool Application Client Id
             client_secret (str, optional): Application Client Secrets
         """
-        self.client = boto3.client('cognito-idp', region_name='ap-northeast-1')
+        self.client = boto3.client('cognito-idp')
         self.pool_id = pool_id
         self.client_id = client_id
         self.client_secret = client_secret

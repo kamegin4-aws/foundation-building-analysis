@@ -83,8 +83,7 @@ class CognitoIdentityProviderWrapper:
             client_id (str): User Pool Application Client Id
             client_secret (str, optional): Application Client Secrets
         """
-        self.cognito_idp_client = boto3.client(
-            'cognito-idp', region_name='ap-northeast-1')
+        self.cognito_idp_client = boto3.client('cognito-idp')
         self.user_pool_id = user_pool_id
         self.client_id = client_id
         self.client_secret = client_secret
