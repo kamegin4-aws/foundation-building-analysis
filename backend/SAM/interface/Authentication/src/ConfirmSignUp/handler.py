@@ -122,9 +122,9 @@ class CognitoIdentityProviderWrapper:
             response = self.cognito_idp_client.confirm_sign_up(**kwargs)
             logger.info(f'confirm_sign_up: {response}')
 
+            return True
+
         except Exception as err:
             raise RuntimeError(
                 "cognito server error: {}.".format(
                     traceback.format_exc())) from err
-
-        return True

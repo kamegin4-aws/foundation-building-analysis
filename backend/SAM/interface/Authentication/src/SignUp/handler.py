@@ -115,6 +115,8 @@ class CognitoIdentityProviderWrapper:
             response = self.cognito_idp_client.sign_up(**kwargs)
             logger.info(f'sign_up: {response}')
 
+            return response
+
         except ClientError as err:
             if err.response['Error']['Code'] == 'UsernameExistsException':
                 response = self.cognito_idp_client.admin_get_user(
@@ -140,8 +142,6 @@ class CognitoIdentityProviderWrapper:
                     user_name, err.response['Error']['Code'], err.response['Error']['Message'])
             raise RuntimeError(
                 f'cognito server error: {error_massage}') from err
-
-        return response
 
     def secret_hash(self, *, user_name):
         """_summary_

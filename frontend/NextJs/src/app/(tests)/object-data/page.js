@@ -14,9 +14,10 @@ import {
 } from '@cloudscape-design/components';
 import React, { useEffect, useState } from 'react';
 
-export default function FileUploadWrapper() {
+export default function ObjectDataPage() {
   const [value, setValue] = useState([]);
   const [objectData, setObjectData] = useState(undefined);
+  const [user, setUser] = useState(undefined);
 
   const uploadOnClick = async (event) => {
     event.preventDefault();
@@ -25,18 +26,7 @@ export default function FileUploadWrapper() {
     try {
       const file = value[0];
       if (objectData) {
-        logger.info(
-          `input: ${JSON.stringify({
-            userId: 'userId',
-            metaKey: 'metaKey',
-            metaValue: 'metaValue',
-            mimeType: 'mimeType',
-            fileName: file.name,
-            comment: 'comment',
-            body: file,
-          })}`
-        );
-
+        logger.info('Start upload');
         const result = await objectData.upload({
           userId: 'userId',
           metaKey: 'metaKey',
@@ -66,17 +56,7 @@ export default function FileUploadWrapper() {
     try {
       if (objectData) {
         const file = value[0];
-        logger.info(
-          `input: ${JSON.stringify({
-            userId: 'userId',
-            metaKey: 'metaKey',
-            metaValue: 'metaValue',
-            mimeType: 'mimeType',
-            fileName: file.name,
-            comment: 'comment',
-            body: file,
-          })}`
-        );
+        logger.info('Start multipartUpload');
         const result = await objectData.multipartUpload({
           userId: 'userId',
           metaKey: 'metaKey',
@@ -105,16 +85,7 @@ export default function FileUploadWrapper() {
     logger.info(event.detail);
     try {
       if (objectData) {
-        logger.info(
-          `input: ${JSON.stringify({
-            userId: 'userId',
-            metaKey: 'metaKey',
-            limit: 3,
-            offset: 1,
-            searchValue: 'metaValue',
-            orderBy: 'updatedAt',
-          })}`
-        );
+        logger.info('Start list');
         const result = await objectData.list({
           userId: 'userId',
           metaKey: 'metaKey',
@@ -143,15 +114,7 @@ export default function FileUploadWrapper() {
     try {
       if (objectData) {
         const file = value[0];
-        logger.info(
-          `input: ${JSON.stringify({
-            userId: 'userId',
-            metaKey: 'metaKey',
-            metaValue: 'metaValue',
-            mimeType: 'mimeType',
-            fileName: file.name,
-          })}`
-        );
+        logger.info('Start detail');
         const result = await objectData.detail({
           userId: 'userId',
           metaKey: 'metaKey',
@@ -179,15 +142,7 @@ export default function FileUploadWrapper() {
     try {
       if (objectData) {
         const file = value[0];
-        logger.info(
-          `input: ${JSON.stringify({
-            userId: 'userId',
-            metaKey: 'metaKey',
-            metaValue: 'metaValue',
-            mimeType: 'mimeType',
-            fileName: file.name,
-          })}`
-        );
+        logger.info('Start listVersions');
         const result = await objectData.listVersions({
           userId: 'userId',
           metaKey: 'metaKey',
@@ -216,16 +171,7 @@ export default function FileUploadWrapper() {
     try {
       if (objectData) {
         const file = value[0];
-        logger.info(
-          `input: ${JSON.stringify({
-            userId: 'userId',
-            metaKey: 'metaKey',
-            metaValue: 'metaValue',
-            mimeType: 'mimeType',
-            fileName: file.name,
-            comment: 'commentUpdate',
-          })}`
-        );
+        logger.info('Start commentUpdate');
         const result = await objectData.commentUpdate({
           userId: 'userId',
           metaKey: 'metaKey',
@@ -245,6 +191,49 @@ export default function FileUploadWrapper() {
       }
     } finally {
       logger.info('commentUpdate finished');
+    }
+  };
+
+  const downloadOnClick = async (event) => {
+    event.preventDefault();
+    logger.info(event.detail);
+    try {
+      if (objectData) {
+        logger.info('Start download');
+        const file = value[0];
+        const url = `${process.env.NEXT_PUBLIC_BASE_PATH}/api/object-data/signed-url`;
+        const options = {
+          method: 'POST', // *GET, POST, PUT, DELETE, etc.
+          cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${user.id_token}`,
+          },
+          body: JSON.stringify({
+            userId: 'userId',
+            metaKey: 'metaKey',
+            metaValue: 'metaValue',
+            mimeType: 'mimeType',
+            fileName: file.name,
+          }),
+        };
+
+        //@ts-ignore
+        const response = await fetch(url, options);
+
+        const data = await response.json();
+
+        logger.info(`download successfully: ${JSON.stringify(data)}`);
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        logger.error(e.message);
+      } else {
+        logger.error('エラー');
+      }
+    } finally {
+      logger.info('download finished');
     }
   };
 
@@ -347,7 +336,7 @@ export default function FileUploadWrapper() {
             .json()
             .then((data) => {
               logger.info(`success for login: ${JSON.stringify(data)}`);
-
+              setUser(data);
               setObjectData(
                 new ObjectData({
                   repositoryInstance: new S3Wrapper({
@@ -418,6 +407,13 @@ export default function FileUploadWrapper() {
               iconAlt={'コメント更新'}
             >
               コメント更新
+            </Button>
+            <Button
+              onClick={downloadOnClick}
+              iconName={'download'}
+              iconAlt={'ダウンロード'}
+            >
+              ダウンロード
             </Button>
             <Button
               onClick={deleteOnClick}

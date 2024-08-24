@@ -120,6 +120,19 @@ export class IRepositoryInstance {
   }
 
   /**
+   * オブジェクトのダウンロードURL
+   * @typedef {Object} InputObjectSignedURL
+   * @property {string} key オブジェクトキー
+   * @property {string} range オブジェクトの指定されたバイト範囲をダウンロードします。
+   * @property {string} versionId オブジェクトの特定のバージョンを参照するために使用されるバージョン ID
+   * @param {InputObjectSignedURL} InputObjectSignedURL
+   * @return {Promise<string>} s3Clientのレスポンス
+   */
+  async signedURL({ key, versionId = undefined, range = undefined }) {
+    throw new Error('Not implemented');
+  }
+
+  /**
    * オブジェクトの削除
    * @typedef {Object} InputObjectDeleteObject
    * @property {string} key オブジェクトキー
@@ -160,7 +173,7 @@ export class IRepositoryInstance {
    * 共通エンティティに変換
    * @typedef {Object} InputObjectToEntity
    * @property {Object} response1 s3Clientのレスポンス
-   * @property {string} type 変換タイプ(upload,multiUpload,list,listVersions,detail,delete,tagUpdate)
+   * @property {string} type 変換タイプ(upload,multiUpload,list,listVersions,download,detail,delete,tagUpdate)
    * @property {string} serviceName サービス名('objectData')
    * @property {Object} response2 s3Clientのレスポンス(detailのみ必要)
    * @property {string} key オブジェクトキー(detailのみ必要)
@@ -188,6 +201,10 @@ export class IRepositoryInstance {
         return this.toEntityForListVersions({
           response: response1,
           serviceName: serviceName,
+        });
+      case 'download':
+        return this.toEntityForDownload({
+          response: response1,
         });
       case 'detail':
         return this.toEntityForDetail({
@@ -296,6 +313,11 @@ export class IRepositoryInstance {
         return entity;
       });
     } else return [{}];
+  }
+
+  toEntityForDownload({ response }) {
+    let entity = {};
+    entity.signedURL = response;
   }
 
   toEntityForDetail({ responseAttributes, responseTagging, key, serviceName }) {

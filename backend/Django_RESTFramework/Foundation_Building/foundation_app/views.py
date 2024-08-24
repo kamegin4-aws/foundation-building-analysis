@@ -1,10 +1,10 @@
 from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from foundation_app.filters import RelationalDataFilter
+from foundation_app.filters import RelationalDataFilter, UserFilter
 from foundation_app.models import RelationalData, User
+from foundation_app.pagination import CustomBasePagination
 from foundation_app.serializers import RelationalDataSerializer, UserSerializer
 from rest_framework import filters, viewsets
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -18,6 +18,7 @@ class RelationalDataViewSet(viewsets.ModelViewSet):
 
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_class = RelationalDataFilter
+    pagination_class = CustomBasePagination
     permission_classes = [IsAuthenticated]
 
     def get_serializer(self, *args, **kwargs):
@@ -28,11 +29,10 @@ class RelationalDataViewSet(viewsets.ModelViewSet):
         return super().get_serializer(*args, **kwargs)
 
 
-class RelationalDataPagination(LimitOffsetPagination):
-    default_limit = 10
-    max_limit = 100
-
-
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_class = UserFilter
+    pagination_class = CustomBasePagination

@@ -91,6 +91,29 @@ export class IRepository {
   }
 
   /**
+   * オブジェクトのダウンロード
+   * @typedef {Object} InputObjectDownload
+   * @property {string} userId ユーザーID
+   * @property {string} metaKey メタキー
+   * @property {string} metaValue メタバリュー
+   * @property {string} mimeType MIMEタイプ
+   * @property {string} fileName ファイル名
+   * @property {string} versionId バージョンID
+   * @param {InputObjectDownload} InputObjectDownload
+   * @returns {Promise<Object>} Repositoryエンティティ
+   */
+  async download({
+    userId,
+    metaKey,
+    metaValue,
+    mimeType,
+    fileName,
+    versionId,
+  }) {
+    throw new Error('Not implemented');
+  }
+
+  /**
    * オブジェクトの詳細
    * @typedef {Object} InputObjectDetail
    * @property {string} userId ユーザーID

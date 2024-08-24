@@ -15,6 +15,7 @@ import {
   UploadPartCommand,
 } from '@aws-sdk/client-s3';
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-providers';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 export class S3Wrapper extends IRepositoryInstance {
   #s3Client;
@@ -233,6 +234,30 @@ export class S3Wrapper extends IRepositoryInstance {
       logger.info(`s3 downloadObject success: ${JSON.stringify(response)}`);
 
       return response;
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(`s3 server error: ${e.message}`);
+      } else {
+        throw new Error('s3 server error');
+      }
+    }
+  }
+
+  async signedURL({ key, versionId = undefined, range = undefined }) {
+    try {
+      const input = {
+        Bucket: process.env.NEXT_PUBLIC_BUCKET,
+        Key: key,
+        VersionId: versionId,
+        Range: range,
+      };
+      const command = new GetObjectCommand(input);
+
+      const url = await getSignedUrl(this.#s3Client, command, {
+        expiresIn: 3600,
+      });
+
+      return url;
     } catch (e) {
       if (e instanceof Error) {
         throw new Error(`s3 server error: ${e.message}`);
