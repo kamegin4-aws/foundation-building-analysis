@@ -129,6 +129,8 @@ class CognitoIdentityProviderWrapper:
             response_init = self.cognito_idp_client.initiate_auth(**kwargs)
             logger.info(f'refresh token: {response_init}')
 
+            return response_init
+
         except ClientError as err:
             logger.error(
                 "Couldn't start client sign in for %s. Here's why: %s: %s",
@@ -139,8 +141,6 @@ class CognitoIdentityProviderWrapper:
             raise RuntimeError(
                 "cognito server error: {}.".format(
                     traceback.format_exc())) from err
-
-        return response_init
 
     def toEntity(self, *, tokens, refresh_token=''):
         """_summary_

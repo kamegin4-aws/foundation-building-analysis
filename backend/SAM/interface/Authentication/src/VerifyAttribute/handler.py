@@ -99,8 +99,8 @@ class CognitoIdentityProviderWrapper:
             response = self.cognito_idp_client.verify_user_attribute(**kwargs)
             logger.info(f'verify_user_attribute: {response}')
 
+            return True
+
         except Exception as err:
             raise RuntimeError(
                 "cognito server error: Couldn't confirm verify_user_attribute.") from err
-
-        return True

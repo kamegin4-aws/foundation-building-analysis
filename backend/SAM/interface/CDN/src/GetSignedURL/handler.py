@@ -31,7 +31,9 @@ def handler(event, context):
         parameter_name = os.environ['PARAMETER_NAME']
         key_id = os.environ['KEY_ID']
         distribution_domain = os.environ['DISTRIBUTION_DOMAIN']
+
         s3_path = body['s3_path']
+        version_id = body['version_id'] if 'version_id' in body else None
 
         systemsManagerWrapper = SystemsManagerWrapper()
         parameter = systemsManagerWrapper.get_parameter(
@@ -43,7 +45,8 @@ def handler(event, context):
             distribution_domain=distribution_domain
         )
 
-        signed_url = cloudFrontWrapper.get_signed_url(s3_path=s3_path)
+        signed_url = cloudFrontWrapper.get_signed_url(
+            s3_path=s3_path, version_id=version_id)
 
         return {
             'statusCode': 200,
@@ -131,12 +134,16 @@ class CloudFrontWrapper:
         )
         self.distribution_domain = distribution_domain
 
-    def get_signed_url(self, *, s3_path):
+    def get_signed_url(self, *, s3_path, version_id=None):
         try:
             expire_date = datetime.now() + timedelta(hours=1)
             jst = pytz.timezone('Asia/Tokyo')
             date = expire_date.astimezone(jst)
+            # バージョンIDをクエリパラメータに含める
             url = f'https://{self.distribution_domain}/{s3_path}'
+            if version_id:
+                url += f'?versionId={version_id}'
+
             signed_url = self.cloud_front_signer.generate_presigned_url(
                 url, date_less_than=date
             )

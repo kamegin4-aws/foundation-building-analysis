@@ -126,7 +126,6 @@ class AWSSRPWrapper:
         Args:
             access_token (str): アクセストークン
 
-
         Returns:
             dict: cognito-idpのレスポンス
         """
