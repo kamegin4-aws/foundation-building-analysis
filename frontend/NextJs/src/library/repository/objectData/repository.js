@@ -313,6 +313,34 @@ export class ObjectData extends IRepository {
     }
   }
 
+  async download({
+    userId,
+    metaKey,
+    metaValue,
+    mimeType,
+    fileName,
+    versionId,
+  }) {
+    try {
+      const key = `userId=${userId}/metaKey=${metaKey}/metaValue=${metaValue}/mimeType=${mimeType}/${fileName}`;
+
+      const signedURL = await this.#repositoryInstance.signedURL({
+        key: key,
+        versionId: versionId,
+      });
+
+      return this.#repositoryInstance.toEntity({
+        response1: signedURL,
+      });
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new Error(`server error: ${e.message}`);
+      } else {
+        throw new Error('server error');
+      }
+    }
+  }
+
   async detail({ userId, metaKey, metaValue, mimeType, fileName, versionId }) {
     try {
       const key = `userId=${userId}/metaKey=${metaKey}/metaValue=${metaValue}/mimeType=${mimeType}/${fileName}`;

@@ -52,7 +52,7 @@ Resources:
       ContainerDefinitions:
         - Name: next_js
           Image: !Sub
-            - ${uri}@sha256:fc2c8ec1badbe4310055e41f073588111cdd5807e43eb7cec3cfed008e564a6b #:next_js
+            - ${uri}@sha256:8abcba9f88942673d783693bb41d0e054a7fb6282d97de5f56f97a49e5f0c3ff #:next_js
             - uri: !ImportValue imageRepositoryUri
           Essential: true
           Privileged: false
@@ -69,7 +69,7 @@ Resources:
               awslogs-create-group: 'true'
         - Name: django_rf
           Image: !Sub
-            - ${uri}@sha256:9d57a42e3f6bb5fe46e465db4e9f42fadcd0f93ecdabb137687080ef72377e33  #:django_rf
+            - ${uri}@sha256:e55b3c5a3eedebcd1a976f059d1deedd2c1d633da7e1c6e81c75d01cd96cac36  #:django_rf
             - uri: !ImportValue imageRepositoryUri
           Essential: true
           Privileged: false

@@ -25,7 +25,7 @@ entity "RelationalData(RDS)" as relational_data {
   comment: varchar: コメント
   created_at: timestamptz: 作成日時
   updated_at : timestamptz: 更新日時
-  user_id: varchar [FK]
+  user_id: varchar: ユーザーID [FK]
   unique : [user_id, meta_key, meta_value, version_id, key]
 }
 
@@ -38,7 +38,7 @@ entity "ObjectData(S3)" as object_data {
   fileName: string: ファイル名
   comment: string: コメント
   signed_uri: string: 署名済みURI
-  versionId: uuid: バージョンID
+  versionId: string: バージョンID
   updated_at : string: 更新日時
   user_id: string: ユーザーID
 }
@@ -50,7 +50,7 @@ entity "ETL(S3)" as etl {
   meta_value: string: メタデータバリュー
   mime_type: string: MIMEタイプ(audio, image, text...)
   name: string: ファイル(テーブル)名
-  versionId: uuid: バージョンID
+  versionId: string: バージョンID
   user_id: string: ユーザーID
 }
 
@@ -63,30 +63,30 @@ entity "AI(S3)" as ai {
   experiment_name: string: 実験名
   step: string: 実験ステップ((ラベリング), (特徴量), (学習), 推論...)
   comment: string: コメント
-  versionId: uuid: バージョンID
+  versionId: string: バージョンID
   user_id: string: ユーザーID
 }
 
 entity "Analytics(S3)" as analytics {
-  +pah: string: userId=user_id/metaKey=meta_key/metaValue=meta_value/analysisName?versionId [PK]
+  +pah: string: userId=user_id/metaKey=meta_key/metaValue=meta_value/analysisName=analysisName/analysisName?versionId [PK]
   --
   meta_key: string: メタデータキー
   meta_value: string: メタデータバリュー
   analysisName: string: 分析名
   comment: string: コメント
-  versionId: uuid: バージョンID
+  versionId: string: バージョンID
   user_id: string: ユーザーID
 }
 
 entity "Progress(DynamoDB)" as progress {
-  +progress_id: datetime.service_name_suffix: 進捗ID [PK]
+  +progress_id: string: datetime.service_name_suffix (進捗ID) [PK]
   --
   meta_key: string: メタデータキー
   meta_value: string: メタデータバリュー
-  service_name: varchar: サービス名
-  status: varchar: ステータス
-  created_at: timestamptz: 作成日時 [SK]
-  user_id: varchar [GSI]
+  service_name: string: サービス名
+  status: string: ステータス
+  created_at: number: 作成日時 [SK]
+  user_id: string: ユーザーID [GSI]
 }
 
 ' Relationships
