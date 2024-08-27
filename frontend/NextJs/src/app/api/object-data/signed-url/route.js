@@ -1,3 +1,5 @@
+import { NextResponse } from 'next/server';
+
 export async function POST(request) {
   const body = await request.json();
   const requestHeaders = new Headers(request.headers);
@@ -23,5 +25,5 @@ export async function POST(request) {
 
   const data = await response.json();
 
-  return Response.json(data);
+  return NextResponse.json(data);
 }

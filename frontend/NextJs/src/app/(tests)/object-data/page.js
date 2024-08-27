@@ -17,7 +17,7 @@ import React, { useEffect, useState } from 'react';
 export default function ObjectDataPage() {
   const [value, setValue] = useState([]);
   const [objectData, setObjectData] = useState(undefined);
-  const [user, setUser] = useState(undefined);
+  const [session, setSession] = useState(undefined);
 
   const uploadOnClick = async (event) => {
     event.preventDefault();
@@ -208,7 +208,7 @@ export default function ObjectDataPage() {
           mode: 'cors',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${user.id_token}`,
+            Authorization: `Bearer ${session.user.idToken}`,
           },
           body: JSON.stringify({
             userId: 'userId',
@@ -313,19 +313,14 @@ export default function ObjectDataPage() {
   };
 
   useEffect(() => {
-    const url = `${process.env.NEXT_PUBLIC_BASE_PATH}/api/user/sign-in`;
+    const url = `${process.env.NEXT_PUBLIC_BASE_PATH}/api/session`;
     const options = {
-      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      method: 'GET', // *GET, POST, PUT, DELETE, etc.
       cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
       mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
-        'X-Api-Key': process.env.NEXT_PUBLIC_USER_API_KEY,
       },
-      body: JSON.stringify({
-        user_name: process.env.NEXT_PUBLIC_USER_NAME,
-        password: process.env.NEXT_PUBLIC_PASSWORD,
-      }),
     };
 
     // @ts-ignore
@@ -335,25 +330,25 @@ export default function ObjectDataPage() {
           response
             .json()
             .then((data) => {
-              logger.info(`success for login: ${JSON.stringify(data)}`);
-              setUser(data);
+              logger.info(`success for session: ${JSON.stringify(data)}`);
+              setSession(data);
               setObjectData(
                 new ObjectData({
                   repositoryInstance: new S3Wrapper({
-                    idToken: data.id_token,
+                    idToken: data.user.idToken,
                   }),
                 })
               );
             })
             .catch((error) => {
-              logger.error(`error for login: ${error.message}`);
+              logger.error(`error for session: ${error.message}`);
             });
         } else {
           throw new Error('Network response was not ok.');
         }
       })
       .catch((error) => {
-        logger.error(`error for login: ${error.message}`);
+        logger.error(`error for session: ${error.message}`);
       });
   }, []);
 
