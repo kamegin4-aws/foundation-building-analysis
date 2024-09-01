@@ -1,59 +1,53 @@
-// app/auth/signin/page.jsx
-
-'use client'; // This enables client-side rendering for this component
+// app/auth/sign-in/page.jsx
+'use client';
 
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-export default function SignInPage() {
-  const [userInfo, setUserInfo] = useState({ username: '', password: '' });
-  const [error, setError] = useState('');
-  const router = useRouter();
+export default function SignIn() {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (process.env.NEXT_PUBLIC_NODE_ENV == 'prod') {
-      const result = await signIn('credentials', {
-        redirect: false,
-        username: userInfo.username,
-        password: userInfo.password,
-      });
 
-      if (result.error) {
-        setError('Invalid credentials. Please try again.');
-      } else {
-        // Redirect to a specific page or reload the page after successful sign-in
-        router.push('/');
-      }
+    // signIn関数を使ってクライアントサイドから認証リクエストを送信
+    const result = await signIn('credentials', {
+      redirect: false,
+      username,
+      password,
+    });
+
+    if (result?.error) {
+      // エラーハンドリング
+      console.error('Failed to sign in:', result.error);
+    } else {
+      // 認証成功後のリダイレクトまたは他の処理
+      console.log(`Successfully signed in: ${JSON.stringify(result)}`);
     }
   };
 
-  useEffect(() => {}, []);
-
   return (
-    <div>
-      <h1>Sign In</h1>
-      <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit}>
+      <label>
+        Username
         <input
+          name="username"
           type="text"
-          placeholder="Username"
-          value={userInfo.username}
-          onChange={(e) =>
-            setUserInfo({ ...userInfo, username: e.target.value })
-          }
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
         />
+      </label>
+      <label>
+        Password
         <input
+          name="password"
           type="password"
-          placeholder="Password"
-          value={userInfo.password}
-          onChange={(e) =>
-            setUserInfo({ ...userInfo, password: e.target.value })
-          }
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
-        <button type="submit">Sign In</button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-      </form>
-    </div>
+      </label>
+      <button type="submit">Sign in</button>
+    </form>
   );
 }

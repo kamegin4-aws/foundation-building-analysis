@@ -51,7 +51,6 @@ export default function SignOutPage() {
   }
 
   const params = {
-    'api-key': process.env.NEXT_PUBLIC_USER_API_KEY,
     'access-token': session.user.accessToken,
   };
   const query = new URLSearchParams(params);
@@ -60,10 +59,26 @@ export default function SignOutPage() {
     <div>
       <h1>SignOutPage</h1>
       <button
-        onClick={() => {
-          if (process.env.NEXT_PUBLIC_NODE_ENV == 'prod') {
+        onClick={async () => {
+          const url = `${process.env.NEXT_PUBLIC_BASE_PATH}/api/session/sign-out`;
+          const options = {
+            method: 'POST',
+            cache: 'no-cache',
+            mode: 'cors',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              accessToken: session.user.accessToken,
+            }),
+          };
+
+          // @ts-ignore
+          const response = await fetch(url, options);
+          logger.info(`sign-out: ${JSON.stringify(response)}`);
+
+          if (response.ok) {
             signOut({
-              callbackUrl: `${process.env.NEXT_PUBLIC_BASE_PATH}/api/session/sign-out?${query}`,
               redirect: false,
             });
           }
