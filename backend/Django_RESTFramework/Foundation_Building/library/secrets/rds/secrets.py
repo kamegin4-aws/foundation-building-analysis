@@ -2,7 +2,9 @@ import logging
 import traceback
 
 from library.env.env import get_env
-from library.secrets.interface.secrets import ISecrets
+
+from backend.Django_RESTFramework.Foundation_Building.library.secrets.interface.rds.secrets import \
+    ISecrets
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

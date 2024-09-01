@@ -1,6 +1,6 @@
 import logger from '@/library/logging/logger';
-import { Service_Name } from '@/library/repository/constant/repository';
-import { IRepository } from '@/library/repository/interface/repository';
+import { Service_Name } from '@/library/repository/common/repository';
+import { IRepository } from '@/library/repository/interface/objectData/repository';
 
 export class ObjectData extends IRepository {
   #repositoryInstance;

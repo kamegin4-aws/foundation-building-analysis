@@ -13,10 +13,6 @@ class User(models.Model):
     user_name = models.CharField(max_length=256)
     email = models.EmailField(unique=True)
     plan = models.CharField(max_length=256)
-    access_token = models.TextField()
-    id_token = models.TextField()
-    refresh_token = models.TextField()
-    expires = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

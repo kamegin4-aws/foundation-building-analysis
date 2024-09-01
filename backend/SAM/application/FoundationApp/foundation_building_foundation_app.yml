@@ -52,7 +52,7 @@ Resources:
       ContainerDefinitions:
         - Name: next_js
           Image: !Sub
-            - ${uri}@sha256:8abcba9f88942673d783693bb41d0e054a7fb6282d97de5f56f97a49e5f0c3ff #:next_js
+            - ${uri}@sha256:f16edce0adc6b2cbc93339eb49766ca884c0e7f570e5f8f9b5f75c6876433d6a #:next_js
             - uri: !ImportValue imageRepositoryUri
           Essential: true
           Privileged: false

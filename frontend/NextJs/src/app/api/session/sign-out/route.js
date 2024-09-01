@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
 
 export async function POST(request) {
-  const searchParams = request.nextUrl.searchParams;
-  const apiKey = searchParams.get('api-key');
-  const accessToken = searchParams.get('access-token');
+  const body = await request.json();
 
   const url =
     'https://b7bjj7fb3i.execute-api.ap-northeast-1.amazonaws.com/paid/cognito/sign-out';
@@ -13,10 +11,10 @@ export async function POST(request) {
     mode: 'cors',
     headers: {
       'Content-Type': 'application/json',
-      'X-Api-Key': apiKey,
+      'X-Api-Key': process.env.API_KEY,
     },
     body: JSON.stringify({
-      access_token: accessToken,
+      access_token: body.accessToken,
     }),
   };
 

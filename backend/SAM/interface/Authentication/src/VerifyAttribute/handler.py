@@ -33,16 +33,15 @@ def handler(event, context):
         access_token = body['access_token']
         code = body['code']
 
-        verify = cognitoIdentityProviderWrapper.verify(
+        cognitoIdentityProviderWrapper.verify(
             access_token=access_token, code=code)
 
         return {
-            'statusCode': 200,
+            'statusCode': 204,
             'headers': {
                 'Access-Control-Allow-Headers': '*',
                 'Access-Control-Allow-Origin': os.environ['AllOW_ORIGIN'],
-                'Access-Control-Allow-Methods': '*'},
-            'body': json.dumps(verify)}
+                'Access-Control-Allow-Methods': '*'}}
 
     except Exception:
         logger.error(traceback.format_exc())

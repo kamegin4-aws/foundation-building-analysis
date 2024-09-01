@@ -1,4 +1,4 @@
-import { Service_Name } from '@/library/repository/constant/repository';
+import { Service_Name } from '@/library/repository/common/repository';
 
 /**
  *Repositoryインスタンスのインターフェース
@@ -339,6 +339,7 @@ export class IRepositoryInstance {
         entity.comment = commentTag ? commentTag.Value : '';
       } else entity.comment = '';
 
+      entity.size = responseAttributes.ObjectSize;
       const lastModified = new Date(responseAttributes.LastModified);
       entity.updatedAt = lastModified.toLocaleString('ja-JP', {
         timeZone: 'Asia/Tokyo',

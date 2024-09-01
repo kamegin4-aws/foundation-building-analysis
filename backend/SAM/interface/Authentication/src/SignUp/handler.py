@@ -38,7 +38,7 @@ def handler(event, context):
         user_email = body['user_email']
         plan_name = body['plan_name']
 
-        confirmed = cognitoIdentityProviderWrapper.sign_up_user(
+        sign_up_user = cognitoIdentityProviderWrapper.sign_up_user(
             user_name=user_name,
             password=password,
             user_email=user_email,
@@ -52,7 +52,7 @@ def handler(event, context):
                 'Access-Control-Allow-Methods': '*'},
             'body': json.dumps(
                 cognitoIdentityProviderWrapper.toEntity(
-                    response=confirmed))}
+                    response=sign_up_user))}
 
     except Exception:
         logger.error(traceback.format_exc())
