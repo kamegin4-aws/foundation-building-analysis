@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 
 const allowedOrigins = [
-  `https://${process.env.NEXT_PUBLIC_HOST_DOMAIN}`,
-  `http://${process.env.NEXT_PUBLIC_APP_DOMAIN}:8080`,
+  `https://${process.env.HOST_DOMAIN}`,
+  `http://${process.env.APP_DOMAIN}:8080`,
 ];
 
 const corsOptions = {

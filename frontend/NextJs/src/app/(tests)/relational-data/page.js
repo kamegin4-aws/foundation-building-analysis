@@ -12,15 +12,14 @@ import {
 import React, { useEffect, useState } from 'react';
 
 export default function RelationalDataPage() {
-  const [user, setUser] = useState(undefined);
+  const [session, setSession] = useState(undefined);
 
   const createOnClick = async (event) => {
     event.preventDefault();
     logger.info(event.detail);
     try {
-      if (user) {
+      if (session) {
         logger.info('Start create');
-        const expiresDate = new Date(user.expires);
 
         const url = `${process.env.NEXT_PUBLIC_BACKEND_PATH}/foundation_app/cognito-users/`;
         const options = {
@@ -29,17 +28,13 @@ export default function RelationalDataPage() {
           mode: 'cors',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${user.id_token}`,
+            Authorization: `Bearer ${session.user.idToken}`,
           },
           body: JSON.stringify({
-            user_id: user.user_id,
-            user_name: user.user_name,
-            email: user.email,
-            plan: user.plan,
-            access_token: user.access_token,
-            id_token: user.id_token,
-            refresh_token: user.refresh_token,
-            expires: expiresDate.toISOString(),
+            user_id: session.user.id,
+            user_name: session.user.name,
+            email: session.user.email,
+            plan: session.user.plan,
           }),
         };
 
@@ -62,19 +57,14 @@ export default function RelationalDataPage() {
   };
 
   useEffect(() => {
-    const url = `${process.env.NEXT_PUBLIC_BASE_PATH}/api/user/sign-in`;
+    const url = `${process.env.NEXT_PUBLIC_BASE_PATH}/api/session`;
     const options = {
-      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      method: 'GET', // *GET, POST, PUT, DELETE, etc.
       cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
       mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
-        'X-Api-Key': process.env.NEXT_PUBLIC_USER_API_KEY,
       },
-      body: JSON.stringify({
-        user_name: process.env.NEXT_PUBLIC_USER_NAME,
-        password: process.env.NEXT_PUBLIC_PASSWORD,
-      }),
     };
 
     // @ts-ignore
@@ -84,25 +74,25 @@ export default function RelationalDataPage() {
           response
             .json()
             .then((data) => {
-              logger.info(`success for login: ${JSON.stringify(data)}`);
-              setUser(data);
+              logger.info(`success for session: ${JSON.stringify(data)}`);
+              setSession(data);
             })
             .catch((error) => {
-              logger.error(`error for login: ${error.message}`);
+              logger.error(`error for session: ${error.message}`);
             });
         } else {
           throw new Error('Network response was not ok.');
         }
       })
       .catch((error) => {
-        logger.error(`error for login: ${error.message}`);
+        logger.error(`error for session: ${error.message}`);
       });
   }, []);
 
-  if (user == undefined) {
+  if (session == undefined) {
     return (
       <div>
-        <p>AWS sign-in中...</p>
+        <p>セッション情報取得中...</p>
       </div>
     );
   }

@@ -24,8 +24,8 @@ const nextConfig = {
   experimental: {
     serverActions: {
       allowedOrigins: [
-        process.env.NEXT_PUBLIC_HOST_DOMAIN,
-        process.env.NEXT_PUBLIC_APP_DOMAIN,
+        `https://${process.env.HOST_DOMAIN}`,
+        `http://${process.env.APP_DOMAIN}:8080`,
       ],
     },
   },
@@ -33,7 +33,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN,
+        hostname: process.env.CLOUDFRONT_DOMAIN,
       },
     ],
   },

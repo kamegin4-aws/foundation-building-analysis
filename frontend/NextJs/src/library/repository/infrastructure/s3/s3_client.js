@@ -19,7 +19,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 export class S3Wrapper extends IRepositoryInstance {
   #s3Client;
-  #cognitoId = process.env.NEXT_PUBLIC_COGNITO_ID;
+  #cognitoId = process.env.COGNITO_ID;
   #loginData = {
     [this.#cognitoId]: '',
   };
@@ -29,10 +29,10 @@ export class S3Wrapper extends IRepositoryInstance {
     this.#loginData[this.#cognitoId] = idToken;
 
     this.#s3Client = new S3Client({
-      region: process.env.NEXT_PUBLIC_REGION,
+      region: process.env.REGION,
       credentials: fromCognitoIdentityPool({
-        clientConfig: { region: process.env.NEXT_PUBLIC_REGION }, // Configure the underlying CognitoIdentityClient.
-        identityPoolId: process.env.NEXT_PUBLIC_IDENTITY_POOL_ID,
+        clientConfig: { region: process.env.REGION }, // Configure the underlying CognitoIdentityClient.
+        identityPoolId: process.env.IDENTITY_POOL_ID,
         logins: this.#loginData,
       }),
     });
@@ -42,7 +42,7 @@ export class S3Wrapper extends IRepositoryInstance {
     try {
       const input = {
         Body: body,
-        Bucket: process.env.NEXT_PUBLIC_BUCKET,
+        Bucket: process.env.BUCKET,
         Key: key,
         ServerSideEncryption: 'AES256',
         Tagging: tagging,
@@ -66,7 +66,7 @@ export class S3Wrapper extends IRepositoryInstance {
   async createMultipartObject({ key, tagging = undefined }) {
     try {
       const input = {
-        Bucket: process.env.NEXT_PUBLIC_BUCKET,
+        Bucket: process.env.BUCKET,
         Key: key,
         Tagging: tagging,
       };
@@ -89,7 +89,7 @@ export class S3Wrapper extends IRepositoryInstance {
     try {
       const input = {
         Body: body,
-        Bucket: process.env.NEXT_PUBLIC_BUCKET,
+        Bucket: process.env.BUCKET,
         Key: key,
         UploadId: uploadId,
         PartNumber: partNumber,
@@ -112,7 +112,7 @@ export class S3Wrapper extends IRepositoryInstance {
   async multipartUploadObject({ key, uploadId, parts }) {
     try {
       const input = {
-        Bucket: process.env.NEXT_PUBLIC_BUCKET,
+        Bucket: process.env.BUCKET,
         Key: key,
         MultipartUpload: parts,
         UploadId: uploadId,
@@ -140,7 +140,7 @@ export class S3Wrapper extends IRepositoryInstance {
   }) {
     try {
       const input = {
-        Bucket: process.env.NEXT_PUBLIC_BUCKET,
+        Bucket: process.env.BUCKET,
         Prefix: prefix,
         MaxKeys: maxKeys,
         StartAfter: startAfter,
@@ -169,7 +169,7 @@ export class S3Wrapper extends IRepositoryInstance {
   }) {
     try {
       const input = {
-        Bucket: process.env.NEXT_PUBLIC_BUCKET,
+        Bucket: process.env.BUCKET,
         Prefix: prefix,
         MaxKeys: maxKeys,
         KeyMarker: keyMarker,
@@ -193,7 +193,7 @@ export class S3Wrapper extends IRepositoryInstance {
     try {
       const input = {
         // GetObjectAttributesRequest
-        Bucket: process.env.NEXT_PUBLIC_BUCKET,
+        Bucket: process.env.BUCKET,
         Key: key, // required
         VersionId: versionId,
         ObjectAttributes: [
@@ -224,7 +224,7 @@ export class S3Wrapper extends IRepositoryInstance {
   async downloadObject({ key, range = 'bytes=0-9', versionId = undefined }) {
     try {
       const input = {
-        Bucket: process.env.NEXT_PUBLIC_BUCKET,
+        Bucket: process.env.BUCKET,
         Key: key,
         Range: range,
         VersionId: versionId,
@@ -246,7 +246,7 @@ export class S3Wrapper extends IRepositoryInstance {
   async signedURL({ key, versionId = undefined, range = undefined }) {
     try {
       const input = {
-        Bucket: process.env.NEXT_PUBLIC_BUCKET,
+        Bucket: process.env.BUCKET,
         Key: key,
         VersionId: versionId,
         Range: range,
@@ -270,7 +270,7 @@ export class S3Wrapper extends IRepositoryInstance {
   async deleteObject({ key, versionId = undefined }) {
     try {
       const input = {
-        Bucket: process.env.NEXT_PUBLIC_BUCKET,
+        Bucket: process.env.BUCKET,
         Key: key,
         VersionId: versionId,
       };
@@ -291,7 +291,7 @@ export class S3Wrapper extends IRepositoryInstance {
   async objectTagDetail({ key, versionId = undefined }) {
     try {
       const input = {
-        Bucket: process.env.NEXT_PUBLIC_BUCKET,
+        Bucket: process.env.BUCKET,
         Key: key,
         VersionId: versionId,
       };
@@ -312,7 +312,7 @@ export class S3Wrapper extends IRepositoryInstance {
   async objectTagUpdate({ key, tagSet, versionId = undefined }) {
     try {
       const input = {
-        Bucket: process.env.NEXT_PUBLIC_BUCKET,
+        Bucket: process.env.BUCKET,
         Key: key,
         VersionId: versionId,
         Tagging: {

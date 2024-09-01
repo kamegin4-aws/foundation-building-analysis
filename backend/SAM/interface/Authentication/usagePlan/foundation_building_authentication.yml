@@ -13,8 +13,6 @@ Resources:
       ApiStages:
         - ApiId: !ImportValue userAPIId
           Stage: free
-        - ApiId: !ImportValue userAuthorizedAPIId
-          Stage: free
   UserAPIFreeApiKey:
     Type: AWS::ApiGateway::ApiKey
     Properties:
@@ -40,8 +38,6 @@ Resources:
         RateLimit: !Ref rateLimitUserAPIPaidUsagePlan
       ApiStages:
         - ApiId: !ImportValue userAPIId
-          Stage: paid
-        - ApiId: !ImportValue userAuthorizedAPIId
           Stage: paid
   UserAPIPaidApiKey:
     Type: AWS::ApiGateway::ApiKey

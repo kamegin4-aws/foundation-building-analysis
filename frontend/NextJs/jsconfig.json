@@ -13,5 +13,5 @@
     "target": "ES6",
   },
   "exclude": ["node_modules", "**/node_modules/*"],
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "../../temp/cookies", "../../temp/common", "../../temp/authentication", "../../temp/api", "../../temp/validation"]
 }

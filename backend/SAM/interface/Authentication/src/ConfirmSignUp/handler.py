@@ -36,16 +36,15 @@ def handler(event, context):
         user_name = body['user_name']
         code = body['code']
 
-        confirmed_signup = cognitoIdentityProviderWrapper.confirm_sign_up(
+        cognitoIdentityProviderWrapper.confirm_sign_up(
             user_name=user_name, confirmation_code=code)
 
         return {
-            'statusCode': 200,
+            'statusCode': 204,
             'headers': {
                 'Access-Control-Allow-Headers': '*',
                 'Access-Control-Allow-Origin': os.environ['AllOW_ORIGIN'],
-                'Access-Control-Allow-Methods': '*'},
-            'body': json.dumps(confirmed_signup)}
+                'Access-Control-Allow-Methods': '*'}}
 
     except Exception:
         logger.error(traceback.format_exc())
@@ -107,9 +106,9 @@ class CognitoIdentityProviderWrapper:
             user_name (str): ユーザー名
             confirmation_code (str): 確認コード
 
-
         Returns:
             bool: True
+
         """
         try:
             kwargs = {

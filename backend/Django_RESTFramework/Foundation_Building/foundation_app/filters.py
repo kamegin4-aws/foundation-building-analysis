@@ -3,6 +3,11 @@ from foundation_app.models import RelationalData, User
 
 
 class RelationalDataFilter(django_filters.FilterSet):
+    created_at_range = django_filters.DateFromToRangeFilter(
+        field_name='created_at')
+    updated_at_range = django_filters.DateFromToRangeFilter(
+        field_name='updated_at')
+
     class Meta:
         model = RelationalData
         fields = {
@@ -13,15 +18,16 @@ class RelationalDataFilter(django_filters.FilterSet):
             'version_id': ['exact'],
             'key': ['icontains'],
             'value': ['icontains'],
-            # 年月日フィルタを追加
-            'created_at': ['year__gt', 'year__lt', 'year', 'month', 'day'],
-            # 年月日フィルタを追加
-            'updated_at': ['year__gt', 'year__lt', 'year', 'month', 'day'],
             'user': ['exact'],
         }
 
 
 class UserFilter(django_filters.FilterSet):
+    created_at_range = django_filters.DateFromToRangeFilter(
+        field_name='created_at')
+    updated_at_range = django_filters.DateFromToRangeFilter(
+        field_name='updated_at')
+
     class Meta:
         model = User
         fields = {
@@ -29,7 +35,4 @@ class UserFilter(django_filters.FilterSet):
             'user_name': ['icontains'],
             'email': ['icontains'],
             'plan': ['icontains'],
-            'expires': ['year__gt', 'year__lt', 'year', 'month', 'day'],
-            'created_at': ['year__gt', 'year__lt', 'year', 'month', 'day'],
-            'updated_at': ['year__gt', 'year__lt', 'year', 'month', 'day'],
         }

@@ -40,10 +40,6 @@ def handler(event, context):
         sign_in = aws_srp_wrapper.sign_in(
             username=user_name, password=password)
 
-        access_token = sign_in['AuthenticationResult']['AccessToken']
-
-        user = aws_srp_wrapper.get_user(access_token=access_token)
-
         return {
             'statusCode': 200,
             'headers': {
@@ -53,7 +49,7 @@ def handler(event, context):
             'body': json.dumps(
                 aws_srp_wrapper.toEntity(
                     tokens=sign_in['AuthenticationResult'],
-                    user_attributes=user))}
+                    user_name=user_name))}
 
     except Exception:
         logger.error(traceback.format_exc())
@@ -120,53 +116,19 @@ class AWSSRPWrapper:
             raise RuntimeError(
                 'cognito server error: {}'.format(traceback.format_exc()))
 
-    def get_user(self, *, access_token):
-        """ユーザー情報の取得
-
-        Args:
-            access_token (str): アクセストークン
-
-        Returns:
-            dict: cognito-idpのレスポンス
-        """
-        try:
-            kwargs = {
-                'AccessToken': access_token,
-            }
-            response = self.client.get_user(
-                **kwargs)
-            logger.info(f'get_user: {response}')
-
-            return response
-
-        except Exception as err:
-            raise RuntimeError(
-                "cognito server error: {}".format(
-                    traceback.format_exc())) from err
-
-    def toEntity(self, *, tokens, user_attributes):
+    def toEntity(self, *, tokens, user_name):
         """_summary_
         エンティティに変換する
         Args:
             tokens (dict): AWSSRPのレスポンス
-            user_attributes (dict) cognito-idpのレスポンス
+            user_name (str): ユーザー名
 
         Returns:
             dict: Userンティティ
         """
         entity = {}
-        entity['user_name'] = user_attributes['Username']
-        for attribute in user_attributes['UserAttributes']:
-            if attribute['Name'] == 'sub':
-                entity['user_id'] = attribute['Value']
-                continue
 
-            if ':' in attribute['Name']:
-                entity[attribute['Name'].split(
-                    ':')[1]] = attribute['Value']
-                continue
-            entity[attribute['Name']] = attribute['Value']
-
+        entity['user_name'] = user_name
         entity['access_token'] = tokens['AccessToken']
         entity['refresh_token'] = tokens['RefreshToken']
         entity['id_token'] = tokens['IdToken']

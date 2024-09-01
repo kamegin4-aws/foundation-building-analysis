@@ -4,7 +4,6 @@ import os
 import re
 import traceback
 from datetime import datetime, timedelta
-from enum import Enum
 
 import boto3
 import pytz
@@ -15,10 +14,6 @@ from cryptography.hazmat.primitives.asymmetric import padding
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-
-
-class ServiceName(Enum):
-    ObjectData = 0
 
 
 def handler(event, context):
@@ -57,9 +52,7 @@ def handler(event, context):
             },
             'body': json.dumps(
                 cloudFrontWrapper.toEntity(
-                    response=signed_url,
-                    service_name=ServiceName.ObjectData.name,
-                    key=s3_path
+                    response=signed_url
                 )
             )
         }
@@ -109,24 +102,6 @@ def rsa_signer_factory(parameter):
     return rsa_signer
 
 
-def parse_string(key, service_name):
-    if service_name == ServiceName.ObjectData.name:
-        regex = r'^userId=([^\/]+)\/metaKey=([^\/]+)\/metaValue=([^\/]+)\/mimeType=([^\/]+)\/(.*)$'
-        match = re.match(regex, key)
-        if match:
-            return {
-                'user_id': match.group(1),
-                'meta_key': match.group(2),
-                'meta_value': match.group(3),
-                'mime_type': match.group(4),
-                'file_name': match.group(5),
-            }
-        else:
-            return {}
-    else:
-        return {}
-
-
 class CloudFrontWrapper:
     def __init__(self, *, key_id, parameter, distribution_domain):
         self.cloud_front_signer = CloudFrontSigner(
@@ -156,15 +131,8 @@ class CloudFrontWrapper:
                 'CloudFront server error: {}'.format(traceback.format_exc())
             ) from err
 
-    def toEntity(self, *, response, service_name, key=None):
+    def toEntity(self, *, response):
         entity = {}
-        parsedKey = parse_string(key=key, service_name=service_name)
-        if parsedKey:
-            entity['meta_key'] = parsedKey['meta_key']
-            entity['meta_value'] = parsedKey['meta_value']
-            entity['mime_type'] = parsedKey['mime_type']
-            entity['file_name'] = parsedKey['file_name']
-            entity['user_id'] = parsedKey['user_id']
 
         entity['signed_uri'] = response
         return entity
