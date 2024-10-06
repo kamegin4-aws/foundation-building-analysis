@@ -29,9 +29,9 @@ Resources:
       Name: !Sub
         - ${ResourceName} From Stack ${AWS::StackName}
         - ResourceName: UserAPI
-      StageName: paid
+      StageName: prod
       Variables:
-        alias: paid
+        alias: prod
       OpenApiVersion: 3.1.0
       DefinitionBody:
         openapi: '3.0'
@@ -86,7 +86,7 @@ Resources:
       Auth:
         ApiKeyRequired: true
       Cors:
-        AllowOrigin: !Sub '''${allowOrigin}'''
+        AllowOrigin: '''${allowOrigin}'''
         AllowHeaders: '''*'''
         AllowMethods: '''*'''
         MaxAge: 600
@@ -121,17 +121,21 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${SignUp}
       RetentionInDays: 7
-  SignUpForFreeInvokePermission:
+  SignUpForDevInvokePermission:
     Type: AWS::Lambda::Permission
+    DependsOn:
+      - SignUpDevAlias
     Properties:
-      FunctionName: !Sub ${SignUp.Arn}:free
+      FunctionName: !Sub ${SignUp.Arn}:dev
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/POST/cognito/signup
-  SignUpForPaidInvokePermission:
+  SignUpForProdInvokePermission:
     Type: AWS::Lambda::Permission
+    DependsOn:
+      - SignUpProdAlias
     Properties:
-      FunctionName: !Sub ${SignUp.Arn}:paid
+      FunctionName: !Sub ${SignUp.Arn}:prod
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/POST/cognito/signup
@@ -166,17 +170,21 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${ConfirmSignUp}
       RetentionInDays: 7
-  ConfirmSignUpForFreeInvokePermission:
+  ConfirmSignUpForDevInvokePermission:
     Type: AWS::Lambda::Permission
+    DependsOn:
+      - ConfirmSignUpDevAlias
     Properties:
-      FunctionName: !Sub ${ConfirmSignUp.Arn}:free
+      FunctionName: !Sub ${ConfirmSignUp.Arn}:dev
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/POST/cognito/signup/confirm
-  ConfirmSignUpForPaidInvokePermission:
+  ConfirmSignUpForProdInvokePermission:
     Type: AWS::Lambda::Permission
+    DependsOn:
+      - ConfirmSignUpProdAlias
     Properties:
-      FunctionName: !Sub ${ConfirmSignUp.Arn}:paid
+      FunctionName: !Sub ${ConfirmSignUp.Arn}:prod
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/POST/cognito/signup/confirm
@@ -211,17 +219,21 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${GetUser}
       RetentionInDays: 7
-  GetUserForFreeInvokePermission:
+  GetUserForDevInvokePermission:
     Type: AWS::Lambda::Permission
+    DependsOn:
+      - GetUserDevAlias
     Properties:
-      FunctionName: !Sub ${GetUser.Arn}:free
+      FunctionName: !Sub ${GetUser.Arn}:dev
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAuthorizedAPI}/*/POST/cognito/user/detail
-  GetUserForPaidInvokePermission:
+  GetUserForProdInvokePermission:
     Type: AWS::Lambda::Permission
+    DependsOn:
+      - GetUserProdAlias
     Properties:
-      FunctionName: !Sub ${GetUser.Arn}:paid
+      FunctionName: !Sub ${GetUser.Arn}:prod
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAuthorizedAPI}/*/POST/cognito/user/detail
@@ -236,9 +248,9 @@ Resources:
       Name: !Sub
         - ${ResourceName} From Stack ${AWS::StackName}
         - ResourceName: UserAuthorizedAPI
-      StageName: paid
+      StageName: prod
       Variables:
-        alias: paid
+        alias: prod
       OpenApiVersion: 3.1.0
       DefinitionBody:
         openapi: '3.0'
@@ -265,6 +277,13 @@ Resources:
                 type: aws_proxy
                 uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${VerifyAttribute.Arn}:${!stageVariables.alias}/invocations
               responses: {}
+          /cognito/user/remove:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteUser.Arn}:${!stageVariables.alias}/invocations
+              responses: {}
       EndpointConfiguration: REGIONAL
       TracingEnabled: true
       AccessLogSetting:
@@ -281,95 +300,95 @@ Resources:
             UserPoolArn: !ImportValue userPoolArn
         DefaultAuthorizer: Cognito
       Cors:
-        AllowOrigin: !Sub '''${allowOrigin}'''
+        AllowOrigin: '''${allowOrigin}'''
         AllowHeaders: '''*'''
         AllowMethods: '''*'''
         MaxAge: 600
-  SignInFixVersion:
+  SignInVersion:
     Type: AWS::Lambda::Version
     Properties:
       FunctionName: !Ref SignIn
-      Description: v1.2
-  SignUpFixVersion:
+      Description: v1.0
+  SignUpVersion:
     Type: AWS::Lambda::Version
     Properties:
       FunctionName: !Ref SignUp
-      Description: v1.2
-  ConfirmSignUpFixVersion:
+      Description: v1.0
+  ConfirmSignUpVersion:
     Type: AWS::Lambda::Version
     Properties:
       FunctionName: !Ref ConfirmSignUp
-      Description: v1.2
-  SignOutFixVersion:
+      Description: v1.0
+  SignOutVersion:
     Type: AWS::Lambda::Version
     Properties:
       FunctionName: !Ref SignOut
-      Description: v1.2
-  GetUserFixVersion:
+      Description: v1.0
+  GetUserVersion:
     Type: AWS::Lambda::Version
     Properties:
       FunctionName: !Ref GetUser
-      Description: v1.2
-  SignInFreeAlias:
-    Type: AWS::Lambda::Alias
-    Properties:
-      FunctionName: !Ref SignIn
-      FunctionVersion: !GetAtt SignInFixVersion.Version
-      Name: free
-  SignInPaidAlias:
+      Description: v1.0
+  SignInDevAlias:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref SignIn
       FunctionVersion: $LATEST
-      Name: paid
-  SignUpFreeAlias:
+      Name: dev
+  SignInProdAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref SignIn
+      FunctionVersion: !GetAtt SignInVersion.Version
+      Name: prod
+  SignUpDevAlias:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref SignUp
-      FunctionVersion: !GetAtt SignUpFixVersion.Version
-      Name: free
-  SignUpPaidAlias:
+      FunctionVersion: $LATEST
+      Name: dev
+  SignUpProdAlias:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref SignUp
-      FunctionVersion: $LATEST
-      Name: paid
-  ConfirmSignUpFreeAlias:
-    Type: AWS::Lambda::Alias
-    Properties:
-      FunctionName: !Ref ConfirmSignUp
-      FunctionVersion: !GetAtt ConfirmSignUpFixVersion.Version
-      Name: free
-  ConfirmSignUpPaidAlias:
+      FunctionVersion: !GetAtt SignUpVersion.Version
+      Name: prod
+  ConfirmSignUpDevAlias:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref ConfirmSignUp
       FunctionVersion: $LATEST
-      Name: paid
-  SignOutFreeAlias:
+      Name: dev
+  ConfirmSignUpProdAlias:
     Type: AWS::Lambda::Alias
     Properties:
-      FunctionName: !Ref SignOut
-      FunctionVersion: !GetAtt SignOutFixVersion.Version
-      Name: free
-  SignOutPaidAlias:
+      FunctionName: !Ref ConfirmSignUp
+      FunctionVersion: !GetAtt ConfirmSignUpVersion.Version
+      Name: prod
+  SignOutDevAlias:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref SignOut
       FunctionVersion: $LATEST
-      Name: paid
-  GetUserFreeAlias:
+      Name: dev
+  SignOutProdAlias:
     Type: AWS::Lambda::Alias
     Properties:
-      FunctionName: !Ref GetUser
-      FunctionVersion: !GetAtt GetUserFixVersion.Version
-      Name: free
-  GetUserPaidAlias:
+      FunctionName: !Ref SignOut
+      FunctionVersion: !GetAtt SignOutVersion.Version
+      Name: prod
+  GetUserDevAlias:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref GetUser
       FunctionVersion: $LATEST
-      Name: paid
+      Name: dev
+  GetUserProdAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref GetUser
+      FunctionVersion: !GetAtt GetUserVersion.Version
+      Name: prod
   UserAPIDeployment:
     Type: AWS::ApiGateway::Deployment
     Properties:
@@ -380,15 +399,15 @@ Resources:
     Properties:
       RestApiId: !Ref UserAuthorizedAPI
       Description: UserAuthorizedAPI deployment
-  UserAPIFreeStage:
+  UserAPIDevStage:
     Type: AWS::ApiGateway::Stage
     Properties:
       RestApiId: !Ref UserAPI
-      StageName: free
-      Description: Free stage
+      StageName: dev
+      Description: dev stage
       DeploymentId: !GetAtt UserAPIDeployment.DeploymentId
       Variables:
-        alias: free
+        alias: dev
       AccessLogSetting:
         DestinationArn: !GetAtt UserAPILogsGroup.Arn
         Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp",
@@ -402,15 +421,15 @@ Resources:
           HttpMethod: '*'
           DataTraceEnabled: true
           LoggingLevel: INFO
-  UserAuthorizedAPIFreeStage:
+  UserAuthorizedAPIDevStage:
     Type: AWS::ApiGateway::Stage
     Properties:
       RestApiId: !Ref UserAuthorizedAPI
-      StageName: free
-      Description: Free stage
+      StageName: dev
+      Description: dev stage
       DeploymentId: !GetAtt UserAuthorizedAPIDeployment.DeploymentId
       Variables:
-        alias: free
+        alias: dev
       AccessLogSetting:
         DestinationArn: !GetAtt UserAuthorizedAPILogsGroup.Arn
         Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp",
@@ -454,71 +473,75 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${TokenRefresh}
       RetentionInDays: 7
-  TokenRefreshForFreeInvokePermission:
+  TokenRefreshForDevInvokePermission:
     Type: AWS::Lambda::Permission
+    DependsOn:
+      - TokenRefreshDevAlias
     Properties:
-      FunctionName: !Sub ${TokenRefresh.Arn}:free
+      FunctionName: !Sub ${TokenRefresh.Arn}:dev
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/POST/cognito/token/refresh
-  TokenRefreshForPaidInvokePermission:
+  TokenRefreshForProdInvokePermission:
     Type: AWS::Lambda::Permission
+    DependsOn:
+      - TokenRefreshProdAlias
     Properties:
-      FunctionName: !Sub ${TokenRefresh.Arn}:paid
+      FunctionName: !Sub ${TokenRefresh.Arn}:prod
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/POST/cognito/token/refresh
-  TokenRefreshFixVersion:
+  TokenRefreshVersion:
     Type: AWS::Lambda::Version
     Properties:
       FunctionName: !Ref TokenRefresh
-      Description: v1.2
-  TokenRefreshFreeAlias:
-    Type: AWS::Lambda::Alias
-    Properties:
-      FunctionName: !Ref TokenRefresh
-      FunctionVersion: !GetAtt TokenRefreshFixVersion.Version
-      Name: free
-  TokenRefreshPaidAlias:
+      Description: v1.0
+  TokenRefreshDevAlias:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref TokenRefresh
       FunctionVersion: $LATEST
-      Name: paid
-  UpdateAttributesFixVersion:
+      Name: dev
+  TokenRefreshProdAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref TokenRefresh
+      FunctionVersion: !GetAtt TokenRefreshVersion.Version
+      Name: prod
+  UpdateAttributesVersion:
     Type: AWS::Lambda::Version
     Properties:
       FunctionName: !Ref UpdateAttributes
       Description: v1.0
-  UpdateAttributesFreeAlias:
+  UpdateAttributesDevAlias:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref UpdateAttributes
-      FunctionVersion: !GetAtt UpdateAttributesFixVersion.Version
-      Name: free
-  UpdateAttributesPaidAlias:
+      FunctionVersion: !GetAtt UpdateAttributesVersion.Version
+      Name: dev
+  UpdateAttributesProdAlias:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref UpdateAttributes
-      FunctionVersion: $LATEST
-      Name: paid
-  VerifyAttributeFixVersion:
+      FunctionVersion: !GetAtt UpdateAttributesVersion.Version
+      Name: prod
+  VerifyAttributeVersion:
     Type: AWS::Lambda::Version
     Properties:
       FunctionName: !Ref VerifyAttribute
       Description: v1.0
-  VerifyAttributeFreeAlias:
+  VerifyAttributeDevAlias:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref VerifyAttribute
-      FunctionVersion: !GetAtt VerifyAttributeFixVersion.Version
-      Name: free
-  VerifyAttributePaidAlias:
+      FunctionVersion: !GetAtt VerifyAttributeVersion.Version
+      Name: dev
+  VerifyAttributeProdAlias:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref VerifyAttribute
-      FunctionVersion: $LATEST
-      Name: paid
+      FunctionVersion: !GetAtt VerifyAttributeVersion.Version
+      Name: prod
   SignIn:
     Type: AWS::Serverless::Function
     Properties:
@@ -550,17 +573,21 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${SignIn}
       RetentionInDays: 7
-  SignInForFreeInvokePermission:
+  SignInForDevInvokePermission:
     Type: AWS::Lambda::Permission
+    DependsOn:
+      - SignInDevAlias
     Properties:
-      FunctionName: !Sub ${SignIn.Arn}:free
+      FunctionName: !Sub ${SignIn.Arn}:dev
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/POST/cognito/sign-in
-  SignInForPaidInvokePermission:
+  SignInForProdInvokePermission:
     Type: AWS::Lambda::Permission
+    DependsOn:
+      - SignInProdAlias
     Properties:
-      FunctionName: !Sub ${SignIn.Arn}:paid
+      FunctionName: !Sub ${SignIn.Arn}:prod
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/POST/cognito/sign-in
@@ -595,17 +622,21 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${SignOut}
       RetentionInDays: 7
-  SignOutForFreeInvokePermission:
+  SignOutForDevInvokePermission:
     Type: AWS::Lambda::Permission
+    DependsOn:
+      - SignOutDevAlias
     Properties:
-      FunctionName: !Sub ${SignOut.Arn}:free
+      FunctionName: !Sub ${SignOut.Arn}:dev
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/POST/cognito/sign-out
-  SignOutForPaidInvokePermission:
+  SignOutForProdInvokePermission:
     Type: AWS::Lambda::Permission
+    DependsOn:
+      - SignOutProdAlias
     Properties:
-      FunctionName: !Sub ${SignOut.Arn}:paid
+      FunctionName: !Sub ${SignOut.Arn}:prod
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/POST/cognito/sign-out
@@ -640,17 +671,21 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${UpdateAttributes}
       RetentionInDays: 7
-  UpdateAttributesForFreeInvokePermission:
+  UpdateAttributesForDevInvokePermission:
     Type: AWS::Lambda::Permission
+    DependsOn:
+      - UpdateAttributesDevAlias
     Properties:
-      FunctionName: !Sub ${UpdateAttributes.Arn}:free
+      FunctionName: !Sub ${UpdateAttributes.Arn}:dev
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAuthorizedAPI}/*/POST/cognito/user/attributes/edit
-  UpdateAttributesForPaidInvokePermission:
+  UpdateAttributesForProdInvokePermission:
     Type: AWS::Lambda::Permission
+    DependsOn:
+      - UpdateAttributesProdAlias
     Properties:
-      FunctionName: !Sub ${UpdateAttributes.Arn}:paid
+      FunctionName: !Sub ${UpdateAttributes.Arn}:prod
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAuthorizedAPI}/*/POST/cognito/user/attributes/edit
@@ -685,20 +720,90 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/${VerifyAttribute}
       RetentionInDays: 7
-  VerifyAttributeForFreeInvokePermission:
+  VerifyAttributeForDevInvokePermission:
     Type: AWS::Lambda::Permission
+    DependsOn:
+      - VerifyAttributeDevAlias
     Properties:
-      FunctionName: !Sub ${VerifyAttribute.Arn}:free
+      FunctionName: !Sub ${VerifyAttribute.Arn}:dev
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAuthorizedAPI}/*/POST/cognito/user/attributes/verify
-  VerifyAttributeForPaidInvokePermission:
+  VerifyAttributeForProdInvokePermission:
     Type: AWS::Lambda::Permission
+    DependsOn:
+      - VerifyAttributeProdAlias
     Properties:
-      FunctionName: !Sub ${VerifyAttribute.Arn}:paid
+      FunctionName: !Sub ${VerifyAttribute.Arn}:prod
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAuthorizedAPI}/*/POST/cognito/user/attributes/verify
+  DeleteUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: !Sub
+        - Stack ${AWS::StackName} Function ${ResourceName}
+        - ResourceName: DeleteUser
+      CodeUri: src/DeleteUser
+      Handler: handler.handler
+      Runtime: python3.12
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Role: !GetAtt LambdaCognitoRole.Arn
+      Events:
+        UserAuthorizedAPIPOSTcognitouserremove:
+          Type: Api
+          Properties:
+            Path: /cognito/user/remove
+            Method: POST
+            RestApiId: !Ref UserAuthorizedAPI
+      Environment:
+        Variables:
+          USER_POOL_ID: !ImportValue userPoolId
+          CLIENT_ID: !ImportValue userPoolClientId
+          CLIENT_SECRET: !Ref clientSecret
+          AllOW_ORIGIN: !Ref allowOrigin
+  DeleteUserLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${DeleteUser}
+      RetentionInDays: 7
+  DeleteUserDevInvokePermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - DeleteUserDevAlias
+    Properties:
+      FunctionName: !Sub ${DeleteUser.Arn}:dev
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAuthorizedAPI}/*/POST/cognito/user/remove
+  DeleteUserProdInvokePermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - DeleteUserProdAlias
+    Properties:
+      FunctionName: !Sub ${DeleteUser.Arn}:prod
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAuthorizedAPI}/*/POST/cognito/user/remove
+  DeleteUserVersion:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref DeleteUser
+      Description: v1.0
+  DeleteUserDevAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref DeleteUser
+      FunctionVersion: $LATEST
+      Name: dev
+  DeleteUserProdAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref DeleteUser
+      FunctionVersion: !GetAtt DeleteUserVersion.Version
+      Name: prod
 Transform: AWS::Serverless-2016-10-31
 Parameters:
   clientSecret:
@@ -708,7 +813,8 @@ Parameters:
   allowOrigin:
     Type: String
     Description: allowOrigin
-    Default: https://foundation-building.XXXX.com, http://foundation-building-infra-inlb-XXXX.elb.ap-northeast-1.amazonaws.com
+    Default: https://foundation-building.XXXX.com,
+      http://foundation-building-infra-inlb-XXXX.elb.ap-northeast-1.amazonaws.com
 Outputs:
   UserAPIId:
     Value: !Ref UserAPI

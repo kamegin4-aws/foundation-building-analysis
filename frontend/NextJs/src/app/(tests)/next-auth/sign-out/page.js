@@ -2,12 +2,14 @@
 
 'use client';
 
-import logger from '@/library/logging/logger';
 import { signOut } from 'next-auth/react';
+
 import React, { useEffect, useState } from 'react';
 
 export default function SignOutPage() {
   const [session, setSession] = useState(undefined);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const url = `${process.env.NEXT_PUBLIC_BASE_PATH}/api/session`;
@@ -27,18 +29,17 @@ export default function SignOutPage() {
           response
             .json()
             .then((data) => {
-              logger.info(`success for session: ${JSON.stringify(data)}`);
               setSession(data);
             })
             .catch((error) => {
-              logger.error(`error for session: ${error.message}`);
+              setError(error.message);
             });
         } else {
           throw new Error('Network response was not ok.');
         }
       })
       .catch((error) => {
-        logger.error(`error for session: ${error.message}`);
+        setError(error.message);
       });
   }, []);
 
@@ -49,11 +50,6 @@ export default function SignOutPage() {
       </div>
     );
   }
-
-  const params = {
-    'access-token': session.user.accessToken,
-  };
-  const query = new URLSearchParams(params);
 
   return (
     <div>
@@ -75,17 +71,33 @@ export default function SignOutPage() {
 
           // @ts-ignore
           const response = await fetch(url, options);
-          logger.info(`sign-out: ${JSON.stringify(response)}`);
 
           if (response.ok) {
             signOut({
               redirect: false,
             });
           }
+
+          setResult({ message: 'サインアウトしました' });
         }}
       >
         Sign Out
       </button>
+
+      <section>
+        {result && (
+          <div>
+            <h2>Result:</h2>
+            <pre>{JSON.stringify(result, null, 2)}</pre>
+          </div>
+        )}
+        {error && (
+          <div>
+            <h2>Error:</h2>
+            <p>{error}</p>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

@@ -54,8 +54,8 @@ Resources:
             Action: '*'
             Principal: '*'
             Resource:
-              - !Join ['', ['arn:aws:s3:::', !Ref ObjectStorage]]
-              - !Join ['', ['arn:aws:s3:::', !Ref ObjectStorage, '/*']]
+              - !GetAtt ObjectStorage.Arn
+              - !Sub ${ObjectStorage.Arn}/*
             Condition:
               Bool:
                 aws:SecureTransport: 'false'
@@ -65,20 +65,20 @@ Resources:
               Service: cloudfront.amazonaws.com
             Action: s3:GetObject
             Resource:
-              - !Join ['', ['arn:aws:s3:::', !Ref ObjectStorage]]
-              - !Join ['', ['arn:aws:s3:::', !Ref ObjectStorage, '/*']]
+              - !GetAtt ObjectStorage.Arn
+              - !Sub ${ObjectStorage.Arn}/*
             Condition:
               StringEquals:
                 aws:ResourceAccount: !Ref AWS::AccountId
                 aws:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${distributionId}
-          - Sid: AllowGlueService
+          - Sid: AllowService
             Effect: Allow
             Principal:
               Service: glue.amazonaws.com
             Action: s3:*
             Resource:
-              - !Join ['', ['arn:aws:s3:::', !Ref ObjectStorage]]
-              - !Join ['', ['arn:aws:s3:::', !Ref ObjectStorage, '/*']]
+              - !GetAtt ObjectStorage.Arn
+              - !Sub ${ObjectStorage.Arn}/*
             Condition:
               StringEquals:
                 aws:ResourceAccount: !Ref AWS::AccountId
@@ -87,8 +87,8 @@ Resources:
             Principal: '*'
             Action: s3:*
             Resource:
-              - !Join ['', ['arn:aws:s3:::', !Ref ObjectStorage]]
-              - !Join ['', ['arn:aws:s3:::', !Ref ObjectStorage, '/*']]
+              - !GetAtt ObjectStorage.Arn
+              - !Sub ${ObjectStorage.Arn}/*
             Condition:
               StringEquals:
                 aws:SourceVpc: !ImportValue vpcId
@@ -123,14 +123,12 @@ Resources:
               Service: logging.s3.amazonaws.com
             Action:
               - s3:PutObject
-            Resource: !Join
-              - ''
-              - - 'arn:aws:s3:::'
-                - !Ref LoggingBucket
-                - /*
+            Resource:
+              - !GetAtt LoggingBucket.Arn
+              - !Sub ${LoggingBucket.Arn}/*
             Condition:
               ArnLike:
-                aws:SourceArn: !Join ['', ['arn:aws:s3:::', !Ref ObjectStorage]]
+                aws:SourceArn: !GetAtt ObjectStorage.Arn
               StringEquals:
                 aws:SourceAccount: !Ref AWS::AccountId
           - Sid: AllowCloudFront
@@ -139,11 +137,9 @@ Resources:
               Service: cloudfront.amazonaws.com
             Action:
               - s3:PutObject
-            Resource: !Join
-              - ''
-              - - 'arn:aws:s3:::'
-                - !Ref LoggingBucket
-                - /*
+            Resource:
+              - !GetAtt LoggingBucket.Arn
+              - !Sub ${LoggingBucket.Arn}/*
             Condition:
               ArnLike:
                 aws:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/*

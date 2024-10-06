@@ -1,14 +1,11 @@
-'use client';
-import { SessionProvider } from 'next-auth/react';
+import { NextAuthProvider } from '@/ui/components/provider/session';
+import { getServerSession } from 'next-auth';
 import React from 'react';
+import { authOptions } from '../api/auth/[...nextauth]/route';
 
-export default function TestLayout({ children, session }) {
-  return (
-    <SessionProvider
-      session={session}
-      basePath={`${process.env.NEXT_PUBLIC_BASE_PATH}/api/auth`}
-    >
-      {children}
-    </SessionProvider>
-  );
+export default async function TestLayout({ children }) {
+  // @ts-ignore
+  const session = await getServerSession(authOptions);
+
+  return <NextAuthProvider session={session}>{children}</NextAuthProvider>;
 }

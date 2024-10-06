@@ -272,7 +272,7 @@ export class IRepositoryInstance {
 
         return entity;
       });
-    } else return [{}];
+    } else return [];
   }
 
   toEntityForListVersions({ response, serviceName }) {
@@ -312,12 +312,12 @@ export class IRepositoryInstance {
 
         return entity;
       });
-    } else return [{}];
+    } else return [];
   }
 
   toEntityForDownload({ response }) {
     let entity = {};
-    entity.signedURL = response;
+    entity.preSignedURL = response;
   }
 
   toEntityForDetail({ responseAttributes, responseTagging, key, serviceName }) {

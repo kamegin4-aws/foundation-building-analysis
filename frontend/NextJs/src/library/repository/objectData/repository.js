@@ -58,7 +58,7 @@ export class ObjectData extends IRepository {
 
       const uploadId = createMultipartObject.UploadId;
 
-      // Multipart uploads require a minimum size of 5 MB per part.
+      // Multipart uploads require a minimum size of 500 MB per part.
       const partSize = 500 * 1024 * 1024;
       const parts = [];
 
@@ -110,7 +110,7 @@ export class ObjectData extends IRepository {
   async list({
     limit = 20,
     offset = 0,
-    orderBy = 'updatedAt',
+    orderBy = '-updatedAt',
     searchValue = undefined,
     userId = undefined,
     metaKey = undefined,
@@ -194,6 +194,11 @@ export class ObjectData extends IRepository {
       });
     }
 
+    //ファイルのみ抽出
+    filteredObjects = filteredObjects?.filter((obj) => {
+      return obj.Key?.split('/').pop()?.includes('.');
+    });
+
     if (filteredObjects) {
       //絞られた分だけ追加検索
       if (limit - filteredObjects.length) {
@@ -216,14 +221,14 @@ export class ObjectData extends IRepository {
         if (orderBy === 'updatedAt') {
           objects.sort((a, b) => {
             if (a.LastModified && b.LastModified) {
-              return -(
-                new Date(a.LastModified).getTime() -
-                new Date(b.LastModified).getTime()
+              return (
+                new Date(b.LastModified).getTime() -
+                new Date(a.LastModified).getTime()
               );
-            } else if (a.LastModified) {
-              return -1;
             } else if (b.LastModified) {
               return 1;
+            } else if (a.LastModified) {
+              return -1;
             } else {
               return 0;
             }
@@ -231,11 +236,11 @@ export class ObjectData extends IRepository {
         } else if (orderBy === 'key') {
           objects.sort((a, b) => {
             if (a.Key && b.Key) {
-              return -a.Key.localeCompare(b.Key);
-            } else if (a.Key) {
-              return -1;
+              return b.Key.localeCompare(a.Key);
             } else if (b.Key) {
               return 1;
+            } else if (a.Key) {
+              return -1;
             } else {
               return 0;
             }
@@ -319,7 +324,7 @@ export class ObjectData extends IRepository {
     metaValue,
     mimeType,
     fileName,
-    versionId,
+    versionId = undefined,
   }) {
     try {
       const key = `userId=${userId}/metaKey=${metaKey}/metaValue=${metaValue}/mimeType=${mimeType}/${fileName}`;
@@ -341,7 +346,14 @@ export class ObjectData extends IRepository {
     }
   }
 
-  async detail({ userId, metaKey, metaValue, mimeType, fileName, versionId }) {
+  async detail({
+    userId,
+    metaKey,
+    metaValue,
+    mimeType,
+    fileName,
+    versionId = undefined,
+  }) {
     try {
       const key = `userId=${userId}/metaKey=${metaKey}/metaValue=${metaValue}/mimeType=${mimeType}/${fileName}`;
 
@@ -377,8 +389,8 @@ export class ObjectData extends IRepository {
     metaValue,
     mimeType,
     fileName,
-    versionId,
     comment,
+    versionId = undefined,
   }) {
     try {
       const tagSet = [
@@ -408,7 +420,14 @@ export class ObjectData extends IRepository {
     }
   }
 
-  async delete({ userId, metaKey, metaValue, mimeType, fileName, versionId }) {
+  async delete({
+    userId,
+    metaKey,
+    metaValue,
+    mimeType,
+    fileName,
+    versionId = undefined,
+  }) {
     try {
       const deleteObject = await this.#repositoryInstance.deleteObject({
         key: `userId=${userId}/metaKey=${metaKey}/metaValue=${metaValue}/mimeType=${mimeType}/${fileName}`,

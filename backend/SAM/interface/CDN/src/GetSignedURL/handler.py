@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-import re
 import traceback
 from datetime import datetime, timedelta
 
@@ -134,5 +133,5 @@ class CloudFrontWrapper:
     def toEntity(self, *, response):
         entity = {}
 
-        entity['signed_uri'] = response
+        entity['presigned_uri'] = response
         return entity

@@ -1,10 +1,10 @@
 'use client';
 
-import logger from '@/library/logging/logger';
 import React, { useEffect, useState } from 'react';
 
 export default function SessionPage() {
-  const [session, setSession] = useState(undefined);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const url = `${process.env.NEXT_PUBLIC_BASE_PATH}/api/session`;
@@ -24,22 +24,21 @@ export default function SessionPage() {
           response
             .json()
             .then((data) => {
-              logger.info(`success for session: ${JSON.stringify(data)}`);
-              setSession(data);
+              setResult(data);
             })
             .catch((error) => {
-              logger.error(`error for session: ${error.message}`);
+              setError(error.message);
             });
         } else {
           throw new Error('Network response was not ok.');
         }
       })
       .catch((error) => {
-        logger.error(`error for session: ${error.message}`);
+        setError(error.message);
       });
   }, []);
 
-  if (session == undefined) {
+  if (result == undefined) {
     return (
       <div>
         <p>Session 情報取得中...</p>
@@ -48,8 +47,19 @@ export default function SessionPage() {
   }
 
   return (
-    <div>
-      <h1>Welcome, {session.user.name}</h1>
-    </div>
+    <section>
+      {result && (
+        <div>
+          <h2>Result:</h2>
+          <pre>{JSON.stringify(result, null, 2)}</pre>
+        </div>
+      )}
+      {error && (
+        <div>
+          <h2>Error:</h2>
+          <p>{error}</p>
+        </div>
+      )}
+    </section>
   );
 }

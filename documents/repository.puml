@@ -37,49 +37,51 @@ entity "ObjectData(S3)" as object_data {
   mime_type: string: MIMEタイプ(audio, image, text...)
   fileName: string: ファイル名
   comment: string: コメント
-  signed_uri: string: 署名済みURI
+  preSigned_uri: string: 署名済みURI
   versionId: string: バージョンID
   updated_at : string: 更新日時
   user_id: string: ユーザーID
 }
 
 entity "ETL(S3)" as etl {
-  +pah: string: userId=user_id/metaKey=meta_key/metaValue=meta_value/mimeType=mime_type/name?versionId [PK]
+  +pah: string: userId=user_id/metaKey=meta_key/metaValue=meta_value/mimeType=mime_type/fileName?versionId [PK]
   --
   meta_key: string: メタデータキー
   meta_value: string: メタデータバリュー
   mime_type: string: MIMEタイプ(audio, image, text...)
-  name: string: ファイル(テーブル)名
+  fileName: string: ファイル(テーブル)名
   versionId: string: バージョンID
   user_id: string: ユーザーID
 }
 
 entity "AI(S3)" as ai {
-  +pah: string: userId=user_id/metaKey=meta_key/metaValue=meta_value/aiType=ai_type/experimentName=experiment_name/step=step/experimentName?versionId [PK]
+  +pah: string: userId=user_id/metaKey=meta_key/metaValue=meta_value/aiType=ai_type/experimentName=experiment_name/step=step/fileName?versionId [PK]
   --
   meta_key: string: メタデータキー
   meta_value: string: メタデータバリュー
   ai_type: string: AIタイプ(画像認識, 音声認識, 動画認識...)
   experiment_name: string: 実験名
   step: string: 実験ステップ((ラベリング), (特徴量), (学習), 推論...)
+  fileName: string: ファイル名
   comment: string: コメント
   versionId: string: バージョンID
   user_id: string: ユーザーID
 }
 
 entity "Analytics(S3)" as analytics {
-  +pah: string: userId=user_id/metaKey=meta_key/metaValue=meta_value/analysisName=analysisName/analysisName?versionId [PK]
+  +pah: string: userId=user_id/metaKey=meta_key/metaValue=meta_value/analysisName=analysisName/fileName?versionId [PK]
   --
   meta_key: string: メタデータキー
   meta_value: string: メタデータバリュー
   analysisName: string: 分析名
+  fileName: string: ファイル名
   comment: string: コメント
   versionId: string: バージョンID
   user_id: string: ユーザーID
 }
 
 entity "Progress(DynamoDB)" as progress {
-  +progress_id: string: datetime.service_name_suffix (進捗ID) [PK]
+  +progress_id: string: service_name.datetime_suffix (進捗ID) [PK]
   --
   meta_key: string: メタデータキー
   meta_value: string: メタデータバリュー

@@ -86,7 +86,6 @@ export const authOptions = {
         }
         const user = await res.json();
 
-        console.log(`user: ${JSON.stringify(user)}`);
         if (res.ok && user) {
           return user; // Authentication success
         } else {
@@ -95,7 +94,7 @@ export const authOptions = {
       },
     }),
   ],
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.SECRET,
   session: {
     strategy: 'jwt',
     maxAge: 60 * 60, // Session expiration (e.g., 1 hour)
@@ -118,7 +117,6 @@ export const authOptions = {
       const redisSession = await getSessionFromRedis(token.sessionToken);
 
       if (redisSession) {
-        console.log(`Retrieved redisSession: ${JSON.stringify(redisSession)}`);
         session.user = {
           ...token, // Keep default JWT fields
           name: redisSession.name,
@@ -172,6 +170,7 @@ export const authOptions = {
           const updatedSession = await updateSessionInRedis(
             token.sessionToken,
             {
+              name: newAccessTokenData.user_name,
               accessToken: newAccessTokenData.access_token,
               refreshToken: newAccessTokenData.refresh_token,
               idToken: newAccessTokenData.id_token,
@@ -180,6 +179,7 @@ export const authOptions = {
           );
           token = {
             ...token,
+            name: updatedSession.name,
             accessToken: updatedSession.accessToken,
             refreshToken: updatedSession.refreshToken,
             idToken: updatedSession.idToken,

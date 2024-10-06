@@ -108,7 +108,7 @@ export class IRepository {
     metaValue,
     mimeType,
     fileName,
-    versionId,
+    versionId = undefined,
   }) {
     throw new Error('Not implemented');
   }
@@ -125,7 +125,14 @@ export class IRepository {
    * @param {InputObjectDetail} InputObjectDetail
    * @returns {Promise<Object>} Repositoryエンティティ
    */
-  async detail({ userId, metaKey, metaValue, mimeType, fileName, versionId }) {
+  async detail({
+    userId,
+    metaKey,
+    metaValue,
+    mimeType,
+    fileName,
+    versionId = undefined,
+  }) {
     throw new Error('Not implemented');
   }
 
@@ -148,8 +155,8 @@ export class IRepository {
     metaValue,
     mimeType,
     fileName,
-    versionId,
     comment,
+    versionId = undefined,
   }) {
     throw new Error('Not implemented');
   }
@@ -166,7 +173,14 @@ export class IRepository {
    * @param {InputObjectDelete} InputObjectDelete
    *@returns {Promise<Object>} Repositoryエンティティ
    */
-  async delete({ userId, metaKey, metaValue, mimeType, fileName, versionId }) {
+  async delete({
+    userId,
+    metaKey,
+    metaValue,
+    mimeType,
+    fileName,
+    versionId = undefined,
+  }) {
     throw new Error('Not implemented');
   }
 

@@ -1,79 +1,43 @@
 Resources:
-  UserAPIFreeUsagePlan:
+  UserAPIProdUsagePlan:
     Type: AWS::ApiGateway::UsagePlan
     Properties:
-      UsagePlanName: !Sub ${AWS::StackName}-userapi-free-plan
+      UsagePlanName: !Sub ${AWS::StackName}-userapi-prod-plan
       Description: Usage free plan for UserAPIUsagePlan
       Quota:
-        Limit: !Ref limitUserAPIFreeUsagePlan
+        Limit: !Ref limitUserAPIProdUsagePlan
         Period: MONTH
       Throttle:
-        BurstLimit: !Ref burstLimitUserAPIFreeUsagePlan
-        RateLimit: !Ref rateLimitUserAPIFreeUsagePlan
+        BurstLimit: !Ref burstLimitUserAPIProdUsagePlan
+        RateLimit: !Ref rateLimitUserAPIProdUsagePlan
       ApiStages:
         - ApiId: !ImportValue userAPIId
-          Stage: free
-  UserAPIFreeApiKey:
+          Stage: prod
+        - ApiId: !ImportValue userAPIId
+          Stage: dev
+  UserAPIProdApiKey:
     Type: AWS::ApiGateway::ApiKey
     Properties:
       Description: API key for UserAPIFreeApiKey
       Enabled: true
-      Name: !Sub ${AWS::StackName}-userapi-free-apikey
-  UserAPIFreeUsagePlanKey:
+      Name: !Sub ${AWS::StackName}-userapi-prod-apikey
+  UserAPIProdUsagePlanKey:
     Type: AWS::ApiGateway::UsagePlanKey
     Properties:
       KeyType: API_KEY
-      UsagePlanId: !Ref UserAPIFreeUsagePlan
-      KeyId: !Ref UserAPIFreeApiKey
-  UserAPIPaidUsagePlan:
-    Type: AWS::ApiGateway::UsagePlan
-    Properties:
-      UsagePlanName: !Sub ${AWS::StackName}-userapi-paid-plan
-      Description: Usage free plan for UserAPIUsagePlan
-      Quota:
-        Limit: !Ref limitUserAPIPaidUsagePlan
-        Period: MONTH
-      Throttle:
-        BurstLimit: !Ref burstLimitUserAPIPaidUsagePlan
-        RateLimit: !Ref rateLimitUserAPIPaidUsagePlan
-      ApiStages:
-        - ApiId: !ImportValue userAPIId
-          Stage: paid
-  UserAPIPaidApiKey:
-    Type: AWS::ApiGateway::ApiKey
-    Properties:
-      Description: API key for UserAPIFreeApiKey
-      Enabled: true
-      Name: !Sub ${AWS::StackName}-userapi-paid-apikey
-  UserAPIPaidUsagePlanKey:
-    Type: AWS::ApiGateway::UsagePlanKey
-    Properties:
-      KeyType: API_KEY
-      UsagePlanId: !Ref UserAPIPaidUsagePlan
-      KeyId: !Ref UserAPIPaidApiKey
+      UsagePlanId: !Ref UserAPIProdUsagePlan
+      KeyId: !Ref UserAPIProdApiKey
 Transform: AWS::Serverless-2016-10-31
 Parameters:
-  limitUserAPIFreeUsagePlan:
-    Type: Number
-    Description: maximum number of requests
-    Default: 500
-  burstLimitUserAPIFreeUsagePlan:
-    Type: Number
-    Description: allows more requests through for a period of time
-    Default: 20
-  rateLimitUserAPIFreeUsagePlan:
-    Type: Number
-    Description: request rate limit.
-    Default: 10
-  limitUserAPIPaidUsagePlan:
+  limitUserAPIProdUsagePlan:
     Type: Number
     Description: maximum number of requests
     Default: 5000
-  burstLimitUserAPIPaidUsagePlan:
+  burstLimitUserAPIProdUsagePlan:
     Type: Number
     Description: allows more requests through for a period of time
     Default: 200
-  rateLimitUserAPIPaidUsagePlan:
+  rateLimitUserAPIProdUsagePlan:
     Type: Number
     Description: request rate limit.
     Default: 100
