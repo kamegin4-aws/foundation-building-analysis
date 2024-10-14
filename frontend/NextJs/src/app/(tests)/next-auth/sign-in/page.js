@@ -13,20 +13,27 @@ export default function SignIn() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      // signIn関数を使ってクライアントサイドから認証リクエストを送信
+      const result = await signIn('credentials', {
+        redirect: false,
+        username,
+        password,
+      });
 
-    // signIn関数を使ってクライアントサイドから認証リクエストを送信
-    const result = await signIn('credentials', {
-      redirect: false,
-      username,
-      password,
-    });
-
-    if (result?.error) {
-      // エラーハンドリング
-      setError(result.error);
-    } else {
-      // 認証成功後のリダイレクトまたは他の処理
-      setResult(result);
+      if (result?.error) {
+        // エラーハンドリング
+        setError(result.error);
+      } else {
+        // 認証成功後のリダイレクトまたは他の処理
+        setResult(result);
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError('エラー');
+      }
     }
   };
 

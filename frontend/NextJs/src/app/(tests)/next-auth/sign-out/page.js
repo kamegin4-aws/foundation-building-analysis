@@ -11,6 +11,40 @@ export default function SignOutPage() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
+  const handSignOut = async () => {
+    try {
+      const url = `${process.env.NEXT_PUBLIC_BASE_PATH}/api/session/sign-out`;
+      const options = {
+        method: 'POST',
+        cache: 'no-cache',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          accessToken: session.user.accessToken,
+        }),
+      };
+
+      // @ts-ignore
+      const response = await fetch(url, options);
+
+      if (response.ok) {
+        signOut({
+          redirect: false,
+        });
+      }
+
+      setResult({ message: 'サインアウトしました' });
+    } catch (e) {
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError('エラー');
+      }
+    }
+  };
+
   useEffect(() => {
     const url = `${process.env.NEXT_PUBLIC_BASE_PATH}/api/session`;
     const options = {
@@ -54,35 +88,7 @@ export default function SignOutPage() {
   return (
     <div>
       <h1>SignOutPage</h1>
-      <button
-        onClick={async () => {
-          const url = `${process.env.NEXT_PUBLIC_BASE_PATH}/api/session/sign-out`;
-          const options = {
-            method: 'POST',
-            cache: 'no-cache',
-            mode: 'cors',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              accessToken: session.user.accessToken,
-            }),
-          };
-
-          // @ts-ignore
-          const response = await fetch(url, options);
-
-          if (response.ok) {
-            signOut({
-              redirect: false,
-            });
-          }
-
-          setResult({ message: 'サインアウトしました' });
-        }}
-      >
-        Sign Out
-      </button>
+      <button onClick={handSignOut}>Sign Out</button>
 
       <section>
         {result && (

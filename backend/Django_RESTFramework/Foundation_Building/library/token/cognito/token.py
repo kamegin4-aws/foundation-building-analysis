@@ -1,8 +1,7 @@
 import logging
 import traceback
 
-from backend.Django_RESTFramework.Foundation_Building.library.token.interface.cognito.token import \
-    IToken
+from library.token.interface.cognito.token import IToken
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

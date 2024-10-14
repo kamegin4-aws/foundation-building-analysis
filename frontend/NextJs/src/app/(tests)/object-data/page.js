@@ -1,8 +1,5 @@
-// app/object-test/page.js
-
 'use client';
 
-import logger from '@/library/logging/logger';
 import { S3Wrapper } from '@/library/repository/infrastructure/s3/s3_client';
 import { ObjectData } from '@/library/repository/objectData/repository';
 import React, { useEffect, useState } from 'react';
@@ -15,15 +12,15 @@ export default function ObjectDataPage() {
   const [fileName, setFileName] = useState('');
   const [body, setBody] = useState(null);
   const [comment, setComment] = useState('');
-  const [versionId, setVersionId] = useState('');
+  const [versionId, setVersionId] = useState(null);
   const [limit, setLimit] = useState(100);
   const [offset, setOffset] = useState(0);
-  const [orderBy, setOrderBy] = useState('');
-  const [searchValue, setSearchValue] = useState('');
+  const [orderBy, setOrderBy] = useState('-updatedAt');
+  const [searchValue, setSearchValue] = useState(null);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  const [objectData, setObjectData] = useState(undefined);
-  const [session, setSession] = useState(undefined);
+  const [objectData, setObjectData] = useState(null);
+  const [session, setSession] = useState(null);
 
   const handleUpload = async () => {
     try {
@@ -38,7 +35,11 @@ export default function ObjectDataPage() {
       });
       setResult(response);
     } catch (e) {
-      setError(e.message);
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError('エラー');
+      }
     }
   };
 
@@ -55,7 +56,11 @@ export default function ObjectDataPage() {
       });
       setResult(response);
     } catch (e) {
-      setError(e.message);
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError('エラー');
+      }
     }
   };
 
@@ -71,7 +76,11 @@ export default function ObjectDataPage() {
       });
       setResult(response);
     } catch (e) {
-      setError(e.message);
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError('エラー');
+      }
     }
   };
 
@@ -101,7 +110,11 @@ export default function ObjectDataPage() {
       const data = await response.json();
       setResult(data);
     } catch (e) {
-      setError(e.message);
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError('エラー');
+      }
     }
   };
 
@@ -117,7 +130,11 @@ export default function ObjectDataPage() {
       });
       setResult(response);
     } catch (e) {
-      setError(e.message);
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError('エラー');
+      }
     }
   };
 
@@ -133,7 +150,11 @@ export default function ObjectDataPage() {
       });
       setResult(response);
     } catch (e) {
-      setError(e.message);
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError('エラー');
+      }
     }
   };
 
@@ -148,7 +169,11 @@ export default function ObjectDataPage() {
       });
       setResult(response);
     } catch (e) {
-      setError(e.message);
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError('エラー');
+      }
     }
   };
 
@@ -165,7 +190,11 @@ export default function ObjectDataPage() {
       });
       setResult(response);
     } catch (e) {
-      setError(e.message);
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError('エラー');
+      }
     }
   };
 
@@ -180,7 +209,11 @@ export default function ObjectDataPage() {
       });
       setResult(response);
     } catch (e) {
-      setError(e.message);
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError('エラー');
+      }
     }
   };
 
@@ -202,7 +235,6 @@ export default function ObjectDataPage() {
           response
             .json()
             .then((data) => {
-              logger.info(`success for session: ${JSON.stringify(data)}`);
               setSession(data);
               setObjectData(
                 new ObjectData({
@@ -213,14 +245,14 @@ export default function ObjectDataPage() {
               );
             })
             .catch((error) => {
-              logger.error(`error for session: ${error.message}`);
+              setError(`error for session: ${error.message}`);
             });
         } else {
           throw new Error('Network response was not ok.');
         }
       })
       .catch((error) => {
-        logger.error(`error for session: ${error.message}`);
+        setError(`error for session: ${error.message}`);
       });
   }, []);
 
@@ -316,7 +348,7 @@ export default function ObjectDataPage() {
         <input
           type="text"
           value={orderBy}
-          onChange={(e) => setVersionId(e.target.value)}
+          onChange={(e) => setOrderBy(e.target.value)}
         />
       </div>
       <div>

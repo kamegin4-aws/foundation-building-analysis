@@ -14,10 +14,28 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import os
+from pathlib import Path
+
+import environ
 from django.contrib import admin
 from django.urls import include, path
+from library.env.env import str_to_bool
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('foundation_app/', include('foundation_app.urls'))
-]
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+env = environ.Env()
+# reading .env file
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+DEBUG = str_to_bool(env('DEBUG'))
+if DEBUG is not True:
+    urlpatterns = [
+        path('foundation-app/', include('foundation_app.urls'))
+    ]
+else:
+    urlpatterns = [
+        path('admin/', admin.site.urls),
+        path('foundation-app/', include('foundation_app.urls'))
+    ]
